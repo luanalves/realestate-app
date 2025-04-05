@@ -1,0 +1,49 @@
+type Query {
+    _empty: String
+}
+type Mutation {
+    createUser(input: CreateUserInput!): User @field(resolver: "Modules\\UserManagement\\Http\\Controllers\\UserResolver@create")
+}
+
+type Mutation {
+    login(email: String!, password: String!): LoginResponse!
+    @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
+}
+
+input CreateUserInput {
+    name: String!
+    email: String!
+    password: String!
+    role_id: ID!
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    role: Role
+}
+
+type Role {
+    id: ID!
+    name: String!
+    description: String
+}
+
+type Mutation {
+    login(email: String!, password: String!): LoginResponse!
+}
+
+type LoginResponse {
+    access_token: String!
+    token_type: String!
+    expires_in: Int!
+    user: User!
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    role: String!
+}
