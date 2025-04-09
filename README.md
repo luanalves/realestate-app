@@ -147,3 +147,34 @@ Todos os dados daquele módulo sejam populados corretamente.
 - [ ] Atualizar README.md com a descrição do novo módulo
 
 ---
+
+// ...existing code...
+- [ ] Atualizar README.md com a descrição do novo módulo
+
+---
+
+## 🚀 Processo de Soft Launch
+
+### 🔐 Chaves de Segurança OAuth
+
+As chaves OAuth do Laravel Passport (`oauth-private.key` e `oauth-public.key`) devem ser tratadas com segurança:
+
+- **NÃO comite estes arquivos no controle de versão**
+- Adicione-os ao `.gitignore`:
+  ```
+  /storage/oauth-*.key
+  ```
+- Gere as chaves durante a implantação:
+  ```bash
+  cd ../realestate-infra && docker compose exec app php artisan passport:keys
+  ```
+- Configure permissões adequadas em produção:
+  ```bash
+  cd ../realestate-infra && docker compose exec app chmod 600 storage/oauth-private.key
+  ```
+- Durante o pipeline de CI/CD, garanta que as chaves sejam geradas como parte do processo de implantação
+- Para desenvolvimento local, execute o comando de geração de chaves após a configuração inicial
+
+Estas chaves são componentes críticos de segurança que assinam e verificam tokens de autenticação para sua API. Chaves comprometidas podem permitir acesso não autorizado à API.
+
+---
