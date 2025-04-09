@@ -6,6 +6,21 @@
 - **Architecture**: Modular architecture
 - **Languages**: PHP, JavaScript, SQL
 - **Package Managers**: Composer, NPM, Pip (Python)
+- **Infrastructure**: Docker containerized application
+
+## Docker Environment
+
+- The project uses Docker for local development and deployment
+- Docker configuration files are located in `../realestate-infra/`
+- To execute commands in the application container, use:
+  ```bash
+  cd ../realestate-infra && docker compose exec app [command]
+  ```
+- Example for running artisan commands:
+  ```bash
+  cd ../realestate-infra && docker compose exec app php artisan [command]
+  ```
+- All PHP commands should be executed in the Docker container, not locally
 
 ## Key Architectural Principles
 

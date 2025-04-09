@@ -13,7 +13,7 @@ return new class extends Migration
     {
       Schema::dropIfExists('oauth_clients');
       Schema::create('oauth_clients', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('name');
             $table->string('secret', 100)->nullable();

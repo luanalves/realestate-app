@@ -7,13 +7,28 @@ use Illuminate\Support\Facades\DB;
 
 class RolesSeeder extends Seeder
 {
+    public const ROLE_SUPER_ADMIN = 'super_admin';
+    public const ROLE_REAL_ESTATE_ADMIN = 'real_estate_admin';
+    public const ROLE_REAL_ESTATE_AGENT = 'real_estate_agent';
+    public const ROLE_CLIENT = 'client';
+
+    public const ROLES = [
+        self::ROLE_SUPER_ADMIN => 'Administrador geral do sistema',
+        self::ROLE_REAL_ESTATE_ADMIN => 'Administrador da imobiliária',
+        self::ROLE_REAL_ESTATE_AGENT => 'Funcionário da imobiliária',
+        self::ROLE_CLIENT => 'Cliente da imobiliária',
+    ];
+
     public function run(): void
     {
-        DB::table('roles')->insert([
-            ['name' => 'super_admin', 'description' => 'Administrador geral do sistema'],
-            ['name' => 'real_estate_admin', 'description' => 'Administrador da imobiliária'],
-            ['name' => 'real_estate_agent', 'description' => 'Funcionário da imobiliária'],
-            ['name' => 'client', 'description' => 'Cliente da imobiliária'],
-        ]);
+        $roles = [];
+        foreach (self::ROLES as $name => $description) {
+            $roles[] = [
+                'name' => $name,
+                'description' => $description
+            ];
+        }
+
+        DB::table('roles')->insert($roles);
     }
 }

@@ -1,6 +1,18 @@
+"""
+User management related queries
+"""
 type Query {
-    _empty: String
+    """
+    Get currently authenticated user
+    """
+    me: User @auth
+    
+    """
+    Get all users (requires authentication)
+    """
+    users: [User!]! @auth
 }
+
 type Mutation {
     createUser(input: CreateUserInput!): User @field(resolver: "Modules\\UserManagement\\Http\\Controllers\\UserResolver@create")
 }
@@ -17,11 +29,15 @@ input CreateUserInput {
     role_id: ID!
 }
 
+"""
+User object
+"""
 type User {
     id: ID!
     name: String!
     email: String!
-    role: Role
+    created_at: String
+    updated_at: String
 }
 
 type Role {
@@ -30,20 +46,9 @@ type Role {
     description: String
 }
 
-type Mutation {
-    login(email: String!, password: String!): LoginResponse!
-}
-
 type LoginResponse {
     access_token: String!
     token_type: String!
     expires_in: Int!
     user: User!
-}
-
-type User {
-    id: ID!
-    name: String!
-    email: String!
-    role: String!
 }
