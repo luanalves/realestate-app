@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @author      Luan Silva
+ * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
+ * @license     https://www.thedevkitchen.com.br  Copyright
+ */
+
+declare(strict_types=1);
+
 namespace Modules\UserManagement\Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -10,9 +18,9 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-      $adminRoleId = DB::table('roles')->where('name', RolesSeeder::ROLE_SUPER_ADMIN)->value('id');
+        $adminRoleId = DB::table('roles')->where('name', RolesSeeder::ROLE_SUPER_ADMIN)->value('id');
 
-        if (!DB::table('users')->where('email', 'contato@thedevkitchen.com.br')->exists()) {
+        if (! DB::table('users')->where('email', 'contato@thedevkitchen.com.br')->exists()) {
             DB::table('users')->insert([
                 'name' => 'the dev kitchen',
                 'email' => 'contato@thedevkitchen.com.br',

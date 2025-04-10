@@ -1,14 +1,22 @@
 <?php
 
+/**
+ * @author      Luan Silva
+ * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
+ * @license     https://www.thedevkitchen.com.br  Copyright
+ */
+
+declare(strict_types=1);
+
 namespace Modules\UserManagement\GraphQL\Mutations;
 
-use Illuminate\Support\Facades\Http;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class Login
 {
-    public function __invoke(null $_, array $args)
+    public function __invoke($_, array $args)
     {
         $validator = Validator::make($args, [
             'email' => ['required', 'email'],
@@ -17,7 +25,7 @@ class Login
 
         $validator->validate();
 
-        $http = Http::asForm()->post(config('app.url') . '/oauth/token', [
+        $http = Http::asForm()->post(config('app.url').'/oauth/token', [
             'grant_type' => 'password',
             'client_id' => env('PASSPORT_CLIENT_ID'),
             'client_secret' => env('PASSPORT_CLIENT_SECRET'),
@@ -26,7 +34,7 @@ class Login
             'scope' => '',
         ]);
 
-        if (!$http->ok()) {
+        if (! $http->ok()) {
             abort(401, 'Credenciais inválidas');
         }
 

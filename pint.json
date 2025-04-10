@@ -1,0 +1,13 @@
+{
+    "preset": "psr12",
+    "ide": true,
+    "exclude": [
+        "vendor",
+        "node_modules",
+        "storage",
+        "bootstrap/cache"
+    ],
+    "notPath": [
+        "Modules/**/GraphQL/schema.graphql"
+    ]
+}

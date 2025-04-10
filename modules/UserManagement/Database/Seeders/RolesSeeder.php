@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @author      Luan Silva
+ * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
+ * @license     https://www.thedevkitchen.com.br  Copyright
+ */
+
+declare(strict_types=1);
+
 namespace Modules\UserManagement\Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -8,8 +16,11 @@ use Illuminate\Support\Facades\DB;
 class RolesSeeder extends Seeder
 {
     public const ROLE_SUPER_ADMIN = 'super_admin';
+
     public const ROLE_REAL_ESTATE_ADMIN = 'real_estate_admin';
+
     public const ROLE_REAL_ESTATE_AGENT = 'real_estate_agent';
+
     public const ROLE_CLIENT = 'client';
 
     public const ROLES = [
@@ -25,7 +36,7 @@ class RolesSeeder extends Seeder
         foreach (self::ROLES as $name => $description) {
             $roles[] = [
                 'name' => $name,
-                'description' => $description
+                'description' => $description,
             ];
         }
 

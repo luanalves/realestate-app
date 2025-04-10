@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-      Schema::dropIfExists('oauth_personal_access_clients');
+        Schema::dropIfExists('oauth_personal_access_clients');
 
-      Schema::create('oauth_personal_access_clients', function (Blueprint $table) {
+        Schema::create('oauth_personal_access_clients', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->uuid('client_id');
             $table->timestamps();

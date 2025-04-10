@@ -53,10 +53,26 @@ Each module should follow this structure:
 
 ## Code Practices
 
+- Follow PHP Standards Recommendations (PSRs):
+  - PSR-1: Basic Coding Standard
+  - PSR-4: Autoloader
+  - PSR-7: HTTP Message Interface
+  - PSR-11: Container Interface
+  - PSR-12: Extended Coding Style Guide
+  - PSR-14: Event Dispatcher
 - Use constants for values that are reused across the application
 - Document complex logic with comments
 - Write tests for critical functionality
 - Keep controllers thin, use services for business logic
+- All PHP files must include `declare(strict_types=1);` at the top of the file
+- All files must include the following comment block at the beginning:
+  ```php
+  /**
+   * @author      Luan Silva
+   * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
+   * @license     https://www.thedevkitchen.com.br  Copyright
+   */
+  ```
 
 ## User Management Module
 

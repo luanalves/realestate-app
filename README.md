@@ -19,6 +19,13 @@ O projeto segue princípios de arquitetura limpa, DDD e modularização baseada 
   - Migrations
   - Seeders
   - GraphQL Schemas
+- 📏 **Padrões PSR implementados**:
+  - PSR-1: Basic Coding Standard
+  - PSR-4: Autoloader
+  - PSR-7: HTTP Message Interface
+  - PSR-11: Container Interface
+  - PSR-12: Extended Coding Style Guide
+  - PSR-14: Event Dispatcher
 
 ---
 
@@ -148,7 +155,6 @@ Todos os dados daquele módulo sejam populados corretamente.
 
 ---
 
-// ...existing code...
 - [ ] Atualizar README.md com a descrição do novo módulo
 
 ---
