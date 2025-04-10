@@ -2,11 +2,28 @@
 
 ## Project Architecture
 
-- **Framework**: Laravel
+- **Framework**: Laravel with GraphQL using Lighthouse PHP
 - **Architecture**: Modular architecture
 - **Languages**: PHP, JavaScript, SQL
 - **Package Managers**: Composer, NPM, Pip (Python)
 - **Infrastructure**: Docker containerized application
+
+## API Architecture
+
+- **IMPORTANT**: This project uses GraphQL exclusively, NOT REST APIs
+- All API endpoints must be implemented as GraphQL queries and mutations
+- Do not create REST controllers or API routes
+- Use Lighthouse PHP directives for simple CRUD operations
+- Create custom resolver classes for complex operations
+
+## GraphQL Implementation
+
+- Schema files (.graphql) define the API contract and are located in each module's GraphQL directory
+- Use schema-first development (define types before implementing resolvers)
+- Create resolver classes in GraphQL/Queries and GraphQL/Mutations directories
+- Extend existing types with `extend type Query` and `extend type Mutation`
+- Implement authentication with `@auth` directive
+- Test queries using GraphQL Playground at `/graphql-playground`
 
 ## Docker Environment
 
@@ -42,10 +59,31 @@
 ## Module Structure
 
 Each module should follow this structure:
+```
+ModuleName/
+├── Database/
+│   ├── Migrations/
+│   └── Seeders/
+├── GraphQL/
+│   ├── Mutations/
+│   ├── Queries/
+│   └── schema.graphql
+├── Http/
+│   ├── Controllers/ (Only for web controllers, NOT for API)
+│   ├── Middleware/
+│   └── Requests/
+├── Models/
+├── Providers/
+│   └── ModuleNameServiceProvider.php
+├── Services/
+└── Tests/
+```
 
 ## Naming Conventions
 
-- **Classes**: PascalCase (e.g., `UserController`)
+- **Classes**: PascalCase (e.g., `UserResolver`)
+- **GraphQL Types**: PascalCase (e.g., `User`, `CreateUserInput`)
+- **GraphQL Fields**: camelCase (e.g., `userName`, `emailAddress`)
 - **Methods**: camelCase (e.g., `getUserById()`)
 - **Variables**: camelCase (e.g., `$userName`)
 - **Constants**: UPPER_SNAKE_CASE (e.g., `ROLE_SUPER_ADMIN`)
@@ -63,7 +101,7 @@ Each module should follow this structure:
 - Use constants for values that are reused across the application
 - Document complex logic with comments
 - Write tests for critical functionality
-- Keep controllers thin, use services for business logic
+- Keep resolvers thin, use services for business logic
 - All PHP files must include `declare(strict_types=1);` at the top of the file
 - All files must include the following comment block at the beginning:
   ```php
@@ -79,8 +117,16 @@ Each module should follow this structure:
 This module handles user authentication, roles, and permissions:
 
 - Constants for roles are defined in `RolesSeeder.php`
-- User creation and management handled in appropriate controllers
+- User creation and management handled through GraphQL mutations
 - Role hierarchy: super_admin > real_estate_admin > real_estate_agent > client
+
+## GraphQL Development Process
+
+1. Define new types and operations in the module's schema.graphql file
+2. Create necessary input types for mutations
+3. Implement resolver classes in GraphQL/Mutations or GraphQL/Queries directories
+4. Use directives like @auth, @find, @all for common operations
+5. Implement custom logic in resolver classes when needed
 
 ## Database Seeding
 

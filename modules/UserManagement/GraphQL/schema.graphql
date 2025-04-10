@@ -10,16 +10,35 @@ type Query {
     """
     Get all users (requires authentication)
     """
-    users: [User!]! @auth
+    users: [User!]! @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\Users")
+
+    """
+    Get a user by ID (requires authentication)
+    """
+    user(id: ID!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\User")
 }
 
 type Mutation {
-    createUser(input: CreateUserInput!): User @field(resolver: "Modules\\UserManagement\\Http\\Controllers\\UserResolver@create")
-}
+    """
+    Create a new user
+    """
+    createUser(input: CreateUserInput!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\CreateUser")
+    
+    """
+    Update an existing user
+    """
+    updateUser(id: ID!, input: UpdateUserInput!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdateUser")
+    
+    """
+    Delete a user
+    """
+    deleteUser(id: ID!): DeleteUserResponse @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\DeleteUser")
 
-type Mutation {
+    """
+    Login a user
+    """
     login(email: String!, password: String!): LoginResponse!
-    @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
 }
 
 input CreateUserInput {
@@ -29,6 +48,13 @@ input CreateUserInput {
     role_id: ID!
 }
 
+input UpdateUserInput {
+    name: String
+    email: String
+    password: String
+    role_id: ID
+}
+
 """
 User object
 """
@@ -36,6 +62,7 @@ type User {
     id: ID!
     name: String!
     email: String!
+    role: Role @belongsTo
     created_at: String
     updated_at: String
 }
@@ -44,6 +71,7 @@ type Role {
     id: ID!
     name: String!
     description: String
+    users: [User!]! @hasMany
 }
 
 type LoginResponse {
@@ -51,4 +79,9 @@ type LoginResponse {
     token_type: String!
     expires_in: Int!
     user: User!
+}
+
+type DeleteUserResponse {
+    success: Boolean!
+    message: String!
 }
