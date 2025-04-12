@@ -12,7 +12,9 @@ namespace Modules\UserManagement\GraphQL\Mutations;
 
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeleteUser
@@ -25,9 +27,15 @@ class DeleteUser
      * @param GraphQLContext $context Arbitrary data that is shared between all fields of a single query
      * @param ResolveInfo $resolveInfo Information about the query itself
      * @return array
+     * @throws \Nuwave\Lighthouse\Exceptions\AuthenticationException
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
+        // Check if user is authenticated using the 'api' guard specifically
+        if (!Auth::guard('api')->check()) {
+            throw new AuthenticationException('You need to be authenticated to delete a user');
+        }
+        
         $user = User::findOrFail($args['id']);
         
         try {

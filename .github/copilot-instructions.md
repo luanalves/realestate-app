@@ -120,6 +120,37 @@ This module handles user authentication, roles, and permissions:
 - User creation and management handled through GraphQL mutations
 - Role hierarchy: super_admin > real_estate_admin > real_estate_agent > client
 
+## Authentication
+
+- This project uses **Laravel Passport** for OAuth token authentication
+- Authentication is integrated with GraphQL using the `@auth` directive from Lighthouse
+- Token-based authentication is implemented for all API endpoints
+- Access tokens are required in the Authorization header (Bearer token)
+- User permissions are checked based on their assigned role
+- Authentication directives should be used on all protected queries and mutations
+
+### OAuth Token Endpoint
+
+- OAuth token endpoint is available at `/oauth/token`
+- Use the password grant type for user authentication
+- Required parameters:
+  - `grant_type=password`
+  - `client_id` - From the `oauth_clients` table
+  - `client_secret` - From the `oauth_clients` table
+  - `username` - User's email address
+  - `password` - User's password
+- Common errors:
+  - "invalid_grant" - Check if user exists and credentials are correct
+  - "invalid_client" - Verify client_id and client_secret are valid
+  - "invalid_request" - Ensure all required parameters are included
+
+### Troubleshooting Authentication
+
+- Ensure the Passport client exists in the database (`php artisan passport:client`)
+- Verify user email and password are correct
+- Check if user account is active and not locked
+- For local development, use the test seeded users or create new ones via GraphQL
+
 ## GraphQL Development Process
 
 1. Define new types and operations in the module's schema.graphql file

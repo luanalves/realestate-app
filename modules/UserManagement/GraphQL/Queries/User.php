@@ -30,8 +30,8 @@ class User
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
-        // Check if user is authenticated
-        if (!Auth::guard()->check()) {
+        // Check if user is authenticated using the 'api' guard specifically
+        if (!Auth::guard('api')->check()) {
             throw new AuthenticationException('You need to be authenticated to access this resource');
         }
 
