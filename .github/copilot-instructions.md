@@ -165,6 +165,275 @@ This module handles user authentication, roles, and permissions:
 - Role constants should be referenced from `RolesSeeder` class (e.g., `RolesSeeder::ROLE_SUPER_ADMIN`)
 - Avoid hardcoding values that are defined as constants
 
+## Testing Guidelines
+
+### Test Structure
+
+- Tests should be organized in the `tests/` directory following the Laravel convention:
+  - `tests/Unit/` for unit tests that test isolated components
+  - `tests/Feature/` for feature tests that test the application as a whole
+  - Module-specific tests should be placed under a subdirectory matching the module name:
+    ```
+    tests/Feature/UserManagement/
+    tests/Feature/Properties/
+    tests/Feature/UserPreferences/
+    ```
+
+### GraphQL Test Requirements
+
+When writing tests for GraphQL functionality:
+
+1. **Test Isolation**
+   - Tests should be independent of the actual database state
+   - Use mocks instead of database interactions to avoid test failures due to data inconsistencies
+   - Tests should pass regardless of the environment they run in
+
+2. **Authentication in Tests**
+   - Use Laravel Passport's `Passport::actingAs()` method to mock authentication
+   - When using mock User objects with Passport, implement the following method expectations:
+     ```php
+     $mockUser = Mockery::mock(User::class)->makePartial();
+     $mockUser->shouldReceive('getAuthIdentifier')->andReturn(1);
+     $mockUser->shouldReceive('withAccessToken')->andReturnSelf();
+     ```
+
+3. **Test Organization**
+   - Create separate test files based on functionality (e.g., UserGraphQLTest, UserGraphQLValidationTest)
+   - For each API operation, test both successful scenarios and error cases
+   - Use descriptive test method names that clearly indicate what's being tested
+
+4. **Running Tests**
+   - Tests must be executed within the Docker container:
+     ```bash
+     cd ../realestate-infra && docker compose exec app php artisan test
+     ```
+   - To run a specific test file:
+     ```bash
+     cd ../realestate-infra && docker compose exec app php artisan test --filter=UserGraphQLTest
+     ```
+   - To run a specific test method:
+     ```bash
+     cd ../realestate-infra && docker compose exec app php artisan test --filter=UserGraphQLTest::testQueryUsers
+     ```
+
+### Standard Test Structure
+
+All test classes must follow this structure:
+
+```php
+<?php
+
+/**
+ * @author      Luan Silva
+ * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
+ * @license     https://www.thedevkitchen.com.br  Copyright
+ */
+
+declare(strict_types=1);
+
+namespace Tests\Feature\ModuleName;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Passport\Passport;
+use Mockery;
+use Tests\TestCase;
+
+class FeatureGraphQLTest extends TestCase
+{
+    use WithFaker;
+    
+    /**
+     * Mock user for testing
+     */
+    protected $mockUser;
+
+    /**
+     * Setup the test environment.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Create a mock user for authentication
+        $this->mockUser = Mockery::mock(User::class)->makePartial();
+        $this->mockUser->shouldReceive('getAuthIdentifier')->andReturn(1);
+        $this->mockUser->shouldReceive('withAccessToken')->andReturnSelf();
+        
+        // Authenticate with Laravel Passport
+        Passport::actingAs($this->mockUser);
+    }
+    
+    /**
+     * Clean up the testing environment.
+     */
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+
+    /**
+     * Test description here.
+     */
+    public function testFeatureName(): void
+    {
+        // Arrange - Set up test data
+        // ...
+        
+        // Act - Perform the action being tested
+        // ...
+        
+        // Assert - Verify the results
+        $this->assertTrue(true, 'Descriptive assertion message');
+    }
+}
+```
+
+### Testing GraphQL Queries and Mutations
+
+For testing GraphQL queries:
+
+```php
+/**
+ * Test getting a list of resources through GraphQL.
+ */
+public function testQueryResources(): void
+{
+    // Prepare mock response data
+    $expectedData = [
+        'data' => [
+            'resources' => [
+                [
+                    'id' => '1',
+                    'name' => 'Resource Name',
+                    'type' => 'Resource Type'
+                ]
+            ]
+        ]
+    ];
+
+    // If making an actual request (use cautiously):
+    $response = $this->postJson('/graphql', [
+        'query' => '
+            query {
+                resources {
+                    id
+                    name
+                    type
+                }
+            }
+        '
+    ]);
+    
+    // Assert response meets expectations
+    $response->assertStatus(200)
+        ->assertJson($expectedData);
+}
+```
+
+### Testing Validation and Error Cases
+
+For testing validation errors:
+
+```php
+/**
+ * Test validation error when creating a resource with invalid data.
+ */
+public function testCreateResourceWithInvalidData(): void
+{
+    // Make the GraphQL request with invalid data
+    $response = $this->postJson('/graphql', [
+        'query' => '
+            mutation {
+                createResource(input: {
+                    name: "",  # Invalid: empty name
+                    type: "InvalidType"  # Invalid: wrong type
+                }) {
+                    id
+                    name
+                    type
+                }
+            }
+        '
+    ]);
+    
+    // Assert validation error is returned
+    $response->assertJson([
+        'errors' => [
+            [
+                'message' => 'Validation failed for the field [createResource].',
+                'extensions' => [
+                    'validation' => [
+                        'input.name' => [
+                            'The name field is required.'
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ]);
+}
+```
+
+### Testing Authentication Requirements
+
+For testing authentication requirements:
+
+```php
+/**
+ * Test authentication is required for protected queries.
+ */
+public function testAuthenticationRequiredForQuery(): void
+{
+    // Remove authentication
+    Passport::actingAs(null);
+    
+    // Make the GraphQL request without authentication
+    $response = $this->postJson('/graphql', [
+        'query' => '
+            query {
+                protectedResources {
+                    id
+                    name
+                }
+            }
+        '
+    ]);
+    
+    // Assert that authentication error is returned
+    $response->assertJson([
+        'errors' => [
+            [
+                'message' => 'Unauthenticated.'
+            ]
+        ]
+    ]);
+}
+```
+
+### Test Coverage Requirements
+
+- All GraphQL queries must have corresponding tests
+- All GraphQL mutations must have corresponding tests
+- Test coverage should include:
+  - Successful operations (happy path)
+  - Authentication requirements
+  - Validation errors
+  - Authorization checks
+  - Edge cases (e.g., non-existent resources)
+
+### Testing Best Practices
+
+1. Follow the Arrange-Act-Assert pattern in tests
+2. Use meaningful assertions that verify actual behavior
+3. Document complex test scenarios with comments
+4. Each test method should focus on testing a single aspect of functionality
+5. Prefer simpler, focused tests over complex, multi-assertion tests
+6. Mock external dependencies when appropriate
+7. Keep tests independent of each other
+8. Test both success and failure scenarios
+
 ## Dependencies
 
 - Always specify explicit versions in `composer.json` and `package.json`
