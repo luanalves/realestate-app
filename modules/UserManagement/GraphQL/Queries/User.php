@@ -12,9 +12,10 @@ namespace Modules\UserManagement\GraphQL\Queries;
 
 use App\Models\User as UserModel;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Facades\Auth;
-use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class User
 {

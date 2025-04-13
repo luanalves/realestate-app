@@ -14,6 +14,8 @@ use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Hash;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Support\Facades\Auth;
+use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class CreateUser
 {
@@ -28,6 +30,10 @@ class CreateUser
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): User
     {
+        // Check if user is authenticated using the 'api' guard specifically
+        if (!Auth::guard('api')->check()) {
+            throw new AuthenticationException('You need to be authenticated to delete a user');
+        }
         $input = $args['input'];
         
         // Hash the password

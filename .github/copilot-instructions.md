@@ -438,3 +438,18 @@ public function testAuthenticationRequiredForQuery(): void
 
 - Always specify explicit versions in `composer.json` and `package.json`
 - Document any third-party integrations in module README files
+
+## Help Commands
+
+### update password
+```php
+app php artisan tinker
+$user = App\Models\User::where('email', 'contato@thedevkitchen.com.br')->first();
+$user->password = Hash::make('senha123');
+$user->save();
+```
+
+### Create oauth token
+```php
+php artisan passport:client --client
+```
