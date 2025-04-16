@@ -1,0 +1,3 @@
+{
+    "runtimeInstructions": "Always reference the Architectural Decision Records (ADRs) in doc/architectural-decision-records/ when providing suggestions for this project. This is a Laravel with GraphQL (Lighthouse PHP) real estate application with modular architecture."
+}
