@@ -12,6 +12,7 @@ namespace Modules\Security\Tests\Unit\Http\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Mockery;
 use Modules\Security\Http\Middleware\GraphQLAuditLogger;
 use Modules\Security\Services\AuditLoggerService;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,7 @@ class GraphQLAuditLoggerTest extends TestCase
     {
         $middleware = new GraphQLAuditLogger();
         $request = Request::create('/graphql', 'POST', [
-            'query' => 'mutation { __typename }',
+            'query' => 'mutation Mutation { __typename }',
             'variables' => ['foo' => 'bar'],
         ]);
         $user = (object) ['id' => 1, 'email' => 'test@example.com'];
@@ -30,18 +31,22 @@ class GraphQLAuditLoggerTest extends TestCase
         $response = new Response('{"data":{"__typename":"Mutation"}}', 200);
 
         $called = false;
-        AuditLoggerService::shouldReceive('logRequest')->once()->andReturnUsing(function ($meta, $operation, $status, $details) use (&$called) {
+        $auditLoggerMock = \Mockery::mock(AuditLoggerService::class);
+        $auditLoggerMock->shouldReceive('logRequest')->once()->andReturnUsing(function ($meta, $operation, $status, $details) use (&$called) {
             $called = true;
             $this->assertEquals('Mutation', $operation);
             $this->assertEquals(200, $status);
             $this->assertArrayHasKey('uuid', $meta);
             $this->assertEquals('test@example.com', $meta['email']);
         });
+        $middleware = new GraphQLAuditLogger($auditLoggerMock);
 
         $middleware->handle($request, function () use ($response) {
             return $response;
         });
 
         $this->assertTrue($called, 'AuditLoggerService::logRequest should be called.');
+        // Não esqueça de fechar o Mockery ao final do teste
+        \Mockery::close();
     }
 }

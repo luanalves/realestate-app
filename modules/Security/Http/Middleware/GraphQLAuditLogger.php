@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Luan Silva
  * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
@@ -8,15 +9,21 @@ declare(strict_types=1);
 
 namespace Modules\Security\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Modules\Security\Services\AuditLoggerService;
 
 class GraphQLAuditLogger
 {
-    public function handle(Request $request, Closure $next)
+    protected AuditLoggerService $auditLoggerService;
+
+    public function __construct(?AuditLoggerService $auditLoggerService = null)
+    {
+        $this->auditLoggerService = $auditLoggerService ?? new AuditLoggerService();
+    }
+
+    public function handle(Request $request, \Closure $next)
     {
         $response = $next($request);
 
@@ -40,7 +47,7 @@ class GraphQLAuditLogger
                 ],
             ];
 
-            AuditLoggerService::logRequest([
+            $this->auditLoggerService->logRequest([
                 'uuid' => $uuid,
                 'user_id' => $user?->id,
                 'email' => $user?->email,
@@ -57,10 +64,13 @@ class GraphQLAuditLogger
 
     protected function getOperationName(?string $query): ?string
     {
-        if (!$query) return null;
+        if (!$query) {
+            return null;
+        }
         if (preg_match('/(mutation|query)\s+(\w+)/', $query, $matches)) {
             return $matches[2] ?? null;
         }
+
         return null;
     }
 }
