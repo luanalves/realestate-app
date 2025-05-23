@@ -467,3 +467,29 @@ $user->save();
 ```php
 php artisan passport:client --client
 ```
+
+## Como Executar os Testes (Testes Unitários e de Integração)
+
+- Todos os testes devem ser executados dentro do container Docker da aplicação.
+- Para rodar todos os testes:
+  ```bash
+  cd ../realestate-infra && docker compose exec app php artisan test
+  ```
+- Para rodar um arquivo de teste específico:
+  ```bash
+  cd ../realestate-infra && docker compose exec app php artisan test --filter=NomeDoArquivoDeTeste
+  ```
+  Exemplo:
+  ```bash
+  cd ../realestate-infra && docker compose exec app php artisan test --filter=AuditLoggerServiceTest
+  ```
+- Para rodar um método de teste específico:
+  ```bash
+  cd ../realestate-infra && docker compose exec app php artisan test --filter=NomeDoArquivoDeTeste::nomeDoMetodoDeTeste
+  ```
+  Exemplo:
+  ```bash
+  cd ../realestate-infra && docker compose exec app php artisan test --filter=AuditLoggerServiceTest::testLogRequestPersistsToPostgresAndMongo
+  ```
+- Os resultados dos testes serão exibidos diretamente no terminal, indicando sucesso, falha ou testes arriscados.
+- Certifique-se de que todas as dependências estejam instaladas e o ambiente Docker esteja rodando antes de executar os testes.
