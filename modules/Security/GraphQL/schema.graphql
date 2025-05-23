@@ -1,0 +1,26 @@
+# GraphQL schema for Security module audit log queries
+
+type AuditLog {
+  id: ID!
+  uuid: String!
+  userId: ID
+  email: String
+  operation: String!
+  module: String
+  ip: String
+  status: String
+  createdAt: DateTime!
+}
+
+type AuditLogDetails {
+  uuid: String!
+  variables: JSON
+  fullQuery: String
+  headers: JSON
+  response: JSON
+}
+
+extend type Query {
+  auditLogs(userId: ID, operation: String, status: String, dateFrom: DateTime, dateTo: DateTime): [AuditLog!]! @auth
+  auditLogDetails(uuid: String!): AuditLogDetails @auth
+}
