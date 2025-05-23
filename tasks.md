@@ -1,3 +1,19 @@
+## Important Note on Testing
+
+Whenever you finish a task, always run the unit tests to ensure that no existing functionality is broken and that your new feature is covered by tests. Use the command below inside the Docker container:
+
+```bash
+cd ../realestate-infra && docker compose exec app php artisan test
+```
+
+To run a specific test file:
+
+```bash
+cd ../realestate-infra && docker compose exec app php artisan test --filter=TestFileName
+```
+
+> **Attention:** Do not consider a task complete until you have run the unit tests and confirmed that all tests pass.
+
 # Real Estate App Development Tasks
 
 This file contains a list of features that need to be implemented in the real estate application. GitHub Copilot can use this file to understand what needs to be built and generate the necessary code.
@@ -45,6 +61,12 @@ When adding a new task, copy and paste this template and fill it out:
 #### Test Cases
 - [Test case 1]
 - [Test case 2]
+
+> **Important:** Each task must include its own unit tests covering all critical scenarios. After implementing the task and its tests, always run the full application test suite to ensure nothing else is broken:
+>
+> ```bash
+> cd ../realestate-infra && docker compose exec app php artisan test
+> ```
 
 #### Additional Notes
 [Any additional information that might be helpful]
@@ -124,6 +146,12 @@ mutation {
 - Test validation errors for password too short
 - Test validation errors for password confirmation mismatch
 - Test unique email constraint validation
+
+> **Important:** Each task must include its own unit tests covering all critical scenarios. After implementing the task and its tests, always run the full application test suite to ensure nothing else is broken:
+>
+> ```bash
+> cd ../realestate-infra && docker compose exec app php artisan test
+> ```
 
 #### Additional Notes
 This mutation should be accessible without authentication and should follow the OAuth2 flow defined in ADR-0004. The token returned should be a valid OAuth access token generated through Laravel Passport.
@@ -301,6 +329,12 @@ query {
 - Test sorting by different fields
 - Test with no filters returns all properties
 - Test with invalid filter values returns appropriate errors
+
+> **Important:** Each task must include its own unit tests covering all critical scenarios. After implementing the task and its tests, always run the full application test suite to ensure nothing else is broken:
+>
+> ```bash
+> cd ../realestate-infra && docker compose exec app php artisan test
+> ```
 
 #### Additional Notes
 This query should be accessible without authentication for basic property information, but detailed contact information might require authentication. Consider implementing caching for frequent searches.
