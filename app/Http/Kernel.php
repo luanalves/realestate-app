@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Luan Silva
  * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
@@ -29,11 +30,6 @@ class Kernel extends HttpKernel
     protected $middlewareGroups = [
         'web' => [
             // ...existing code...
-        ],
-
-        'api' => [
-            // ...existing code...
-            \Modules\Security\Http\Middleware\GraphQLAuditLogger::class,
         ],
     ];
 
