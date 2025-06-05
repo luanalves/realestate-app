@@ -14,7 +14,13 @@ use Jenssegers\Mongodb\Eloquent\Model as MongoModel;
 
 class LogDetail extends MongoModel
 {
-    // ...existing code...
+    /**
+     * The connection name for the model.
+     *
+     * @var string
+     */
+    protected $connection = 'mongodb';
+
     /**
      * The collection associated with the model.
      *

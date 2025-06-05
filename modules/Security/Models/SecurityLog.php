@@ -10,11 +10,13 @@ declare(strict_types=1);
 
 namespace Modules\Security\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class SecurityLog extends Model
 {
-    // ...existing code...
     /**
      * The table associated with the model.
      *
@@ -28,11 +30,11 @@ class SecurityLog extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'uuid',
         'user_id',
-        'action',
+        'operation',
         'ip_address',
-        'created_at',
-        'updated_at',
+        'status',
     ];
 
     /**
@@ -46,5 +48,19 @@ class SecurityLog extends Model
         'updated_at' => 'datetime',
     ];
 
-    // ...existing code...
+    /**
+     * Get the user that made the request.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the detailed log information from MongoDB.
+     */
+    public function logDetail(): HasOne
+    {
+        return $this->hasOne(LogDetail::class, 'security_log_id', 'id');
+    }
 }
