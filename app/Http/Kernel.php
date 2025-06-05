@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Luan Silva
  * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
@@ -33,7 +34,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // ...existing code...
-            \Modules\Security\Http\Middleware\GraphQLAuditLogger::class,
+            \Modules\Security\Http\Middleware\GraphQLLoggingMiddleware::class,
         ],
     ];
 
