@@ -31,7 +31,6 @@ class Kernel extends HttpKernel
         'web' => [
             // ...existing code...
         ],
-
         'api' => [
             // ...existing code...
             \Modules\Security\Http\Middleware\GraphQLLoggingMiddleware::class,
