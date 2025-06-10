@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\Security\Models;
 
-use Jenssegers\Mongodb\Eloquent\Model as MongoModel;
+use MongoDB\Laravel\Eloquent\Model as MongoModel;
 
 class LogDetail extends MongoModel
 {
