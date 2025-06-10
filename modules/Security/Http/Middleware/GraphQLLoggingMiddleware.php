@@ -152,7 +152,7 @@ class GraphQLLoggingMiddleware
                 'email' => $requestData['email'],
                 'operation' => $requestData['operation'],
                 'module' => $requestData['module'],
-                'ip' => $requestData['ip'],
+                'ip_address' => $requestData['ip'],
                 'status' => $status,
             ]);
             
