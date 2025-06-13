@@ -1,8 +1,13 @@
 <?php
 
 /**
- * @author      Luan Silva
- * @copyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
+ * @author      Lua    public function handle(Request $request, Closure $next): BaseResponse
+ * {
+ * // Generate unique identifier for this request
+ * $uuid = (string) Str::uuid();
+ *
+ * // Extract request data
+ * $requestData = $this->extractRequestData($request, $uuid);opyright   2025 The Dev Kitchen (https://www.thedevkitchen.com.br)
  * @license     https://www.thedevkitchen.com.br  Copyright
  */
 
@@ -10,7 +15,6 @@ declare(strict_types=1);
 
 namespace Modules\Security\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -25,24 +29,30 @@ class GraphQLLoggingMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @param \Closure(Request): (Response|\Illuminate\Http\RedirectResponse) $next
+     *
+     * @return Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next): BaseResponse
+    public function handle(Request $request, \Closure $next): BaseResponse
     {
+        // Log para teste - confirmar que middleware está sendo executado
+        Log::info('GraphQLLoggingMiddleware: Interceptando requisição GraphQL', [
+            'path' => $request->path(),
+            'method' => $request->method(),
+        ]);
+
         // Generate unique identifier for this request
         $uuid = (string) Str::uuid();
-        
+
         // Extract request data
         $requestData = $this->extractRequestData($request, $uuid);
-        
+
         // Continue with the request
         $response = $next($request);
-        
+
         // Extract response data and log
         $this->logGraphQLRequest($requestData, $response, $uuid);
-        
+
         return $response;
     }
 
@@ -53,11 +63,11 @@ class GraphQLLoggingMiddleware
     {
         $user = Auth::user();
         $graphqlData = $request->input();
-        
+
         // Extract GraphQL operation information
         $operation = $this->extractGraphQLOperation($graphqlData);
         $variables = $graphqlData['variables'] ?? [];
-        
+
         return [
             'uuid' => $uuid,
             'user_id' => $user?->id,
@@ -80,21 +90,21 @@ class GraphQLLoggingMiddleware
     {
         $query = $graphqlData['query'] ?? '';
         $operationName = $graphqlData['operationName'] ?? null;
-        
+
         if ($operationName) {
             return $operationName;
         }
-        
+
         // Try to extract operation from query string
         if (preg_match('/(?:query|mutation|subscription)\s+(\w+)/', $query, $matches)) {
             return $matches[1];
         }
-        
+
         // Try to extract field name from simple queries
         if (preg_match('/{\s*(\w+)/', $query, $matches)) {
             return $matches[1];
         }
-        
+
         return 'unknown_operation';
     }
 
@@ -111,13 +121,13 @@ class GraphQLLoggingMiddleware
             'security' => 'Security',
             'auth' => 'Authentication',
         ];
-        
+
         foreach ($moduleMap as $keyword => $module) {
             if (Str::contains(strtolower($operation), $keyword)) {
                 return $module;
             }
         }
-        
+
         return 'Unknown';
     }
 
@@ -127,13 +137,13 @@ class GraphQLLoggingMiddleware
     private function sanitizeHeaders(array $headers): array
     {
         $sensitiveHeaders = ['authorization', 'cookie', 'x-api-key'];
-        
+
         foreach ($sensitiveHeaders as $header) {
             if (isset($headers[$header])) {
                 $headers[$header] = ['[REDACTED]'];
             }
         }
-        
+
         return $headers;
     }
 
@@ -144,7 +154,7 @@ class GraphQLLoggingMiddleware
     {
         try {
             $status = $this->determineStatus($response);
-            
+
             // Log basic information to PostgreSQL
             $securityLog = SecurityLog::create([
                 'uuid' => $uuid,
@@ -155,10 +165,9 @@ class GraphQLLoggingMiddleware
                 'ip_address' => $requestData['ip'],
                 'status' => $status,
             ]);
-            
+
             // Log detailed information to MongoDB
             $this->logDetailedToMongoDB($securityLog->id, $requestData, $response);
-            
         } catch (\Exception $e) {
             // Log error but don't break the request flow
             Log::error('GraphQL logging middleware error', [
@@ -175,24 +184,25 @@ class GraphQLLoggingMiddleware
     private function determineStatus(BaseResponse $response): string
     {
         $statusCode = $response->getStatusCode();
-        
+
         if ($statusCode >= 200 && $statusCode < 300) {
             // Check if GraphQL response contains errors
             $content = $response->getContent();
             if ($content && Str::contains($content, '"errors":')) {
                 return 'graphql_error';
             }
+
             return 'success';
         }
-        
+
         if ($statusCode >= 400 && $statusCode < 500) {
             return 'client_error';
         }
-        
+
         if ($statusCode >= 500) {
             return 'server_error';
         }
-        
+
         return 'unknown';
     }
 
@@ -203,11 +213,11 @@ class GraphQLLoggingMiddleware
     {
         $responseContent = $response->getContent();
         $responseData = null;
-        
+
         if ($responseContent && Str::isJson($responseContent)) {
             $responseData = json_decode($responseContent, true);
         }
-        
+
         LogDetail::create([
             'security_log_id' => $securityLogId,
             'details' => [
@@ -239,6 +249,7 @@ class GraphQLLoggingMiddleware
     private function calculateExecutionTime(\DateTime $startTime): float
     {
         $endTime = now();
+
         return $endTime->diffInMilliseconds($startTime);
     }
 }

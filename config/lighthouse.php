@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | GraphQL Schema Location
@@ -34,7 +33,7 @@ return [
     | Specify which controller handles GraphQL requests.
     |
     */
-    'controller' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
+    'controller' => Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -65,5 +64,4 @@ return [
     |
     */
     'debug' => env('LIGHTHOUSE_DEBUG', env('APP_DEBUG', false)),
-
 ];
