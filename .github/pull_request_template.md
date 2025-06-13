@@ -115,7 +115,7 @@ Descreva os passos para testar as funcionalidades implementadas:
    ```
 
 2. **Teste via GraphQL Playground:**
-   - Acesse: http://localhost:8080/graphql-playground
+   - Acesse: http://realestate.localhost/graphql-playground
    - Execute a query/mutation: 
    ```graphql
    # Cole aqui a query/mutation de exemplo
