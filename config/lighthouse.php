@@ -22,7 +22,10 @@ return [
     */
     'route' => [
         'uri' => '/graphql',
-        'middleware' => ['api'],
+        'middleware' => [
+            'api',
+            Modules\Security\Http\Middleware\GraphQLLoggingMiddleware::class,
+        ],
     ],
 
     /*
