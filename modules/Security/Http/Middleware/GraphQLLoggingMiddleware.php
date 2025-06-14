@@ -35,12 +35,6 @@ class GraphQLLoggingMiddleware
      */
     public function handle(Request $request, \Closure $next): BaseResponse
     {
-        // Log para teste - confirmar que middleware está sendo executado
-        Log::info('GraphQLLoggingMiddleware: Interceptando requisição GraphQL', [
-            'path' => $request->path(),
-            'method' => $request->method(),
-        ]);
-
         // Generate unique identifier for this request
         $uuid = (string) Str::uuid();
 
