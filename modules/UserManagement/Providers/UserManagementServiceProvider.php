@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Providers;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class UserManagementServiceProvider extends ServiceProvider
@@ -20,9 +19,27 @@ class UserManagementServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register our user service in the service container
+        // Register UserRepositoryInterface with automatic factory resolution
+        $this->app->bind(
+            \Modules\UserManagement\Contracts\UserRepositoryInterface::class,
+            function ($app) {
+                return \Modules\UserManagement\Factories\UserRepositoryFactory::create();
+            }
+        );
+
+        // Register UserService as singleton for better performance
+        $this->app->singleton(
+            \Modules\UserManagement\Services\UserService::class,
+            function ($app) {
+                return new \Modules\UserManagement\Services\UserService(
+                    $app->make(\Modules\UserManagement\Contracts\UserRepositoryInterface::class)
+                );
+            }
+        );
+
+        // Keep existing binding for backward compatibility
         $this->app->bind('modules\UserManagement\Services\UserService', function () {
-            return new \modules\UserManagement\Services\UserService;
+            return new \modules\UserManagement\Services\UserService();
         });
     }
 
@@ -32,6 +49,7 @@ class UserManagementServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->bootRoutes();
+        $this->bootCommands();
     }
 
     /**
@@ -39,11 +57,21 @@ class UserManagementServiceProvider extends ServiceProvider
      */
     protected function bootRoutes(): void
     {
-        if (! $this->app->routesAreCached()) {
-            // Load web routes
-            Route::prefix('user-management')
-                ->middleware('web')
-                ->group(base_path('routes/user_management.php'));
+        // UserManagement uses GraphQL exclusively
+        // No web routes needed at this time
+        // Future web routes can be added here when needed
+    }
+
+    /**
+     * Register the module's commands.
+     */
+    protected function bootCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Modules\UserManagement\Console\Commands\UserCacheCommand::class,
+                \Modules\UserManagement\Console\Commands\TokenAnalysisCommand::class,
+            ]);
         }
     }
 }

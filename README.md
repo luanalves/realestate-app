@@ -66,6 +66,48 @@ Os módulos seguem uma estrutura isolada com seus próprios:
 - Providers
 - GraphQL Schemas
 - Migrations & Seeders
+- **Padrões Arquiteturais Específicos** (Factory, Strategy, Service Layer, etc.)
+
+### 🏗️ Padrões Arquiteturais Implementados
+
+#### 🏭 Factory Pattern
+Utilizado para criação dinâmica de objetos baseado em configurações do ambiente:
+- **Exemplo**: `UserRepositoryFactory` detecta automaticamente se cache está disponível
+- **Benefícios**: Flexibilidade, facilita testes, configuração automática
+
+#### 🎯 Strategy Pattern  
+Implementação de diferentes algoritmos/comportamentos para a mesma interface:
+- **Exemplo**: `CachedUserRepository` vs `DatabaseUserRepository`
+- **Benefícios**: Performance otimizada, fallback automático, código limpo
+
+#### 🔧 Service Layer Pattern
+Camada de aplicação que orquestra operações complexas:
+- **Exemplo**: `UserService` gerencia operações de usuário e cache
+- **Benefícios**: Separação de responsabilidades, reutilização, testabilidade
+
+#### ⚡ Command Pattern
+Comandos Artisan específicos para operações de sistema:
+- **Exemplo**: `user:cache`, `user:token-analysis`
+- **Benefícios**: Automação, manutenção, monitoramento
+
+### 📁 Estrutura Recomendada por Módulo
+
+```
+ModuleName/
+├── Console/Commands/       # Comandos Artisan específicos
+├── Contracts/              # Interfaces e contratos
+├── Database/
+│   ├── Migrations/
+│   └── Seeders/
+├── Factories/              # Padrão Factory
+├── GraphQL/
+├── Http/
+├── Models/
+├── Providers/
+├── Repositories/           # Implementações Strategy
+├── Services/               # Service Layer
+└── Tests/                  # Testes abrangentes
+```
 
 ---
 
@@ -144,14 +186,39 @@ Todos os dados daquele módulo sejam populados corretamente.
 - Integração com mais módulos (Imóveis, Leads, Contratos, etc.)
 ## ✅ Checklist para criação de um novo módulo
 
+### 📋 Estrutura Básica
 - [ ] Criar diretório `modules/NomeModulo`
 - [ ] Criar Provider e registrar em `bootstrap/providers.php`
 - [ ] Criar migrations e registrar via `AppServiceProvider`
 - [ ] Criar GraphQL Schema em `modules/NomeModulo/GraphQL/schema.graphql`
 - [ ] Atualizar `config/lighthouse.php` com o caminho do schema, se necessário
+
+### 🏗️ Padrões Arquiteturais (Conforme Necessário)
+- [ ] Implementar **Factory Pattern** se houver múltiplas implementações
+- [ ] Usar **Strategy Pattern** para algoritmos alternativos (ex: cache vs database)
+- [ ] Criar **Service Layer** para lógica de negócio complexa
+- [ ] Implementar **Commands** para operações de sistema e manutenção
+- [ ] Definir **Interfaces/Contracts** para desacoplamento
+
+### 🧪 Qualidade e Testes
+- [ ] Criar testes unitários abrangentes (estruturais e funcionais)
+- [ ] Criar testes de integração se necessário
+- [ ] Verificar cobertura de testes com PHPUnit
+- [ ] Seguir padrões de naming e documentação
+
+### 📚 Documentação
 - [ ] Criar Controller/Resolver e Request (FormRequest) para validações
 - [ ] Criar Seeders se houver dados base (ex: perfis, categorias, etc)
 - [ ] Atualizar README.md com a descrição do novo módulo
+- [ ] Documentar padrões específicos implementados no módulo
+
+### 📖 Exemplo de Referência
+Consulte o módulo `UserManagement` como exemplo completo de implementação incluindo:
+- ✅ Factory Pattern com `UserRepositoryFactory`
+- ✅ Strategy Pattern com repositórios de cache
+- ✅ Service Layer com `UserService`  
+- ✅ Commands com `UserCacheCommand`
+- ✅ 62 testes unitários (173 assertions)
 
 ---
 
@@ -182,5 +249,54 @@ As chaves OAuth do Laravel Passport (`oauth-private.key` e `oauth-public.key`) d
 - Para desenvolvimento local, execute o comando de geração de chaves após a configuração inicial
 
 Estas chaves são componentes críticos de segurança que assinam e verificam tokens de autenticação para sua API. Chaves comprometidas podem permitir acesso não autorizado à API.
+
+---
+
+## 📋 Padrões de Desenvolvimento
+
+### 🏷️ Conventional Commits
+
+Este projeto utiliza o padrão **Conventional Commits** para todas as mensagens de commit. Este padrão facilita a geração automática de CHANGELOGs, versionamento semântico e melhora a legibilidade do histórico.
+
+#### Estrutura Básica
+```
+<type>(<scope>): <subject>
+```
+
+#### Exemplos
+```bash
+feat(user): add cache layer with Redis support
+fix(auth): resolve OAuth2 token expiration issue
+refactor(database): extract repository pattern
+config(cache): set Redis as default cache driver
+docs(readme): update installation instructions
+test(user): add unit tests for UserService
+```
+
+#### Types Principais
+- `feat`: Nova funcionalidade
+- `fix`: Correção de bugs
+- `refactor`: Refatoração sem mudança de funcionalidade
+- `config`: Alterações de configuração
+- `docs`: Documentação
+- `test`: Testes
+- `chore`: Manutenção e dependências
+
+#### Scopes do Projeto
+- `auth`: Autenticação e autorização
+- `user`: Gestão de usuários
+- `cache`: Sistema de cache
+- `database`: Configurações de banco
+- `config`: Arquivos de configuração
+- `graphql`: Schema e resolvers
+- `oauth`: Configurações OAuth/Passport
+
+Para guia completo, consulte: [`doc/conventional-commits-guide.md`](doc/conventional-commits-guide.md)
+
+### 📚 Documentação Técnica
+
+- **ADRs**: Decisões arquiteturais em `doc/architectural-decision-records/`
+- **Guias**: Padrões e convenções em `doc/`
+- **GraphQL**: Schemas por módulo em `modules/*/GraphQL/`
 
 ---
