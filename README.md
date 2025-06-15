@@ -66,6 +66,48 @@ Os módulos seguem uma estrutura isolada com seus próprios:
 - Providers
 - GraphQL Schemas
 - Migrations & Seeders
+- **Padrões Arquiteturais Específicos** (Factory, Strategy, Service Layer, etc.)
+
+### 🏗️ Padrões Arquiteturais Implementados
+
+#### 🏭 Factory Pattern
+Utilizado para criação dinâmica de objetos baseado em configurações do ambiente:
+- **Exemplo**: `UserRepositoryFactory` detecta automaticamente se cache está disponível
+- **Benefícios**: Flexibilidade, facilita testes, configuração automática
+
+#### 🎯 Strategy Pattern  
+Implementação de diferentes algoritmos/comportamentos para a mesma interface:
+- **Exemplo**: `CachedUserRepository` vs `DatabaseUserRepository`
+- **Benefícios**: Performance otimizada, fallback automático, código limpo
+
+#### 🔧 Service Layer Pattern
+Camada de aplicação que orquestra operações complexas:
+- **Exemplo**: `UserService` gerencia operações de usuário e cache
+- **Benefícios**: Separação de responsabilidades, reutilização, testabilidade
+
+#### ⚡ Command Pattern
+Comandos Artisan específicos para operações de sistema:
+- **Exemplo**: `user:cache`, `user:token-analysis`
+- **Benefícios**: Automação, manutenção, monitoramento
+
+### 📁 Estrutura Recomendada por Módulo
+
+```
+ModuleName/
+├── Console/Commands/       # Comandos Artisan específicos
+├── Contracts/              # Interfaces e contratos
+├── Database/
+│   ├── Migrations/
+│   └── Seeders/
+├── Factories/              # Padrão Factory
+├── GraphQL/
+├── Http/
+├── Models/
+├── Providers/
+├── Repositories/           # Implementações Strategy
+├── Services/               # Service Layer
+└── Tests/                  # Testes abrangentes
+```
 
 ---
 
@@ -144,14 +186,39 @@ Todos os dados daquele módulo sejam populados corretamente.
 - Integração com mais módulos (Imóveis, Leads, Contratos, etc.)
 ## ✅ Checklist para criação de um novo módulo
 
+### 📋 Estrutura Básica
 - [ ] Criar diretório `modules/NomeModulo`
 - [ ] Criar Provider e registrar em `bootstrap/providers.php`
 - [ ] Criar migrations e registrar via `AppServiceProvider`
 - [ ] Criar GraphQL Schema em `modules/NomeModulo/GraphQL/schema.graphql`
 - [ ] Atualizar `config/lighthouse.php` com o caminho do schema, se necessário
+
+### 🏗️ Padrões Arquiteturais (Conforme Necessário)
+- [ ] Implementar **Factory Pattern** se houver múltiplas implementações
+- [ ] Usar **Strategy Pattern** para algoritmos alternativos (ex: cache vs database)
+- [ ] Criar **Service Layer** para lógica de negócio complexa
+- [ ] Implementar **Commands** para operações de sistema e manutenção
+- [ ] Definir **Interfaces/Contracts** para desacoplamento
+
+### 🧪 Qualidade e Testes
+- [ ] Criar testes unitários abrangentes (estruturais e funcionais)
+- [ ] Criar testes de integração se necessário
+- [ ] Verificar cobertura de testes com PHPUnit
+- [ ] Seguir padrões de naming e documentação
+
+### 📚 Documentação
 - [ ] Criar Controller/Resolver e Request (FormRequest) para validações
 - [ ] Criar Seeders se houver dados base (ex: perfis, categorias, etc)
 - [ ] Atualizar README.md com a descrição do novo módulo
+- [ ] Documentar padrões específicos implementados no módulo
+
+### 📖 Exemplo de Referência
+Consulte o módulo `UserManagement` como exemplo completo de implementação incluindo:
+- ✅ Factory Pattern com `UserRepositoryFactory`
+- ✅ Strategy Pattern com repositórios de cache
+- ✅ Service Layer com `UserService`  
+- ✅ Commands com `UserCacheCommand`
+- ✅ 62 testes unitários (173 assertions)
 
 ---
 
