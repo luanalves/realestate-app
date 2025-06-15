@@ -136,7 +136,7 @@ Todos os dados daquele módulo sejam populados corretamente.
 ## 🧪 Testes e Uso
 
 - Para testar a mutation de criação de usuários, utilize Postman, Insomnia ou Altair
-- Endpoint: `http://localhost:8080/graphql`
+- Endpoint: `http://realestate.localhost:8080/graphql`
 
 ## 🚧 Em desenvolvimento
 
@@ -182,5 +182,54 @@ As chaves OAuth do Laravel Passport (`oauth-private.key` e `oauth-public.key`) d
 - Para desenvolvimento local, execute o comando de geração de chaves após a configuração inicial
 
 Estas chaves são componentes críticos de segurança que assinam e verificam tokens de autenticação para sua API. Chaves comprometidas podem permitir acesso não autorizado à API.
+
+---
+
+## 📋 Padrões de Desenvolvimento
+
+### 🏷️ Conventional Commits
+
+Este projeto utiliza o padrão **Conventional Commits** para todas as mensagens de commit. Este padrão facilita a geração automática de CHANGELOGs, versionamento semântico e melhora a legibilidade do histórico.
+
+#### Estrutura Básica
+```
+<type>(<scope>): <subject>
+```
+
+#### Exemplos
+```bash
+feat(user): add cache layer with Redis support
+fix(auth): resolve OAuth2 token expiration issue
+refactor(database): extract repository pattern
+config(cache): set Redis as default cache driver
+docs(readme): update installation instructions
+test(user): add unit tests for UserService
+```
+
+#### Types Principais
+- `feat`: Nova funcionalidade
+- `fix`: Correção de bugs
+- `refactor`: Refatoração sem mudança de funcionalidade
+- `config`: Alterações de configuração
+- `docs`: Documentação
+- `test`: Testes
+- `chore`: Manutenção e dependências
+
+#### Scopes do Projeto
+- `auth`: Autenticação e autorização
+- `user`: Gestão de usuários
+- `cache`: Sistema de cache
+- `database`: Configurações de banco
+- `config`: Arquivos de configuração
+- `graphql`: Schema e resolvers
+- `oauth`: Configurações OAuth/Passport
+
+Para guia completo, consulte: [`doc/conventional-commits-guide.md`](doc/conventional-commits-guide.md)
+
+### 📚 Documentação Técnica
+
+- **ADRs**: Decisões arquiteturais em `doc/architectural-decision-records/`
+- **Guias**: Padrões e convenções em `doc/`
+- **GraphQL**: Schemas por módulo em `modules/*/GraphQL/`
 
 ---
