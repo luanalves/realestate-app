@@ -38,6 +38,38 @@ class User extends Authenticatable
     ];
 
     /**
+     * Bootstrap the model and its traits.
+     */
+    protected static function booted(): void
+    {
+        // Invalidate cache when user is updated
+        static::updated(function (User $user) {
+            try {
+                $userService = app(\Modules\UserManagement\Services\UserService::class);
+                $userService->invalidateUserCache($user->id);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed to invalidate user cache on update', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        });
+
+        // Invalidate cache when user is deleted
+        static::deleted(function (User $user) {
+            try {
+                $userService = app(\Modules\UserManagement\Services\UserService::class);
+                $userService->invalidateUserCache($user->id);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed to invalidate user cache on delete', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        });
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
