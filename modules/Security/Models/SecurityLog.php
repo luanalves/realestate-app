@@ -32,7 +32,9 @@ class SecurityLog extends Model
     protected $fillable = [
         'uuid',
         'user_id',
+        'email',
         'operation',
+        'module',
         'ip_address',
         'status',
     ];

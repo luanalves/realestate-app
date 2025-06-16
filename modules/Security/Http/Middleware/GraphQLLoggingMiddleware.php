@@ -22,10 +22,18 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Modules\Security\Models\LogDetail;
 use Modules\Security\Models\SecurityLog;
+use Modules\UserManagement\Services\UserService;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 class GraphQLLoggingMiddleware
 {
+    private UserService $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -55,7 +63,7 @@ class GraphQLLoggingMiddleware
      */
     private function extractRequestData(Request $request, string $uuid): array
     {
-        $user = Auth::user();
+        $authData = $this->extractAuthData($request);
         $graphqlData = $request->input();
 
         // Extract GraphQL operation information
@@ -64,8 +72,8 @@ class GraphQLLoggingMiddleware
 
         return [
             'uuid' => $uuid,
-            'user_id' => $user?->id,
-            'email' => $user?->email,
+            'user_id' => $authData['user_id'],
+            'email' => $authData['email'],
             'operation' => $operation,
             'module' => $this->extractModule($operation),
             'ip' => $request->ip(),
@@ -75,6 +83,95 @@ class GraphQLLoggingMiddleware
             'query' => $graphqlData['query'] ?? '',
             'timestamp' => now(),
         ];
+    }
+
+    /**
+     * Extract authentication data from JWT token.
+     */
+    private function extractAuthData(Request $request): array
+    {
+        $userId = null;
+        $email = null;
+
+        // First try to get user_id from JWT token
+        $userId = $this->extractUserIdFromJWT($request);
+
+        // If we have a user_id, try to get email from UserService (with cache)
+        if ($userId) {
+            try {
+                $user = $this->userService->getUserById($userId);
+                $email = $user->email;
+            } catch (\Exception $e) {
+                // Log error but continue - we still have user_id from JWT
+                Log::warning('GraphQL Middleware: Failed to get user email from UserService', [
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        } else {
+            // Fallback to Auth::user() if JWT extraction fails
+            $user = Auth::user();
+            if ($user) {
+                $userId = $user->id;
+                $email = $user->email;
+            }
+        }
+
+        return [
+            'user_id' => $userId,
+            'email' => $email,
+        ];
+    }
+
+    /**
+     * Extract user ID from JWT token.
+     */
+    private function extractUserIdFromJWT(Request $request): ?int
+    {
+        $authHeader = $request->header('Authorization');
+
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            return null;
+        }
+
+        $token = substr($authHeader, 7); // Remove 'Bearer ' prefix
+
+        if (empty($token)) {
+            return null;
+        }
+
+        try {
+            // Split JWT token (header.payload.signature)
+            $parts = explode('.', $token);
+
+            if (count($parts) !== 3) {
+                return null;
+            }
+
+            // Decode payload (second part)
+            $payload = base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1]));
+
+            if (!$payload) {
+                return null;
+            }
+
+            $decodedPayload = json_decode($payload, true);
+
+            if (!$decodedPayload) {
+                return null;
+            }
+
+            // Extract user_id from 'sub' claim (Passport default)
+            $userId = isset($decodedPayload['sub']) ? (int) $decodedPayload['sub'] : null;
+
+            return $userId;
+        } catch (\Exception $e) {
+            Log::warning('GraphQL Middleware: Error extracting user_id from JWT', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     /**
