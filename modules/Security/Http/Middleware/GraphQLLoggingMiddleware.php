@@ -29,6 +29,19 @@ class GraphQLLoggingMiddleware
 {
     private UserService $userService;
 
+    /**
+     * Operations that should be excluded from security logging.
+     * These are typically development/introspection queries that don't represent user actions.
+     */
+    private const EXCLUDED_OPERATIONS = [
+        'IntrospectionQuery',
+        '__schema',
+        '__type',
+        '__typename',
+        '_service',
+        '_entities',
+    ];
+
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
@@ -43,19 +56,64 @@ class GraphQLLoggingMiddleware
      */
     public function handle(Request $request, \Closure $next): BaseResponse
     {
-        // Generate unique identifier for this request
-        $uuid = (string) Str::uuid();
-
-        // Extract request data
-        $requestData = $this->extractRequestData($request, $uuid);
-
         // Continue with the request
         $response = $next($request);
 
-        // Extract response data and log
-        $this->logGraphQLRequest($requestData, $response, $uuid);
+        // Check if this operation should be logged
+        if ($this->shouldLogOperation($request)) {
+            // Generate unique identifier for this request
+            $uuid = (string) Str::uuid();
+
+            // Extract request data
+            $requestData = $this->extractRequestData($request, $uuid);
+
+            // Log the GraphQL request
+            $this->logGraphQLRequest($requestData, $response, $uuid);
+        }
 
         return $response;
+    }
+
+    /**
+     * Determine if the GraphQL operation should be logged.
+     */
+    private function shouldLogOperation(Request $request): bool
+    {
+        $graphqlData = $request->input();
+        $operation = $this->extractGraphQLOperation($graphqlData);
+
+        // Don't log excluded operations
+        if (in_array($operation, self::EXCLUDED_OPERATIONS, true)) {
+            return false;
+        }
+
+        // Don't log operations that start with double underscore (GraphQL introspection)
+        if (str_starts_with($operation, '__')) {
+            return false;
+        }
+
+        // Check if the query contains only introspection fields
+        $query = $graphqlData['query'] ?? '';
+        if ($this->isIntrospectionQuery($query)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if a query is purely introspection-based.
+     */
+    private function isIntrospectionQuery(string $query): bool
+    {
+        // Remove comments and whitespace for analysis
+        $cleanQuery = preg_replace('/\s+/', ' ', $query);
+        $cleanQuery = preg_replace('/#[^\r\n]*/', '', $cleanQuery);
+
+        // Check if query contains only introspection fields
+        $introspectionPattern = '/^[^{]*\{\s*(__schema|__type|__typename|_service|_entities)/i';
+
+        return (bool) preg_match($introspectionPattern, $cleanQuery);
     }
 
     /**
