@@ -1,2 +1,204 @@
-# Security Module GraphQL Schema
-# Defina tipos, queries e mutations específicos do módulo aqui.
+"""
+Security module queries and types
+"""
+extend type Query {
+    """
+    Get security logs with filters and pagination
+    """
+    securityLogs(
+        filter: SecurityLogFilterInput
+        orderBy: [SecurityLogOrderByInput!]
+        first: Int = 20
+        page: Int = 1
+    ): SecurityLogsPaginated! @field(resolver: "Modules\\Security\\GraphQL\\Queries\\SecurityLogs")
+
+    """
+    Get a specific security log by ID
+    """
+    securityLog(id: ID!): SecurityLog @field(resolver: "Modules\\Security\\GraphQL\\Queries\\SecurityLogQuery")
+
+    """
+    Get security log statistics/summary
+    """
+    securityLogStats(
+        filter: SecurityLogFilterInput
+    ): SecurityLogStats! @field(resolver: "Modules\\Security\\GraphQL\\Queries\\SecurityLogStats")
+}
+
+"""
+Security log entry
+"""
+type SecurityLog {
+    id: ID!
+    uuid: String!
+    user_id: ID
+    email: String
+    operation: String!
+    module: String
+    ip_address: String!
+    status: SecurityLogStatus!
+    created_at: DateTime!
+    updated_at: DateTime!
+    
+    """
+    Related user (if exists)
+    """
+    user: User @belongsTo
+    
+    """
+    Detailed log information from MongoDB
+    """
+    details: SecurityLogDetails @field(resolver: "Modules\\Security\\GraphQL\\Queries\\SecurityLogDetails")
+}
+
+"""
+Paginated security logs response
+"""
+type SecurityLogsPaginated {
+    data: [SecurityLog!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+"""
+Security log statistics
+"""
+type SecurityLogStats {
+    total_requests: Int!
+    unique_users: Int!
+    success_rate: Float!
+    top_operations: [OperationStat!]!
+    top_modules: [ModuleStat!]!
+    requests_by_status: [StatusStat!]!
+    requests_by_hour: [HourStat!]!
+}
+
+"""
+Operation statistics
+"""
+type OperationStat {
+    operation: String!
+    count: Int!
+    percentage: Float!
+}
+
+"""
+Module statistics
+"""
+type ModuleStat {
+    module: String!
+    count: Int!
+    percentage: Float!
+}
+
+"""
+Status statistics
+"""
+type StatusStat {
+    status: SecurityLogStatus!
+    count: Int!
+    percentage: Float!
+}
+
+"""
+Hourly request statistics
+"""
+type HourStat {
+    hour: Int!
+    count: Int!
+}
+
+"""
+Detailed log information from MongoDB
+"""
+type SecurityLogDetails {
+    request: RequestDetails
+    response: ResponseDetails
+    execution: ExecutionDetails
+}
+
+"""
+Request details
+"""
+type RequestDetails {
+    headers: JSON
+    variables: JSON
+    query: String
+    user_agent: String
+    timestamp: String
+}
+
+"""
+Response details
+"""
+type ResponseDetails {
+    status_code: Int
+    headers: JSON
+    data: JSON
+    size: Int
+}
+
+"""
+Execution details
+"""
+type ExecutionDetails {
+    duration_ms: Float
+    memory_peak: Int
+    memory_usage: Int
+}
+
+"""
+Security log filter input
+"""
+input SecurityLogFilterInput {
+    user_id: ID
+    email: String
+    operation: String
+    module: String
+    status: SecurityLogStatus
+    ip_address: String
+    date_from: DateTime
+    date_to: DateTime
+    search: String
+}
+
+"""
+Security log ordering input
+"""
+input SecurityLogOrderByInput {
+    column: SecurityLogOrderByColumn!
+    order: SortOrder!
+}
+
+"""
+Available columns for ordering security logs
+"""
+enum SecurityLogOrderByColumn {
+    ID
+    USER_ID
+    OPERATION
+    MODULE
+    IP_ADDRESS
+    STATUS
+    CREATED_AT
+}
+
+"""
+Security log status enum
+"""
+enum SecurityLogStatus {
+    success @enum(value: "success")
+    error @enum(value: "error")
+    unauthorized @enum(value: "unauthorized")
+    graphql_error @enum(value: "graphql_error")
+    client_error @enum(value: "client_error")
+    server_error @enum(value: "server_error")
+    unknown @enum(value: "unknown")
+}
+
+"""
+Sort order enum
+"""
+enum SortOrder {
+    ASC
+    DESC
+}
