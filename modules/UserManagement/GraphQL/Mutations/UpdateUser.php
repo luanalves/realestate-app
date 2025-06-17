@@ -12,13 +12,19 @@ namespace Modules\UserManagement\GraphQL\Mutations;
 
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Nuwave\Lighthouse\Exceptions\AuthenticationException;
+use Modules\UserManagement\Services\UserManagementAuthorizationService;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class UpdateUser
 {
+    private UserManagementAuthorizationService $authService;
+
+    public function __construct(UserManagementAuthorizationService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     /**
      * Update an existing user.
      *
@@ -27,14 +33,10 @@ class UpdateUser
      * @param GraphQLContext $context Arbitrary data that is shared between all fields of a single query
      * @param ResolveInfo $resolveInfo Information about the query itself
      * @return User
-     * @throws \Nuwave\Lighthouse\Exceptions\AuthenticationException
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): User
     {
-        // Check if user is authenticated using the 'api' guard specifically
-        if (!Auth::guard('api')->check()) {
-            throw new AuthenticationException('You need to be authenticated to update a user');
-        }
+        $this->authService->authorizeUserManagementWrite();
         
         $user = User::findOrFail($args['id']);
         $input = $args['input'];

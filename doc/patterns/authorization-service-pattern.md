@@ -274,6 +274,8 @@ class UserManagementAuthorizationService
     ];
 
     public function authorizeUserManagementAccess(): User { /* ... */ }
+    public function authorizeUserManagementRead(): User { /* ... */ }
+    public function authorizeUserManagementWrite(): User { /* ... */ }
 }
 ```
 
@@ -300,6 +302,7 @@ class PropertyAuthorizationService
 - **Testabilidade:** Fácil de testar isoladamente
 - **Segurança:** Centralização reduz riscos de falhas
 - **Performance:** Evita validações duplicadas
+- **Reutilização:** Mesma lógica em diferentes contextos
 
 ### ⚠️ **Considerações**
 - Criar serviços específicos para cada contexto
@@ -309,11 +312,13 @@ class PropertyAuthorizationService
 
 ## 🎯 Próximos Passos
 
-1. **Implementar em outros módulos** seguindo o mesmo padrão
-2. **Criar testes unitários** para todos os serviços de autorização
-3. **Documentar regras de acesso** para cada recurso
-4. **Considerar middleware** para autorização automática
-5. **Implementar cache** para otimizar verificações frequentes
+1. **✅ Implementado em Security Module** - SecurityAuthorizationService
+2. **✅ Implementado em UserManagement Module** - UserManagementAuthorizationService
+3. **🔄 Implementar em Properties Module** seguindo o mesmo padrão
+4. **📝 Criar testes unitários** para todos os serviços de autorização
+5. **🔍 Considerar middleware** para autorização automática
+6. **⚡ Implementar cache** para otimizar verificações frequentes
+7. **📚 Documentar regras de acesso** para cada recurso
 
 ## 📝 Convenções de Nomenclatura
 

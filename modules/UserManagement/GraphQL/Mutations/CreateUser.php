@@ -13,12 +13,18 @@ namespace Modules\UserManagement\GraphQL\Mutations;
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Hash;
+use Modules\UserManagement\Services\UserManagementAuthorizationService;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Illuminate\Support\Facades\Auth;
-use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class CreateUser
 {
+    private UserManagementAuthorizationService $authService;
+
+    public function __construct(UserManagementAuthorizationService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     /**
      * Create a new user.
      *
@@ -30,10 +36,8 @@ class CreateUser
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): User
     {
-        // Check if user is authenticated using the 'api' guard specifically
-        if (!Auth::guard('api')->check()) {
-            throw new AuthenticationException('You need to be authenticated to delete a user');
-        }
+        $this->authService->authorizeUserManagementWrite();
+        
         $input = $args['input'];
         
         // Hash the password

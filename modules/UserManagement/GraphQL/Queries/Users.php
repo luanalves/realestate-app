@@ -12,13 +12,18 @@ namespace Modules\UserManagement\GraphQL\Queries;
 
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
+use Modules\UserManagement\Services\UserManagementAuthorizationService;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class Users
 {
+    private UserManagementAuthorizationService $authService;
+
+    public function __construct(UserManagementAuthorizationService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     /**
      * Return a list of all users.
      *
@@ -30,10 +35,8 @@ class Users
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
-        // Check if user is authenticated using the 'api' guard specifically
-        if (!Auth::guard('api')->check()) {
-            throw new AuthenticationException('You need to be authenticated to access this resource');
-        }
+        $this->authService->authorizeUserManagementRead();
+        
         return User::with('role')->get();
     }
 }
