@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | GraphQL Schema Location
@@ -11,7 +10,7 @@ return [
     | You may change this path to organize your project better.
     |
     */
-    'schema_path' => base_path('modules/UserManagement/GraphQL/schema.graphql'),
+    'schema_path' => base_path('graphql/schema.graphql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -23,7 +22,10 @@ return [
     */
     'route' => [
         'uri' => '/graphql',
-        'middleware' => ['api'],
+        'middleware' => [
+            'api',
+            Modules\Security\Http\Middleware\GraphQLLoggingMiddleware::class,
+        ],
     ],
 
     /*
@@ -34,7 +36,7 @@ return [
     | Specify which controller handles GraphQL requests.
     |
     */
-    'controller' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
+    'controller' => Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -65,5 +67,4 @@ return [
     |
     */
     'debug' => env('LIGHTHOUSE_DEBUG', env('APP_DEBUG', false)),
-
 ];

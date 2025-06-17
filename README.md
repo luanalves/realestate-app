@@ -178,7 +178,7 @@ Todos os dados daquele módulo sejam populados corretamente.
 ## 🧪 Testes e Uso
 
 - Para testar a mutation de criação de usuários, utilize Postman, Insomnia ou Altair
-- Endpoint: `http://realestate.localhost:8080/graphql`
+- Endpoint: `http://realestate.localhost/graphql`
 
 ## 🚧 Em desenvolvimento
 
