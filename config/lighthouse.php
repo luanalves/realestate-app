@@ -10,7 +10,7 @@ return [
     | You may change this path to organize your project better.
     |
     */
-    'schema_path' => base_path('modules/UserManagement/GraphQL/schema.graphql'),
+    'schema_path' => base_path('graphql/schema.graphql'),
 
     /*
     |--------------------------------------------------------------------------
