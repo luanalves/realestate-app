@@ -19,7 +19,7 @@ use GraphQL\Utils\Utils;
 
 class JSON extends ScalarType
 {
-    public ?string $name = 'JSON';
+    public string $name = 'JSON';
 
     public ?string $description = 'JSON scalar type that represents JSON values.';
 
