@@ -42,6 +42,27 @@
   - Garantir usuários com roles apropriadas existem
   - Dados MongoDB de exemplo para LogDetail
 
+### Módulo UserManagement - Funcionalidades Essenciais
+- [ ] **Gestão de Senha**
+  - [ ] Implementar mutation para alteração de senha (changePassword)
+  - [ ] Implementar fluxo de recuperação de senha (requestPasswordReset, resetPassword)
+  - [ ] Testes para alteração e recuperação de senha
+- [ ] **Associação Multi-Tenant (Imobiliárias)**
+  - [ ] Garantir campo tenant_id em users
+  - [ ] Restringir queries/mutations por tenant_id (exceto Master Admin)
+  - [ ] Testes de acesso multi-tenant
+- [ ] **Dados de Perfil**
+  - [ ] Query para visualização de perfil (me)
+  - [ ] Mutation para edição de perfil (updateProfile)
+  - [ ] Mutation para upload de avatar (uploadAvatar)
+  - [ ] Mutation para preferências pessoais (updatePreferences)
+  - [ ] Testes de perfil e preferências
+- [ ] **Listagem e Gerenciamento de Usuários (Backoffice)**
+  - [ ] Query para listar usuários por imobiliária (usersByTenant)
+  - [ ] Mutation para ativar/inativar usuário (setUserActiveStatus)
+  - [ ] Mutation para resetar senha de usuário (adminResetUserPassword)
+  - [ ] Testes de gerenciamento de usuários
+
 ## 🔶 Prioridade MÉDIA
 
 ### Módulo Security - Completar Testes Faltantes
@@ -110,3 +131,7 @@ TOTAL: 80% implementado (4/5 tarefas)
 2. **Resolver testes GraphQL** do módulo Security  
 3. **Implementar middleware GraphQL** para autorização automática
 4. **Documentar outros padrões** identificados no projeto
+
+## Observações Técnicas
+- O model `User` deve conter o campo `tenant_id` para associação multi-tenant.
+- Todos os acessos (queries e mutations) devem ser protegidos com middleware do tipo `auth` e `can` (autorização baseada em permissões/roles).
