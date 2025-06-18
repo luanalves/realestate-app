@@ -63,6 +63,20 @@
   - [ ] Mutation para resetar senha de usuário (adminResetUserPassword)
   - [ ] Testes de gerenciamento de usuários
 
+### Módulo BFFAuth - Backend-for-Frontend (Full)
+- [ ] **Implementar módulo BFFAuth para autenticação centralizada e proxy de requisições**
+  - [ ] Criar estrutura de diretórios: Controllers, Requests, Services, Providers, routes, Tests/Feature
+  - [ ] Implementar endpoints:
+    - [ ] POST /bffauth/login (login e geração de token)
+    - [ ] POST /bffauth/refresh (refresh de token)
+    - [ ] POST /bffauth/logout (revogação de token)
+    - [ ] POST /bffauth/graphql (proxy para requisições GraphQL autenticadas)
+  - [ ] Garantir que o client_secret nunca seja exposto ao frontend
+  - [ ] Validar tokens e repassar requisições para o backend principal
+  - [ ] Adicionar testes automatizados para todos os endpoints
+  - [ ] Documentar o fluxo e a arquitetura no README do módulo
+  - [ ] Consultar ADRs para garantir aderência ao padrão do projeto
+
 ## 🔶 Prioridade MÉDIA
 
 ### Módulo Security - Completar Testes Faltantes
