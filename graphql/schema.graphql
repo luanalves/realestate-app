@@ -352,3 +352,7 @@ enum SortOrder {
     ASC
     DESC
 }
+
+# Module schemas are registered via ServiceProviders
+# using the lighthouse.schema.register configuration
+# DO NOT use #import for modules registered this way
