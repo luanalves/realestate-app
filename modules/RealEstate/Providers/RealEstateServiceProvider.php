@@ -19,7 +19,6 @@ class RealEstateServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
     }
 
     /**
@@ -28,11 +27,12 @@ class RealEstateServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Load migrations
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
-        // Load GraphQL schema
-        $this->publishes([
-            __DIR__ . '/../GraphQL/schema.graphql' => base_path('graphql/schemas/real-estate.graphql'),
-        ], 'graphql-schema');
+        // Register GraphQL schema
+        config(['lighthouse.schema.register' => array_merge(
+            config('lighthouse.schema.register', []),
+            [__DIR__.'/../GraphQL/schema.graphql']
+        )]);
     }
 }

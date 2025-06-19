@@ -50,6 +50,15 @@ class UserManagementServiceProvider extends ServiceProvider
     {
         $this->bootRoutes();
         $this->bootCommands();
+        
+        // Load migrations
+        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        
+        // Register GraphQL schema
+        config(['lighthouse.schema.register' => array_merge(
+            config('lighthouse.schema.register', []),
+            [__DIR__ . '/../GraphQL/schema.graphql']
+        )]);
     }
 
     /**
