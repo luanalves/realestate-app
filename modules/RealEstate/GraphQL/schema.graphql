@@ -1,0 +1,172 @@
+extend type Query {
+    "List all real estate agencies"
+    realEstates(
+        first: Int = 10
+        page: Int = 1
+        orderBy: [OrderByClause!]
+    ): RealEstatePaginator! @paginate(defaultCount: 10) @auth
+
+    "Get a specific real estate agency by ID"
+    realEstateById(id: ID! @eq): RealEstate @find @auth
+}
+
+extend type Mutation {
+    "Create a new real estate agency"
+    createRealEstate(input: CreateRealEstateInput! @spread): RealEstate! 
+        @create @auth
+
+    "Update an existing real estate agency"
+    updateRealEstate(id: ID!, input: UpdateRealEstateInput! @spread): RealEstate! 
+        @update @auth
+
+    "Delete a real estate agency"
+    deleteRealEstate(id: ID! @eq): RealEstate! 
+        @delete @auth
+}
+
+"Real Estate Agency"
+type RealEstate {
+    "Unique identifier"
+    id: ID!
+
+    "Agency name"
+    name: String!
+
+    "Agency description"
+    description: String
+
+    "Contact email"
+    email: String!
+
+    "Contact phone"
+    phone: String
+
+    "Website URL"
+    website: String
+
+    "Address information"
+    address: RealEstateAddress
+
+    "CRECI license number"
+    creci: String
+
+    "Whether the agency is active"
+    active: Boolean!
+
+    "Tenant ID for multi-tenant support"
+    tenant_id: ID
+
+    "Creation date"
+    created_at: DateTime!
+
+    "Last update date"
+    updated_at: DateTime!
+
+    "Users associated with this real estate agency"
+    users: [User!]! @hasMany
+}
+
+"Real Estate Address"
+type RealEstateAddress {
+    "Street address"
+    street: String
+
+    "City"
+    city: String
+
+    "State"
+    state: String
+
+    "ZIP/Postal code"
+    zip_code: String
+
+    "Country"
+    country: String
+}
+
+"Input for creating a real estate agency"
+input CreateRealEstateInput {
+    "Agency name"
+    name: String! @rules(apply: ["required", "string", "max:255"])
+
+    "Agency description"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+
+    "Contact email"
+    email: String! @rules(apply: ["required", "email", "unique:real_estates,email"])
+
+    "Contact phone"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+
+    "Website URL"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+
+    "Address information"
+    address: RealEstateAddressInput
+
+    "CRECI license number"
+    creci: String @rules(apply: ["nullable", "string", "max:50"])
+
+    "Whether the agency is active"
+    active: Boolean = true
+
+    "Tenant ID for multi-tenant support"
+    tenant_id: ID @rules(apply: ["nullable", "exists:tenants,id"])
+}
+
+"Input for updating a real estate agency"
+input UpdateRealEstateInput {
+    "Agency name"
+    name: String @rules(apply: ["string", "max:255"])
+
+    "Agency description"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+
+    "Contact email"
+    email: String @rules(apply: ["email", "unique:real_estates,email"])
+
+    "Contact phone"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+
+    "Website URL"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+
+    "Address information"
+    address: RealEstateAddressInput
+
+    "CRECI license number"
+    creci: String @rules(apply: ["nullable", "string", "max:50"])
+
+    "Whether the agency is active"
+    active: Boolean
+
+    "Tenant ID for multi-tenant support"
+    tenant_id: ID @rules(apply: ["nullable", "exists:tenants,id"])
+}
+
+"Input for real estate address"
+input RealEstateAddressInput {
+    "Street address"
+    street: String @rules(apply: ["nullable", "string", "max:255"])
+
+    "City"
+    city: String @rules(apply: ["nullable", "string", "max:100"])
+
+    "State"
+    state: String @rules(apply: ["nullable", "string", "max:100"])
+
+    "ZIP/Postal code"
+    zip_code: String @rules(apply: ["nullable", "string", "max:20"])
+
+    "Country"
+    country: String @rules(apply: ["nullable", "string", "max:100"])
+}
+
+"Paginated real estate agencies"
+type RealEstatePaginator {
+    "Pagination metadata"
+    paginatorInfo: PaginatorInfo!
+
+    "List of real estate agencies"
+    data: [RealEstate!]!
+}
