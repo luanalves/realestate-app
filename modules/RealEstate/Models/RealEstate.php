@@ -28,6 +28,7 @@ class RealEstate extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'name',
         'fantasy_name',
         'corporate_name',
         'cnpj',

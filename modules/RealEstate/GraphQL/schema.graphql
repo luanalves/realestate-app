@@ -4,24 +4,38 @@ extend type Query {
         first: Int = 10
         page: Int = 1
         orderBy: [OrderByClause!]
-    ): RealEstatePaginator! @paginate(defaultCount: 10) @auth
+    ): RealEstatePaginator! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstates")
 
     "Get a specific real estate agency by ID"
-    realEstateById(id: ID! @eq): RealEstate @find @auth
+    realEstateById(id: ID!): RealEstate @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateById")
 }
 
 extend type Mutation {
     "Create a new real estate agency"
-    createRealEstate(input: CreateRealEstateInput! @spread): RealEstate! 
-        @create @auth
+    createRealEstate(
+        name: String! @rules(apply: ["required", "string", "max:255"]),
+        fantasy_name: String @rules(apply: ["nullable", "string", "max:255"]),
+        corporate_name: String @rules(apply: ["nullable", "string", "max:255"]),
+        cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:real_estates,cnpj"]),
+        description: String @rules(apply: ["nullable", "string", "max:1000"]),
+        email: String! @rules(apply: ["required", "email", "unique:real_estates,email"]),
+        phone: String @rules(apply: ["nullable", "string", "max:20"]),
+        website: String @rules(apply: ["nullable", "url", "max:255"]),
+        creci: String @rules(apply: ["nullable", "string", "max:50"]),
+        state_registration: String @rules(apply: ["nullable", "string", "max:50"]),
+        legal_representative: String @rules(apply: ["nullable", "string", "max:255"]),
+        active: Boolean = true,
+        address: RealEstateAddressInput
+    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstate")
 
     "Update an existing real estate agency"
-    updateRealEstate(id: ID!, input: UpdateRealEstateInput! @spread): RealEstate! 
-        @update @auth
+    updateRealEstate(
+        id: ID!,
+        input: UpdateRealEstateInput! @spread
+    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstate")
 
     "Delete a real estate agency"
-    deleteRealEstate(id: ID! @eq): RealEstate! 
-        @delete @auth
+    deleteRealEstate(id: ID!): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstate")
 }
 
 "Real Estate Agency"
