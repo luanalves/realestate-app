@@ -91,6 +91,20 @@ type Query {
     securityLogStats(
         filter: SecurityLogFilterInput
     ): SecurityLogStats! @field(resolver: "Modules\\Security\\GraphQL\\Queries\\SecurityLogStats")
+
+    """
+    List all real estate agencies
+    """
+    realEstates(
+        first: Int = 10
+        page: Int = 1
+        orderBy: [OrderByClause!]
+    ): RealEstatePaginator! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstates")
+
+    """
+    Get a specific real estate agency by ID
+    """
+    realEstateById(id: ID!): RealEstate @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateById")
 }
 
 type Mutation {
@@ -114,6 +128,38 @@ type Mutation {
     """
     login(email: String!, password: String!): LoginResponse!
         @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
+
+    """
+    Create a new real estate agency
+    """
+    createRealEstate(
+        name: String! @rules(apply: ["required", "string", "max:255"]),
+        fantasy_name: String @rules(apply: ["nullable", "string", "max:255"]),
+        corporate_name: String @rules(apply: ["nullable", "string", "max:255"]),
+        cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:real_estates,cnpj"]),
+        description: String @rules(apply: ["nullable", "string", "max:1000"]),
+        email: String! @rules(apply: ["required", "email", "unique:real_estates,email"]),
+        phone: String @rules(apply: ["nullable", "string", "max:20"]),
+        website: String @rules(apply: ["nullable", "url", "max:255"]),
+        creci: String @rules(apply: ["nullable", "string", "max:50"]),
+        state_registration: String @rules(apply: ["nullable", "string", "max:50"]),
+        legal_representative: String @rules(apply: ["nullable", "string", "max:255"]),
+        active: Boolean = true,
+        address: RealEstateAddressInput
+    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstate")
+
+    """
+    Update an existing real estate agency
+    """
+    updateRealEstate(
+        id: ID!,
+        input: UpdateRealEstateInput! @spread
+    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstate")
+
+    """
+    Delete a real estate agency
+    """
+    deleteRealEstate(id: ID!): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstate")
 }
 
 # User Management Types
@@ -351,6 +397,172 @@ Sort order enum
 enum SortOrder {
     ASC
     DESC
+}
+
+"""
+Real Estate Agency
+"""
+type RealEstate {
+    "Unique identifier"
+    id: ID!
+
+    "Agency name"
+    name: String!
+
+    "Agency description"
+    description: String
+
+    "Contact email"
+    email: String!
+
+    "Contact phone"
+    phone: String
+
+    "Website URL"
+    website: String
+
+    "Fantasy name"
+    fantasy_name: String
+
+    "Corporate name"
+    corporate_name: String
+
+    "CNPJ (Brazilian tax ID)"
+    cnpj: String!
+
+    "CRECI (Real estate license)"
+    creci: String
+
+    "State registration"
+    state_registration: String
+
+    "Legal representative"
+    legal_representative: String
+
+    "Whether the agency is active"
+    active: Boolean
+
+    "Creation timestamp"
+    created_at: DateTime!
+
+    "Last update timestamp"
+    updated_at: DateTime!
+
+    "Address information"
+    address: RealEstateAddress
+}
+
+"""
+Real Estate Address
+"""
+type RealEstateAddress {
+    "Street name"
+    street: String!
+
+    "Street number"
+    number: String!
+
+    "Complement"
+    complement: String
+
+    "Neighborhood"
+    neighborhood: String!
+
+    "City"
+    city: String!
+
+    "State"
+    state: String!
+
+    "ZIP code"
+    zip_code: String!
+
+    "Country"
+    country: String
+}
+
+"""
+Real Estate Address Input
+"""
+input RealEstateAddressInput {
+    "Street name"
+    street: String! @rules(apply: ["required", "string", "max:255"])
+
+    "Street number"
+    number: String! @rules(apply: ["required", "string", "max:20"])
+
+    "Complement"
+    complement: String @rules(apply: ["nullable", "string", "max:255"])
+
+    "Neighborhood"
+    neighborhood: String! @rules(apply: ["required", "string", "max:255"])
+
+    "City"
+    city: String! @rules(apply: ["required", "string", "max:255"])
+
+    "State"
+    state: String! @rules(apply: ["required", "string", "max:100"])
+
+    "ZIP code"
+    zip_code: String! @rules(apply: ["required", "string", "max:20"])
+
+    "Country"
+    country: String @rules(apply: ["nullable", "string", "max:100"])
+}
+
+"""
+Input for updating a real estate agency
+"""
+input UpdateRealEstateInput {
+    "Agency name"
+    name: String @rules(apply: ["string", "max:255"])
+
+    "Agency description"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+
+    "Contact email"
+    email: String @rules(apply: ["email", "unique:real_estates,email"])
+
+    "Contact phone"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+
+    "Website URL"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+
+    "Fantasy name"
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
+
+    "Corporate name"
+    corporate_name: String @rules(apply: ["nullable", "string", "max:255"])
+
+    "CNPJ (Brazilian tax ID)"
+    cnpj: String @rules(apply: ["string", "size:14", "unique:real_estates,cnpj"])
+
+    "CRECI (Real estate license)"
+    creci: String @rules(apply: ["nullable", "string", "max:50"])
+
+    "State registration"
+    state_registration: String @rules(apply: ["nullable", "string", "max:50"])
+
+    "Legal representative"
+    legal_representative: String @rules(apply: ["nullable", "string", "max:255"])
+
+    "Whether the agency is active"
+    active: Boolean
+
+    "Address information"
+    address: RealEstateAddressInput
+}
+
+"""
+Paginated real estate agencies
+"""
+type RealEstatePaginator {
+    "Pagination metadata"
+    paginatorInfo: PaginatorInfo!
+
+    "List of real estate agencies"
+    data: [RealEstate!]!
 }
 
 # Module schemas are registered via ServiceProviders
