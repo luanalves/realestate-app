@@ -149,3 +149,261 @@ TOTAL: 80% implementado (4/5 tarefas)
 ## Observações Técnicas
 - O model `User` deve conter o campo `tenant_id` para associação multi-tenant.
 - Todos os acessos (queries e mutations) devem ser protegidos com middleware do tipo `auth` e `can` (autorização baseada em permissões/roles).
+
+
+--------------------------------------------------------------------------------------------
+
+Domínio: Property (Gestão de Imóveis)
+🗂 História: Cadastro de Imóveis
+Descrição:
+Como um gestor ou corretor de imobiliária, desejo cadastrar imóveis detalhadamente no sistema para disponibilizá-los facilmente para potenciais clientes, promovendo maior visibilidade e eficiência nas negociações.
+
+Critérios de Aceitação:
+Cadastro completo com validação dos campos essenciais.
+
+Upload de fotos e vídeos.
+
+Possibilidade de definir status (disponível, alugado, vendido).
+
+Cada imóvel deve ser vinculado claramente à imobiliária responsável.
+
+⚙️ Tarefas Técnicas:
+📌 Tarefa: Criar Migration para tabela "properties"
+Status: Pending
+
+Priority: High
+
+Feature Type: Migration
+
+Requisitos:
+
+Criar campos principais com base em pesquisa dos principais portais imobiliários (Zap, OLX, QuintoAndar, VivaReal):
+
+Título do imóvel
+
+Descrição detalhada
+
+Tipo do imóvel (Casa, Apartamento, Comercial, Terreno)
+
+Status do imóvel (Disponível, Alugado, Vendido)
+
+Endereço completo (Rua, Número, Bairro, Cidade, Estado, CEP)
+
+Preço (venda/aluguel)
+
+Área total e útil
+
+Quartos, Banheiros, Garagens
+
+Características adicionais (Piscina, Elevador, etc.)
+
+Data de publicação
+
+ID da imobiliária responsável
+
+📌 Tarefa: Criar Model "Property"
+Status: Pending
+
+Priority: High
+
+Feature Type: Model
+
+Requisitos:
+
+Relacionar model Property com RealEstate (imobiliária responsável)
+
+Definir casts adequados (ex: preço como decimal, área como float)
+
+📌 Tarefa: Implementar Mutation GraphQL para Cadastro de Imóveis
+Status: Pending
+
+Priority: High
+
+Feature Type: GraphQL Mutation
+
+GraphQL Schema:
+
+graphql
+Copiar
+Editar
+extend type Mutation {
+    createProperty(input: CreatePropertyInput! @spread): Property! 
+      @field(resolver: "Property\\GraphQL\\Mutations\\CreatePropertyMutation") 
+      @auth(guard: "api")
+}
+
+input CreatePropertyInput {
+    title: String! @rules(apply: ["required", "string", "max:255"])
+    description: String! @rules(apply: ["required", "string"])
+    propertyType: PropertyType! @rules(apply: ["required"])
+    status: PropertyStatus! @rules(apply: ["required"])
+    price: Float! @rules(apply: ["required", "numeric", "min:0"])
+    address: AddressInput! @rules(apply: ["required"])
+    features: PropertyFeaturesInput
+    realEstateId: ID! @rules(apply: ["required", "exists:real_estates,id"])
+}
+
+enum PropertyType {
+    APARTMENT
+    HOUSE
+    COMMERCIAL
+    LAND
+}
+
+enum PropertyStatus {
+    AVAILABLE
+    RENTED
+    SOLD
+}
+
+input AddressInput {
+    street: String!
+    number: String!
+    neighborhood: String!
+    city: String!
+    state: String!
+    zipCode: String!
+}
+
+input PropertyFeaturesInput {
+    bedrooms: Int
+    bathrooms: Int
+    area: Float
+    hasGarage: Boolean
+    hasPool: Boolean
+}
+📌 Tarefa: Criar Resolver para Mutation GraphQL
+Status: Pending
+
+Priority: High
+
+Feature Type: Service/Resolver
+
+Requisitos:
+
+Implementar validação adicional de regras específicas (como limites mínimos e máximos de valores)
+
+Manipular upload de mídias (imagens e vídeos)
+
+Garantir vinculação correta do imóvel à imobiliária autenticada
+
+🗂 História: Upload e Gestão de Mídia do Imóvel
+Descrição:
+Como corretor ou gestor, desejo fazer upload e gestão de fotos e vídeos dos imóveis diretamente pelo sistema, facilitando a exibição visual atrativa aos clientes.
+
+Critérios de Aceitação:
+Upload fácil e rápido de mídias (fotos e vídeos).
+
+Validação automática de formatos aceitos.
+
+Associação automática das mídias ao imóvel correto.
+
+⚙️ Tarefas Técnicas:
+📌 Tarefa: Criar Migration para tabela "property_media"
+Status: Pending
+
+Priority: Medium
+
+Feature Type: Migration
+
+Requisitos:
+
+Criar tabela com campos:
+
+ID do imóvel (property_id)
+
+Tipo de mídia (imagem ou vídeo)
+
+URL do arquivo armazenado
+
+Flag para mídia principal (destaque)
+
+Timestamp de criação e atualização
+
+📌 Tarefa: Criar Model "PropertyMedia"
+Status: Pending
+
+Priority: Medium
+
+Feature Type: Model
+
+Requisitos:
+
+Relacionamento com Model Property
+
+📌 Tarefa: Implementar Mutation GraphQL para Upload de Mídia
+Status: Pending
+
+Priority: Medium
+
+Feature Type: GraphQL Mutation
+
+GraphQL Schema:
+
+graphql
+Copiar
+Editar
+extend type Mutation {
+    uploadPropertyMedia(input: UploadPropertyMediaInput! @spread): PropertyMedia!
+      @field(resolver: "Property\\GraphQL\\Mutations\\UploadPropertyMediaMutation")
+      @auth(guard: "api")
+}
+
+input UploadPropertyMediaInput {
+    propertyId: ID! @rules(apply: ["required", "exists:properties,id"])
+    media: Upload! @rules(apply: ["required", "mimes:jpg,jpeg,png,mp4,mov"])
+    isPrimary: Boolean = false
+}
+📌 Tarefa: Implementar serviço de armazenamento e validação de mídia
+Status: Pending
+
+Priority: Medium
+
+Feature Type: Service
+
+Requisitos:
+
+Validar tamanho e formato das mídias antes de armazenar
+
+Usar storage do Laravel (AWS S3 ou local no desenvolvimento)
+
+🗂 História: Pesquisa e Listagem de Imóveis (básico backend)
+Descrição:
+Como cliente ou corretor, quero pesquisar imóveis facilmente através de diversos filtros e visualizar informações detalhadas rapidamente.
+
+Critérios de Aceitação:
+Pesquisa com filtros por cidade, bairro, preço, tipo e características.
+
+Paginação e ordenação claras e rápidas.
+
+Informações essenciais retornadas de forma otimizada.
+
+⚙️ Tarefas Técnicas:
+📌 Tarefa: Criar Query GraphQL de pesquisa de imóveis
+Status: Pending
+
+Priority: High
+
+Feature Type: GraphQL Query
+
+GraphQL Schema já fornecido no arquivo tasks.md anterior.
+
+📌 Tarefa: Implementar Resolver para Query de pesquisa de imóveis
+Status: Pending
+
+Priority: High
+
+Feature Type: Resolver
+
+Requisitos:
+
+Filtragem dinâmica e eficiente usando Criteria Pattern ou Query Builder.
+
+Suporte a paginação com Lighthouse.
+
+📚 Pesquisas Necessárias (dev):
+Conferir campos adicionais que grandes sites imobiliários usam para melhorar a completude dos cadastros (Zap, QuintoAndar, OLX, VivaReal).
+
+Validação dos formatos e limites das mídias mais usados no mercado imobiliário.
+
+Essas histórias e tarefas estruturadas e detalhadas oferecem clareza suficiente para o desenvolvimento backend inicial com Laravel e GraphQL, e permitem ao time de desenvolvimento atuar de forma clara, objetiva e autônoma.
