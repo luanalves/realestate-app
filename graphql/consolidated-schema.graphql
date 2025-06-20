@@ -1,0 +1,144 @@
+"""
+Main GraphQL Schema
+This is a consolidated schema combining all module schemas for testing purposes.
+"""
+
+# Global scalars
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+scalar JSON @scalar(class: "App\\GraphQL\\Scalars\\JSON")
+
+"""
+The available pagination information.
+"""
+type PaginatorInfo {
+    """
+    Total count of available items.
+    """
+    count: Int!
+
+    """
+    Current page of the cursor.
+    """
+    currentPage: Int!
+
+    """
+    Count of available pages.
+    """
+    lastPage: Int!
+
+    """
+    Last page of the cursor.
+    """
+    hasMorePages: Boolean!
+
+    """
+    First item of the page.
+    """
+    firstItem: Int
+
+    """
+    Last item of the page.
+    """
+    lastItem: Int
+
+    """
+    Total number of items in the cursor.
+    """
+    total: Int!
+}
+
+# Base types
+type Query {
+    """
+    Get currently authenticated user
+    """
+    me: User @auth
+    
+    """
+    Get all users (requires authentication)
+    """
+    users: [User!]! @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\Users")
+
+    """
+    Get a user by ID (requires authentication)
+    """
+    user(id: ID!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\User")
+}
+
+type Mutation {
+    """
+    Create a new user
+    """
+    createUser(input: CreateUserInput!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\CreateUser")
+    
+    """
+    Update an existing user
+    """
+    updateUser(id: ID!, input: UpdateUserInput!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdateUser")
+    
+    """
+    Delete a user
+    """
+    deleteUser(id: ID!): DeleteUserResponse @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\DeleteUser")
+
+    """
+    Login a user
+    """
+    login(email: String!, password: String!): LoginResponse!
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
+}
+
+# Input types
+input CreateUserInput {
+    name: String!
+    email: String!
+    password: String!
+    role_id: ID!
+}
+
+input UpdateUserInput {
+    name: String
+    email: String
+    password: String
+    role_id: ID
+}
+
+# Object types
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    role: Role @belongsTo
+    created_at: String
+    updated_at: String
+}
+
+type Role {
+    id: ID!
+    name: String!
+    description: String
+    users: [User!]! @hasMany
+}
+
+type LoginResponse {
+    access_token: String!
+    token_type: String!
+    expires_in: Int!
+    user: User!
+}
+
+type DeleteUserResponse {
+    success: Boolean!
+    message: String!
+}
+
+# Standard Lighthouse ordering types
+input OrderByClause {
+    column: String!
+    order: SortOrder!
+}
+
+enum SortOrder {
+    ASC
+    DESC
+}
