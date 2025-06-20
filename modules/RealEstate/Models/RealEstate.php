@@ -13,7 +13,6 @@ namespace Modules\RealEstate\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Modules\RealEstate\Models\RealEstateAddress;
 
 class RealEstate extends Model
 {
@@ -30,7 +29,6 @@ class RealEstate extends Model
     protected $fillable = [
         'name',
         'fantasy_name',
-        'corporate_name',
         'cnpj',
         'description',
         'email',

@@ -21,7 +21,7 @@ return new class extends Migration {
         Schema::create('real_estates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('fantasy_name');
+            $table->string('fantasy_name')->nullable();
             $table->string('cnpj', 14)->unique();
             $table->text('description')->nullable();
             $table->string('email')->unique();
