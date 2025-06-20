@@ -15,6 +15,20 @@
 
 ## 🔥 Prioridade ALTA
 
+### GraphQL Pagination - Padronização
+- [x] **Fix RealEstates query pagination**
+  - ✅ Changed return format to match GraphQL schema expectation
+  - ✅ Added documentation in `doc/patterns/graphql-pagination-pattern.md`
+- [ ] **Audit all paginated queries and fix if needed**
+  - [x] SecurityLogs query (correctly implemented)
+  - [x] RealEstates query (fixed)
+  - [ ] Verify all other paginated queries in all modules
+  - [ ] Add pagination handling to future query resolvers
+- [ ] **Create Lighthouse pagination helper**
+  - [ ] Create utility function to transform Laravel paginators to GraphQL format
+  - [ ] Add to shared utilities
+  - [ ] Update documentation with examples
+
 ### Authorization Service Pattern - Expansão
 - [x] **Identificar todos os módulos existentes**
   - ✅ Security: Implementado

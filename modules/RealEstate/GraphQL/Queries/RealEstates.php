@@ -11,8 +11,6 @@ declare(strict_types=1);
 namespace Modules\RealEstate\GraphQL\Queries;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
 use Modules\RealEstate\Models\RealEstate;
 use Modules\RealEstate\Services\RealEstateService;
 use Modules\UserManagement\Database\Seeders\RolesSeeder;
@@ -20,15 +18,10 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class RealEstates
 {
-    /**
-     * @var RealEstateService
-     */
     private RealEstateService $_realEstateService;
 
     /**
      * Constructor.
-     *
-     * @param RealEstateService $realEstateService
      */
     public function __construct(RealEstateService $realEstateService)
     {
@@ -37,14 +30,8 @@ class RealEstates
 
     /**
      * Return a paginated list of real estate agencies.
-     *
-     * @param mixed $rootValue
-     * @param array $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo $resolveInfo
-     * @return LengthAwarePaginator
      */
-    public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
+    public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         // Authorize access to real estate data
         $user = $this->_realEstateService->authorizeRealEstateAccess();
@@ -73,6 +60,22 @@ class RealEstates
             $query->orderBy('name', 'asc');
         }
 
-        return $query->paginate($first, ['*'], 'page', $page);
+        // Get paginated results
+        $paginatedRealEstates = $query->paginate($first, ['*'], 'page', $page);
+
+        // Return data in the format expected by the GraphQL schema
+        return [
+            'data' => $paginatedRealEstates->items(),
+            'paginatorInfo' => [
+                'count' => $paginatedRealEstates->count(),
+                'currentPage' => $paginatedRealEstates->currentPage(),
+                'firstItem' => $paginatedRealEstates->firstItem(),
+                'hasMorePages' => $paginatedRealEstates->hasMorePages(),
+                'lastItem' => $paginatedRealEstates->lastItem(),
+                'lastPage' => $paginatedRealEstates->lastPage(),
+                'perPage' => $paginatedRealEstates->perPage(),
+                'total' => $paginatedRealEstates->total(),
+            ],
+        ];
     }
 }

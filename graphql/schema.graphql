@@ -135,7 +135,6 @@ type Mutation {
     createRealEstate(
         name: String! @rules(apply: ["required", "string", "max:255"]),
         fantasy_name: String @rules(apply: ["nullable", "string", "max:255"]),
-        corporate_name: String @rules(apply: ["nullable", "string", "max:255"]),
         cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:real_estates,cnpj"]),
         description: String @rules(apply: ["nullable", "string", "max:1000"]),
         email: String! @rules(apply: ["required", "email", "unique:real_estates,email"]),
@@ -424,9 +423,6 @@ type RealEstate {
     "Fantasy name"
     fantasy_name: String
 
-    "Corporate name"
-    corporate_name: String
-
     "CNPJ (Brazilian tax ID)"
     cnpj: String!
 
@@ -448,14 +444,26 @@ type RealEstate {
     "Last update timestamp"
     updated_at: DateTime!
 
-    "Address information"
-    address: RealEstateAddress
+    "Main address (headquarters) information"
+    address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateHeadquarters")
+
+    "All addresses (headquarters and branches)"
+    addresses: [RealEstateAddress!]! @hasMany
+
+    "Branch addresses only"
+    branches: [RealEstateAddress!] @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateBranches")
 }
 
 """
 Real Estate Address
 """
 type RealEstateAddress {
+    "Unique identifier"
+    id: ID!
+    
+    "Address type (headquarters or branch)"
+    type: String!
+    
     "Street name"
     street: String!
 
@@ -479,6 +487,15 @@ type RealEstateAddress {
 
     "Country"
     country: String
+    
+    "Whether the address is active"
+    active: Boolean!
+    
+    "Creation timestamp"
+    created_at: DateTime!
+    
+    "Last update timestamp"
+    updated_at: DateTime!
 }
 
 """
@@ -531,9 +548,6 @@ input UpdateRealEstateInput {
 
     "Fantasy name"
     fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
-
-    "Corporate name"
-    corporate_name: String @rules(apply: ["nullable", "string", "max:255"])
 
     "CNPJ (Brazilian tax ID)"
     cnpj: String @rules(apply: ["string", "size:14", "unique:real_estates,cnpj"])

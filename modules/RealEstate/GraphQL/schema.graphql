@@ -15,7 +15,6 @@ extend type Mutation {
     createRealEstate(
         name: String! @rules(apply: ["required", "string", "max:255"]),
         fantasy_name: String @rules(apply: ["nullable", "string", "max:255"]),
-        corporate_name: String @rules(apply: ["nullable", "string", "max:255"]),
         cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:real_estates,cnpj"]),
         description: String @rules(apply: ["nullable", "string", "max:1000"]),
         email: String! @rules(apply: ["required", "email", "unique:real_estates,email"]),
@@ -58,8 +57,14 @@ type RealEstate {
     "Website URL"
     website: String
 
-    "Address information"
-    address: RealEstateAddress
+    "Main address (headquarters) information"
+    address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateHeadquarters")
+
+    "All addresses (headquarters and branches)"
+    addresses: [RealEstateAddress!]! @hasMany
+
+    "Branch addresses only"
+    branches: [RealEstateAddress!] @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateBranches")
 
     "CRECI license number"
     creci: String
@@ -78,24 +83,57 @@ type RealEstate {
 
     "Users associated with this real estate agency"
     users: [User!]! @hasMany
+    
+    "All addresses of this real estate agency"
+    addresses: [RealEstateAddress!]! @hasMany
+    
+    "Headquarters address of this real estate agency"
+    headquarters: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateHeadquarters")
+    
+    "Branch addresses of this real estate agency"
+    branches: [RealEstateAddress!]! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateBranches")
 }
 
 "Real Estate Address"
 type RealEstateAddress {
+    "Unique identifier"
+    id: ID!
+    
+    "Address type (headquarters or branch)"
+    type: String!
+    
     "Street address"
-    street: String
+    street: String!
 
+    "Street number"
+    number: String!
+    
+    "Complement"
+    complement: String
+    
+    "Neighborhood"
+    neighborhood: String!
+    
     "City"
-    city: String
+    city: String!
 
     "State"
-    state: String
+    state: String!
 
     "ZIP/Postal code"
-    zip_code: String
+    zip_code: String!
 
     "Country"
     country: String
+    
+    "Whether the address is active"
+    active: Boolean!
+    
+    "Creation timestamp"
+    created_at: DateTime!
+    
+    "Last update timestamp"
+    updated_at: DateTime!
 }
 
 "Input for creating a real estate agency"
