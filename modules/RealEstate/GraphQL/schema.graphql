@@ -78,14 +78,11 @@ type RealEstate {
     "Website URL"
     website: String
 
-    "Main address (headquarters) information"
-    address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateHeadquarters")
+    "Main address information"
+    address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateAddress")
 
-    "All addresses (headquarters and branches)"
+    "All addresses of this real estate agency"
     addresses: [RealEstateAddress!]! @hasMany
-
-    "Branch addresses only"
-    branches: [RealEstateAddress!] @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateBranches")
 
     "CRECI license number"
     creci: String
@@ -104,15 +101,6 @@ type RealEstate {
 
     "Users associated with this real estate agency"
     users: [User!]! @hasMany
-    
-    "All addresses of this real estate agency"
-    addresses: [RealEstateAddress!]! @hasMany
-    
-    "Headquarters address of this real estate agency"
-    headquarters: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateHeadquarters")
-    
-    "Branch addresses of this real estate agency"
-    branches: [RealEstateAddress!]! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateBranches")
 }
 
 "Real Estate Address"

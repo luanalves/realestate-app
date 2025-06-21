@@ -475,10 +475,10 @@ type RealEstate {
     "Last update timestamp"
     updated_at: DateTime!
 
-    "Main address (headquarters) information"
-    address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateHeadquarters")
+    "Main address information"
+    address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateAddress")
 
-    "All addresses (headquarters and branches)"
+    "All addresses"
     addresses: [RealEstateAddress!]! @hasMany
 
     "Branch addresses only"
@@ -616,8 +616,8 @@ type RealEstatePaginator {
 
 "Input for creating a new real estate address"
 input CreateRealEstateAddressInput {
-    "Address type (headquarters or branch)"
-    type: String! @rules(apply: ["required", "string", "in:headquarters,branch"])
+    "Address type"
+    type: String! @rules(apply: ["required", "string", "max:50"])
     
     "Street address"
     street: String! @rules(apply: ["required", "string", "max:255"])
@@ -649,8 +649,8 @@ input CreateRealEstateAddressInput {
 
 "Input for updating an existing real estate address"
 input UpdateRealEstateAddressInput {
-    "Address type (headquarters or branch)"
-    type: String @rules(apply: ["string", "in:headquarters,branch"])
+    "Address type"
+    type: String @rules(apply: ["string", "max:50"])
     
     "Street address"
     street: String @rules(apply: ["string", "max:255"])

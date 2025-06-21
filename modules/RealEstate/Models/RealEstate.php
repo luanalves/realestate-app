@@ -58,22 +58,6 @@ class RealEstate extends Model
     }
 
     /**
-     * Get the headquarters address for this real estate agency.
-     */
-    public function headquarters()
-    {
-        return $this->hasOne(RealEstateAddress::class)->where('type', 'headquarters');
-    }
-
-    /**
-     * Get the branch addresses for this real estate agency.
-     */
-    public function branches(): HasMany
-    {
-        return $this->hasMany(RealEstateAddress::class)->where('type', 'branch');
-    }
-
-    /**
      * Scope a query to only include active real estates.
      */
     public function scopeActive($query)
