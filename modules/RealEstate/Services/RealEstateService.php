@@ -93,16 +93,9 @@ class RealEstateService
             if ($addressData) {
                 $this->createRealEstateAddress($realEstate->id, $addressData);
             }
-
-            Log::info('Real estate agency created', [
-                'id' => $realEstate->id,
-                'name' => $realEstate->name,
-                'created_by_user_id' => $user->id,
-            ]);
-
             // Load addresses relationship for return value
             $realEstate->load('addresses');
-            
+
             return $realEstate;
         } catch (\Exception $e) {
             Log::error('Error creating real estate agency', [
@@ -120,7 +113,7 @@ class RealEstateService
     {
         $user = $this->authorizeRealEstateWrite($user);
         $realEstate = RealEstate::findOrFail($id);
-        
+
         // Check if user can access this real estate
         $this->authorizeRealEstateEntityAccess($realEstate, $user);
 
@@ -142,15 +135,8 @@ class RealEstateService
                 $this->updateRealEstateAddress($realEstate, $addressData);
             }
 
-            Log::info('Real estate agency updated', [
-                'id' => $realEstate->id,
-                'name' => $realEstate->name,
-                'updated_by_user_id' => $user->id,
-            ]);
-
-            // Load addresses relationship for return value
             $realEstate->load('addresses');
-            
+
             return $realEstate;
         } catch (\Exception $e) {
             Log::error('Error updating real estate agency', [
@@ -169,7 +155,7 @@ class RealEstateService
     {
         $user = $this->authorizeRealEstateWrite($user);
         $realEstate = RealEstate::with('addresses')->findOrFail($id);
-        
+
         // Check if user can access this real estate
         $this->authorizeRealEstateEntityAccess($realEstate, $user);
 
@@ -179,16 +165,10 @@ class RealEstateService
         try {
             // Delete the addresses first (should cascade but being explicit)
             $realEstate->addresses()->delete();
-            
+
             // Delete the real estate agency
             $realEstate->delete();
-            
-            Log::info('Real estate agency deleted', [
-                'id' => $deletedRealEstate->id,
-                'name' => $deletedRealEstate->name,
-                'deleted_by_user_id' => $user->id,
-            ]);
-            
+
             return $deletedRealEstate;
         } catch (\Exception $e) {
             Log::error('Error deleting real estate agency', [
@@ -208,7 +188,11 @@ class RealEstateService
         $addressData['real_estate_id'] = $realEstateId;
         $addressData['type'] = $addressData['type'] ?? 'headquarters';
         $addressData['active'] = $addressData['active'] ?? true;
-        
+
+        if (isset($addressData['zip_code'])) {
+            $addressData['zip_code'] = str_replace('-', '', $addressData['zip_code']);
+        }
+
         return RealEstateAddress::create($addressData);
     }
 
@@ -218,14 +202,99 @@ class RealEstateService
     private function updateRealEstateAddress(RealEstate $realEstate, array $addressData): RealEstateAddress
     {
         $address = $realEstate->headquarters ?? $realEstate->addresses()->first();
-        
+
         if ($address) {
             // Update existing address
             $address->update($addressData);
+
             return $address;
         } else {
             // Create new address if none exists
             return $this->createRealEstateAddress($realEstate->id, $addressData);
+        }
+    }
+
+    /**
+     * Create a new address for an existing real estate.
+     */
+    public function createRealEstateAddressForExisting(int $realEstateId, array $addressData, ?object $user = null): RealEstateAddress
+    {
+        $user = $this->authorizeRealEstateWrite($user);
+        $realEstate = RealEstate::findOrFail($realEstateId);
+
+        // Check if user can access this real estate
+        $this->authorizeRealEstateEntityAccess($realEstate, $user);
+
+        try {
+            $address = $this->createRealEstateAddress($realEstateId, $addressData);
+
+            return $address;
+        } catch (\Exception $e) {
+            Log::error('Error creating real estate address', [
+                'error' => $e->getMessage(),
+                'real_estate_id' => $realEstateId,
+                'user_id' => $user->id,
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Update an existing real estate address.
+     */
+    public function updateRealEstateAddressById(int $id, array $addressData, ?object $user = null): RealEstateAddress
+    {
+        $user = $this->authorizeRealEstateWrite($user);
+        $address = RealEstateAddress::findOrFail($id);
+
+        // Check if user can access the real estate this address belongs to
+        $this->authorizeRealEstateEntityAccess($address->realEstate, $user);
+
+        try {
+            // Processando os dados do endereço
+            if (isset($addressData['zip_code'])) {
+                $addressData['zip_code'] = str_replace('-', '', $addressData['zip_code']);
+            }
+
+            $address->update($addressData);
+
+            return $address;
+        } catch (\Exception $e) {
+            Log::error('Error updating real estate address', [
+                'error' => $e->getMessage(),
+                'address_id' => $id,
+                'user_id' => $user->id,
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Delete an existing real estate address.
+     */
+    public function deleteRealEstateAddress(int $id, ?object $user = null): RealEstateAddress
+    {
+        $user = $this->authorizeRealEstateWrite($user);
+        $address = RealEstateAddress::findOrFail($id);
+
+        // Check if user can access the real estate this address belongs to
+        $this->authorizeRealEstateEntityAccess($address->realEstate, $user);
+
+        // Store reference before deletion for return value
+        $deletedAddress = clone $address;
+
+        try {
+            // Delete the address
+            $address->delete();
+
+            return $deletedAddress;
+        } catch (\Exception $e) {
+            Log::error('Error deleting real estate address', [
+                'error' => $e->getMessage(),
+                'address_id' => $id,
+                'user_id' => $user->id,
+            ]);
+            throw $e;
         }
     }
 }
