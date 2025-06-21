@@ -105,6 +105,16 @@ type Query {
     Get a specific real estate agency by ID
     """
     realEstateById(id: ID!): RealEstate @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateById")
+
+    """
+    Get a specific real estate address by ID
+    """
+    realEstateAddressById(id: ID!): RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateAddressById")
+    
+    """
+    Get all addresses for a specific real estate agency
+    """
+    addressesByRealEstateId(realEstateId: ID!): [RealEstateAddress!]! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\AddressesByRealEstateId")
 }
 
 type Mutation {
@@ -159,6 +169,27 @@ type Mutation {
     Delete a real estate agency
     """
     deleteRealEstate(id: ID!): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstate")
+
+    """
+    Create a new address for an existing real estate agency
+    """
+    createRealEstateAddress(
+        realEstateId: ID! @rules(apply: ["required", "exists:real_estates,id"]),
+        input: CreateRealEstateAddressInput!
+    ): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstateAddressMutation")
+    
+    """
+    Update an existing real estate address
+    """
+    updateRealEstateAddress(
+        id: ID!,
+        input: UpdateRealEstateAddressInput!
+    ): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstateAddressMutation")
+    
+    """
+    Delete a real estate address
+    """
+    deleteRealEstateAddress(id: ID!): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstateAddressMutation")
 }
 
 # User Management Types
@@ -582,3 +613,69 @@ type RealEstatePaginator {
 # Module schemas are registered via ServiceProviders
 # using the lighthouse.schema.register configuration
 # DO NOT use #import for modules registered this way
+
+"Input for creating a new real estate address"
+input CreateRealEstateAddressInput {
+    "Address type (headquarters or branch)"
+    type: String! @rules(apply: ["required", "string", "in:headquarters,branch"])
+    
+    "Street address"
+    street: String! @rules(apply: ["required", "string", "max:255"])
+    
+    "Street number"
+    number: String! @rules(apply: ["required", "string", "max:20"])
+    
+    "Complement"
+    complement: String @rules(apply: ["nullable", "string", "max:100"])
+    
+    "Neighborhood"
+    neighborhood: String! @rules(apply: ["required", "string", "max:100"])
+    
+    "City"
+    city: String! @rules(apply: ["required", "string", "max:100"])
+    
+    "State"
+    state: String! @rules(apply: ["required", "string", "max:50"])
+    
+    "ZIP/Postal code"
+    zip_code: String! @rules(apply: ["required", "string", "max:10"])
+    
+    "Country"
+    country: String = "BR" @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Whether the address is active"
+    active: Boolean = true @rules(apply: ["boolean"])
+}
+
+"Input for updating an existing real estate address"
+input UpdateRealEstateAddressInput {
+    "Address type (headquarters or branch)"
+    type: String @rules(apply: ["string", "in:headquarters,branch"])
+    
+    "Street address"
+    street: String @rules(apply: ["string", "max:255"])
+    
+    "Street number"
+    number: String @rules(apply: ["string", "max:20"])
+    
+    "Complement"
+    complement: String @rules(apply: ["nullable", "string", "max:100"])
+    
+    "Neighborhood"
+    neighborhood: String @rules(apply: ["string", "max:100"])
+    
+    "City"
+    city: String @rules(apply: ["string", "max:100"])
+    
+    "State"
+    state: String @rules(apply: ["string", "max:50"])
+    
+    "ZIP/Postal code"
+    zip_code: String @rules(apply: ["string", "max:10"])
+    
+    "Country"
+    country: String @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Whether the address is active"
+    active: Boolean @rules(apply: ["boolean"])
+}
