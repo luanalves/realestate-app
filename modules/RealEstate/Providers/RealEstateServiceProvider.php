@@ -30,9 +30,23 @@ class RealEstateServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
         // Register GraphQL schema
+        $schemaPath = __DIR__.'/../GraphQL/schema.graphql';
+        $currentSchemas = config('lighthouse.schema.register', []);
+
+        // Debug information
+        \Log::debug('Registering RealEstate schema', [
+            'schema_path' => $schemaPath,
+            'current_schemas' => $currentSchemas,
+        ]);
+
         config(['lighthouse.schema.register' => array_merge(
-            config('lighthouse.schema.register', []),
-            [__DIR__.'/../GraphQL/schema.graphql']
+            $currentSchemas,
+            [$schemaPath]
         )]);
+
+        // Verify registration
+        \Log::debug('After RealEstate schema registration', [
+            'registered_schemas' => config('lighthouse.schema.register'),
+        ]);
     }
 }
