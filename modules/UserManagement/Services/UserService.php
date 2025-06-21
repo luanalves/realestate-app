@@ -32,16 +32,8 @@ class UserService
      */
     public function getAuthenticatedUserData(string $email): User
     {
-        Log::info('UserService: Getting authenticated user data', ['email' => $email]);
-
         try {
             $user = $this->userRepository->findByEmailWithRole($email);
-
-            Log::info('UserService: User data retrieved successfully', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'role' => $user->role?->name ?? 'no_role',
-            ]);
 
             return $user;
         } catch (\Exception $e) {
@@ -61,8 +53,6 @@ class UserService
      */
     public function getUserById(int $userId): User
     {
-        Log::debug('UserService: Getting user by ID', ['user_id' => $userId]);
-
         return $this->userRepository->findByIdWithRole($userId);
     }
 
@@ -72,8 +62,6 @@ class UserService
      */
     public function invalidateUserCache(int $userId): void
     {
-        Log::info('UserService: Invalidating user cache', ['user_id' => $userId]);
-
         $this->userRepository->invalidateCache($userId);
     }
 
@@ -83,8 +71,6 @@ class UserService
      */
     public function clearAllUserCache(): void
     {
-        Log::info('UserService: Clearing all user caches');
-
         $this->userRepository->clearAllCache();
     }
 

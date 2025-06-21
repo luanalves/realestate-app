@@ -22,31 +22,26 @@ class UserRepositoryFactory
      * Create appropriate user repository based on cache availability and configuration.
      *
      * @param bool|null $forceCache Override automatic detection
-     * @return UserRepositoryInterface
      */
     public static function create(?bool $forceCache = null): UserRepositoryInterface
     {
         // Allow manual override for testing or specific use cases
         if ($forceCache !== null) {
-            return $forceCache 
-                ? new CachedUserRepository() 
+            return $forceCache
+                ? new CachedUserRepository()
                 : new DatabaseUserRepository();
         }
 
         // Auto-detect best strategy
         if (self::isCacheAvailable()) {
-            Log::debug("UserRepositoryFactory: Creating CachedUserRepository");
             return new CachedUserRepository();
         }
 
-        Log::debug("UserRepositoryFactory: Creating DatabaseUserRepository (cache not available)");
         return new DatabaseUserRepository();
     }
 
     /**
      * Create cached repository explicitly.
-     *
-     * @return CachedUserRepository
      */
     public static function createCached(): CachedUserRepository
     {
@@ -55,8 +50,6 @@ class UserRepositoryFactory
 
     /**
      * Create database repository explicitly.
-     *
-     * @return DatabaseUserRepository
      */
     public static function createDatabase(): DatabaseUserRepository
     {
@@ -65,45 +58,40 @@ class UserRepositoryFactory
 
     /**
      * Check if cache is available and working.
-     *
-     * @return bool
      */
     private static function isCacheAvailable(): bool
     {
         try {
             // Test cache connectivity
-            $testKey = 'user_repository_factory_test_' . time();
+            $testKey = 'user_repository_factory_test_'.time();
             $testValue = 'test';
-            
+
             Cache::put($testKey, $testValue, 5);
             $retrieved = Cache::get($testKey);
             Cache::forget($testKey);
-            
+
             $isAvailable = $retrieved === $testValue;
-            
+
             if (!$isAvailable) {
-                Log::warning("UserRepositoryFactory: Cache test failed - value mismatch", [
+                Log::warning('UserRepositoryFactory: Cache test failed - value mismatch', [
                     'expected' => $testValue,
-                    'retrieved' => $retrieved
+                    'retrieved' => $retrieved,
                 ]);
             }
-            
+
             return $isAvailable;
-            
         } catch (\Exception $e) {
-            Log::warning("UserRepositoryFactory: Cache is not available", [
+            Log::warning('UserRepositoryFactory: Cache is not available', [
                 'error' => $e->getMessage(),
-                'cache_driver' => config('cache.default')
+                'cache_driver' => config('cache.default'),
             ]);
-            
+
             return false;
         }
     }
 
     /**
      * Get current cache configuration for debugging.
-     *
-     * @return array
      */
     public static function getCacheInfo(): array
     {
