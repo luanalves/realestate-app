@@ -45,7 +45,7 @@ class OrganizationConstants
      * Mapeamento entre tipos de organização e as classes correspondentes
      */
     public const ORGANIZATION_TYPE_MAP = [
-        self::ORGANIZATION_TYPE_REAL_ESTATE => \Modules\Organization\Models\RealEstateOrganization::class,
+        self::ORGANIZATION_TYPE_REAL_ESTATE => \Modules\RealEstate\Models\RealEstateOrganization::class,
     ];
     
     /**

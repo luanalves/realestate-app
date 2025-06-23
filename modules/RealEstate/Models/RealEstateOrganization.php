@@ -8,11 +8,10 @@
 
 declare(strict_types=1);
 
-namespace Modules\Organization\Models;
+namespace Modules\RealEstate\Models;
 
-/**
- * Modelo específico para imobiliárias
- */
+use Modules\Organization\Models\Organization;
+
 class RealEstateOrganization extends Organization
 {
     /**
@@ -51,4 +50,16 @@ class RealEstateOrganization extends Organization
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * Escopo para filtrar por CRECI
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $creci
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereCRECI($query, $creci)
+    {
+        return $query->where('creci', $creci);
+    }
 }

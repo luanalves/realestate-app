@@ -1,0 +1,166 @@
+"""
+Schema GraphQL para o módulo RealEstate
+"""
+
+"""
+RealEstateOrganization representa uma imobiliária no sistema
+"""
+type RealEstateOrganization implements Organization {
+    "ID única da organização"
+    id: ID!
+    
+    "Nome da organização"
+    name: String!
+    
+    "Nome fantasia da imobiliária"
+    fantasyName: String
+    
+    "CNPJ da imobiliária"
+    cnpj: String!
+    
+    "Descrição da organização"
+    description: String
+    
+    "Email de contato principal"
+    email: String!
+    
+    "Telefone de contato principal"
+    phone: String
+    
+    "Website da organização"
+    website: String
+    
+    "Número do CRECI da imobiliária"
+    creci: String
+    
+    "Inscrição estadual"
+    stateRegistration: String
+    
+    "Representante legal"
+    legalRepresentative: String
+    
+    "Indica se a organização está ativa"
+    active: Boolean!
+    
+    "Membros da organização"
+    members: [OrganizationMembership!]! @morphMany
+    
+    "Membros ativos da organização"
+    activeMembers: [OrganizationMembership!]! @morphMany(relation: "activeMembers")
+    
+    "Endereço principal da organização"
+    mainAddress: OrganizationAddress
+    
+    "Endereços da organização"
+    addresses: [OrganizationAddress!]!
+    
+    "Data de criação"
+    createdAt: DateTime!
+    
+    "Data da última atualização"
+    updatedAt: DateTime!
+}
+
+"""
+Input para criação de uma imobiliária
+"""
+input CreateRealEstateOrganizationInput {
+    "Nome da organização"
+    name: String! @rules(apply: ["required", "string", "max:255"])
+    
+    "Nome fantasia da imobiliária"
+    fantasyName: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "CNPJ da imobiliária"
+    cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:real_estate_organizations,cnpj"])
+    
+    "Descrição da organização"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+    
+    "Email de contato principal"
+    email: String! @rules(apply: ["required", "email", "unique:real_estate_organizations,email"])
+    
+    "Telefone de contato principal"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+    
+    "Website da organização"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+    
+    "Número do CRECI da imobiliária"
+    creci: String @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Inscrição estadual"
+    stateRegistration: String @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Representante legal"
+    legalRepresentative: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Indica se a organização está ativa"
+    active: Boolean = true
+    
+    "Endereço principal da organização"
+    address: OrganizationAddressInput
+}
+
+"""
+Input para atualização de uma imobiliária
+"""
+input UpdateRealEstateOrganizationInput {
+    "Nome da organização"
+    name: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Nome fantasia da imobiliária"
+    fantasyName: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Descrição da organização"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+    
+    "Email de contato principal"
+    email: String @rules(apply: ["nullable", "email"])
+    
+    "Telefone de contato principal"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+    
+    "Website da organização"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+    
+    "Número do CRECI da imobiliária"
+    creci: String @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Inscrição estadual"
+    stateRegistration: String @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Representante legal"
+    legalRepresentative: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Indica se a organização está ativa"
+    active: Boolean
+}
+
+extend type Query {
+    "Listar todas as imobiliárias"
+    realEstateOrganizations(
+        first: Int = 10
+        page: Int = 1
+        orderBy: [OrderByClause!]
+    ): RealEstateOrganizationPaginator! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateOrganizations")
+
+    "Obter uma imobiliária específica pelo ID"
+    realEstateOrganizationById(id: ID!): RealEstateOrganization @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateOrganizationById")
+}
+
+extend type Mutation {
+    "Criar uma nova imobiliária"
+    createRealEstateOrganization(
+        input: CreateRealEstateOrganizationInput! @spread
+    ): RealEstateOrganization! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstateOrganization")
+    
+    "Atualizar uma imobiliária existente"
+    updateRealEstateOrganization(
+        id: ID!,
+        input: UpdateRealEstateOrganizationInput! @spread
+    ): RealEstateOrganization! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstateOrganization")
+    
+    "Remover uma imobiliária"
+    deleteRealEstateOrganization(id: ID!): RealEstateOrganization! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstateOrganization")
+}

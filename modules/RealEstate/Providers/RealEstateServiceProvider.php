@@ -11,14 +11,28 @@ declare(strict_types=1);
 namespace Modules\RealEstate\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Organization\Providers\OrganizationServiceProvider;
 
 class RealEstateServiceProvider extends ServiceProvider
 {
+    /**
+     * Todas as dependências de serviço do pacote.
+     *
+     * @var array
+     */
+    protected $dependencies = [
+        OrganizationServiceProvider::class,
+    ];
+
     /**
      * Register services.
      */
     public function register(): void
     {
+        // Registre todas as dependências primeiro
+        foreach ($this->dependencies as $dependency) {
+            $this->app->register($dependency);
+        }
     }
 
     /**
@@ -31,22 +45,19 @@ class RealEstateServiceProvider extends ServiceProvider
 
         // Register GraphQL schema
         $schemaPath = __DIR__.'/../GraphQL/schema.graphql';
-        $currentSchemas = config('lighthouse.schema.register', []);
+        if (file_exists($schemaPath)) {
+            $currentSchemas = config('lighthouse.schema.register', []);
 
-        // Debug information
-        \Log::debug('Registering RealEstate schema', [
-            'schema_path' => $schemaPath,
-            'current_schemas' => $currentSchemas,
-        ]);
+            config(['lighthouse.schema.register' => array_merge(
+                $currentSchemas,
+                [$schemaPath]
+            )]);
 
-        config(['lighthouse.schema.register' => array_merge(
-            $currentSchemas,
-            [$schemaPath]
-        )]);
-
-        // Verify registration
-        \Log::debug('After RealEstate schema registration', [
-            'registered_schemas' => config('lighthouse.schema.register'),
-        ]);
+            // Log registration for debugging
+            \Log::debug('RealEstate schema registered', [
+                'schema_path' => $schemaPath,
+                'registered_schemas' => config('lighthouse.schema.register'),
+            ]);
+        }
     }
 }

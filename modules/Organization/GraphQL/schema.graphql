@@ -75,64 +75,6 @@ type OrganizationMembership {
     updatedAt: DateTime!
 }
 
-"""
-RealEstateOrganization - Representa uma imobiliária no sistema
-"""
-type RealEstateOrganization implements Organization {
-    "ID única da organização"
-    id: ID!
-    
-    "Nome da organização"
-    name: String!
-    
-    "Nome fantasia da imobiliária"
-    fantasyName: String
-    
-    "CNPJ da imobiliária"
-    cnpj: String!
-    
-    "Descrição da organização"
-    description: String
-    
-    "Email de contato principal"
-    email: String!
-    
-    "Telefone de contato principal"
-    phone: String
-    
-    "Website da organização"
-    website: String
-    
-    "Número do CRECI da imobiliária"
-    creci: String
-    
-    "Inscrição estadual"
-    stateRegistration: String
-    
-    "Representante legal"
-    legalRepresentative: String
-    
-    "Indica se a organização está ativa"
-    active: Boolean!
-    
-    "Membros da organização"
-    members: [OrganizationMembership!]! @morphMany
-    
-    "Membros ativos da organização"
-    activeMembers: [OrganizationMembership!]! @morphMany(relation: "activeMembers")
-    
-    "Endereço principal da organização"
-    mainAddress: OrganizationAddress
-    
-    "Endereços da organização"
-    addresses: [OrganizationAddress!]!
-    
-    "Data de criação"
-    createdAt: DateTime!
-    
-    "Data da última atualização"
-    updatedAt: DateTime!
-}
 
 """
 OrganizationAddress - Endereço de uma organização
@@ -251,16 +193,6 @@ extend type User {
 }
 
 extend type Query {
-    "Listar todas as imobiliárias"
-    realEstateOrganizations(
-        first: Int = 10
-        page: Int = 1
-        orderBy: [OrderByClause!]
-    ): RealEstateOrganizationPaginator! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\RealEstateOrganizations")
-
-    "Obter uma imobiliária específica pelo ID"
-    realEstateOrganizationById(id: ID!): RealEstateOrganization @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\RealEstateOrganizationById")
-    
     "Obter um endereço de organização pelo ID"
     organizationAddressById(id: ID!): OrganizationAddress @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\OrganizationAddressById")
     
@@ -297,40 +229,6 @@ extend type Mutation {
         position: String
         isActive: Boolean
     ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationMember")
-    
-    "Criar uma nova imobiliária"
-    createRealEstateOrganization(
-        name: String! @rules(apply: ["required", "string", "max:255"]),
-        fantasyName: String @rules(apply: ["nullable", "string", "max:255"]),
-        cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:real_estate_organizations,cnpj"]),
-        description: String @rules(apply: ["nullable", "string", "max:1000"]),
-        email: String! @rules(apply: ["required", "email", "unique:real_estate_organizations,email"]),
-        phone: String @rules(apply: ["nullable", "string", "max:20"]),
-        website: String @rules(apply: ["nullable", "url", "max:255"]),
-        creci: String @rules(apply: ["nullable", "string", "max:50"]),
-        stateRegistration: String @rules(apply: ["nullable", "string", "max:50"]),
-        legalRepresentative: String @rules(apply: ["nullable", "string", "max:255"]),
-        active: Boolean = true,
-        address: OrganizationAddressInput
-    ): RealEstateOrganization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateRealEstateOrganization")
-    
-    "Atualizar uma imobiliária existente"
-    updateRealEstateOrganization(
-        id: ID!,
-        name: String @rules(apply: ["nullable", "string", "max:255"]),
-        fantasyName: String @rules(apply: ["nullable", "string", "max:255"]),
-        description: String @rules(apply: ["nullable", "string", "max:1000"]),
-        email: String @rules(apply: ["nullable", "email"]),
-        phone: String @rules(apply: ["nullable", "string", "max:20"]),
-        website: String @rules(apply: ["nullable", "url", "max:255"]),
-        creci: String @rules(apply: ["nullable", "string", "max:50"]),
-        stateRegistration: String @rules(apply: ["nullable", "string", "max:50"]),
-        legalRepresentative: String @rules(apply: ["nullable", "string", "max:255"]),
-        active: Boolean
-    ): RealEstateOrganization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateRealEstateOrganization")
-    
-    "Remover uma imobiliária"
-    deleteRealEstateOrganization(id: ID!): RealEstateOrganization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\DeleteRealEstateOrganization")
     
     "Criar um novo endereço para uma organização existente"
     createOrganizationAddress(
