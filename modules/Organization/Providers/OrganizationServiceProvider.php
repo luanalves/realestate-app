@@ -19,6 +19,10 @@ class OrganizationServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Registrar o caminho para os testes do módulo
+        if ($this->app->runningInConsole()) {
+            $this->registerTests();
+        }
     }
 
     /**
@@ -27,5 +31,16 @@ class OrganizationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+    }
+    
+    /**
+     * Registra os testes do módulo para serem executados pelo PHPUnit
+     */
+    protected function registerTests(): void
+    {
+        // Adiciona o diretório de testes do módulo ao PHPUnit
+        $this->publishes([
+            __DIR__ . '/../Tests' => base_path('tests'),
+        ], 'organization-tests');
     }
 }
