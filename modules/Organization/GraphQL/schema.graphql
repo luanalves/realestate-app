@@ -1,0 +1,83 @@
+"""
+Schema GraphQL para o módulo Organization
+"""
+
+"""
+Interface que representa qualquer tipo de organização no sistema
+"""
+interface Organization {
+    "ID única da organização"
+    id: ID!
+    
+    "Nome da organização"
+    name: String!
+    
+    "Membros da organização"
+    members: [OrganizationMembership!]! @morphMany
+    
+    "Membros ativos da organização"
+    activeMembers: [OrganizationMembership!]! @morphMany(relation: "activeMembers")
+}
+
+"""
+OrganizationMembership - Representa a relação entre um usuário e uma organização
+"""
+type OrganizationMembership {
+    "ID única do registro de associação"
+    id: ID!
+    
+    "Usuário associado à organização"
+    user: User! @belongsTo
+    
+    "Papel do usuário na organização (admin, manager, member, etc)"
+    role: String
+    
+    "Cargo/posição do usuário na organização"
+    position: String
+    
+    "Indica se o usuário está ativo na organização"
+    isActive: Boolean!
+    
+    "Data em que o usuário entrou na organização"
+    joinedAt: DateTime
+    
+    "Data de criação do registro"
+    createdAt: DateTime!
+    
+    "Data da última atualização do registro"
+    updatedAt: DateTime!
+}
+
+extend type User {
+    "Associações do usuário com organizações"
+    organizationMemberships: [OrganizationMembership!]! @hasMany
+}
+
+extend type Mutation {
+    "Adicionar um membro à organização"
+    addOrganizationMember(
+        organizationType: String!  # Valores de OrganizationConfig::ORGANIZATION_TYPE_*
+        organizationId: ID!
+        userId: ID!
+        role: String!           # Valores de OrganizationConfig::ROLE_*
+        position: String
+        joinedAt: DateTime
+    ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\AddOrganizationMember")
+    
+    "Remover um membro da organização"
+    removeOrganizationMember(
+        organizationId: ID!
+        organizationType: String!
+        userId: ID!
+    ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\RemoveOrganizationMember")
+    
+    "Atualizar informações do membro na organização"
+    updateOrganizationMember(
+        organizationId: ID!
+        organizationType: String!
+        userId: ID!
+        role: String
+        position: String
+        isActive: Boolean
+    ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationMember")
+}
