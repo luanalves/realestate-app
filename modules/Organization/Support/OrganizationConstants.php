@@ -39,12 +39,26 @@ class OrganizationConstants
     /**
      * Tipos de organizações suportadas pelo sistema
      */
-    public const ORGANIZATION_TYPE_REAL_ESTATE = 'RealEstate';
+    public const ORGANIZATION_TYPE_REAL_ESTATE = 'RealEstateOrganization';
     
     /**
      * Mapeamento entre tipos de organização e as classes correspondentes
      */
     public const ORGANIZATION_TYPE_MAP = [
-        self::ORGANIZATION_TYPE_REAL_ESTATE => \Modules\RealEstate\Models\RealEstate::class,
+        self::ORGANIZATION_TYPE_REAL_ESTATE => \Modules\Organization\Models\RealEstateOrganization::class,
+    ];
+    
+    /**
+     * Tipos de endereços
+     */
+    public const ADDRESS_TYPE_HEADQUARTERS = 'headquarters';
+    public const ADDRESS_TYPE_BRANCH = 'branch';
+    
+    /**
+     * Mapeamento dos tipos de endereços com suas descrições
+     */
+    public const ADDRESS_TYPES = [
+        self::ADDRESS_TYPE_HEADQUARTERS => 'Matriz',
+        self::ADDRESS_TYPE_BRANCH => 'Filial',
     ];
 }

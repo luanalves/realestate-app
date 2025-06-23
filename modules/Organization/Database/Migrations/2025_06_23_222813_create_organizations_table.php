@@ -12,31 +12,28 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('real_estates', function (Blueprint $table) {
+        Schema::create('organizations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('fantasy_name')->nullable();
-            $table->string('cnpj', 14)->unique();
             $table->text('description')->nullable();
-            $table->string('email')->unique();
+            $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('website')->nullable();
-            $table->string('creci')->nullable();
-            $table->string('state_registration')->nullable();
-            $table->string('legal_representative')->nullable();
             $table->boolean('active')->default(true);
+            $table->string('organization_type')->comment('Tipo de organização (classe concreta)');
             $table->timestamps();
-
-            // Indexes
-            $table->index('cnpj');
+            $table->softDeletes();
+            
+            // Índices
+            $table->index('organization_type');
             $table->index('active');
-            $table->index('creci');
         });
     }
 
@@ -45,6 +42,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('real_estates');
+        Schema::dropIfExists('organizations');
     }
 };

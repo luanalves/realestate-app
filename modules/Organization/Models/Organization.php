@@ -8,40 +8,39 @@
 
 declare(strict_types=1);
 
-namespace Modules\RealEstate\Models;
+namespace Modules\Organization\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Organization\Traits\HasOrganizationMemberships;
 
-class RealEstate extends Model
+/**
+ * Modelo base para todos os tipos de organizações no sistema
+ */
+abstract class Organization extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, HasOrganizationMemberships;
 
     /**
-     * The table associated with the model.
-     */
-    protected $table = 'real_estates';
-
-    /**
-     * The attributes that are mass assignable.
+     * Os atributos que são atribuíveis em massa.
+     *
+     * @var array<string>
      */
     protected $fillable = [
         'name',
-        'fantasy_name',
-        'cnpj',
         'description',
         'email',
         'phone',
         'website',
-        'creci',
-        'state_registration',
-        'legal_representative',
         'active',
     ];
 
     /**
-     * The attributes that should be cast.
+     * Os atributos que devem ser convertidos.
+     *
+     * @var array<string, string>
      */
     protected $casts = [
         'active' => 'boolean',
@@ -50,26 +49,23 @@ class RealEstate extends Model
     ];
 
     /**
-     * Get the addresses for this real estate agency.
+     * Obtém os endereços desta organização
+     *
+     * @return HasMany
      */
     public function addresses(): HasMany
     {
-        return $this->hasMany(RealEstateAddress::class);
+        return $this->hasMany(OrganizationAddress::class);
     }
 
     /**
-     * Scope a query to only include active real estates.
+     * Escopo para filtrar apenas organizações ativas
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {
         return $query->where('active', true);
-    }
-
-    /**
-     * Scope a query to filter by tenant.
-     */
-    public function scopeForTenant($query, $tenantId)
-    {
-        return $query->where('tenant_id', $tenantId);
     }
 }

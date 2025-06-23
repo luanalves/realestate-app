@@ -12,16 +12,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('real_estate_addresses', function (Blueprint $table) {
+        Schema::create('organization_addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('real_estate_id')->constrained('real_estates')->onDelete('cascade');
-            $table->string('type')->default('branch'); // 'headquarters' or 'branch'
+            $table->foreignId('organization_id');
+            $table->string('organization_type');
+            $table->string('type')->default('branch'); // 'headquarters' ou 'branch'
             $table->string('street');
             $table->string('number')->nullable();
             $table->string('complement')->nullable();
@@ -32,12 +34,12 @@ return new class extends Migration {
             $table->string('country')->default('BR');
             $table->boolean('active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
-            // Indexes
-            $table->index('real_estate_id');
+            // Índices
+            $table->index(['organization_id', 'organization_type']);
             $table->index('type');
-            $table->index(['real_estate_id', 'type']);
-            $table->index(['real_estate_id', 'active']);
+            $table->index('active');
         });
     }
 
@@ -46,6 +48,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('real_estate_addresses');
+        Schema::dropIfExists('organization_addresses');
     }
 };
