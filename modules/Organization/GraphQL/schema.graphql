@@ -12,6 +12,12 @@ interface Organization {
     "Nome da organização"
     name: String!
     
+    "Nome fantasia da organização"
+    fantasyName: String
+    
+    "CNPJ da organização"
+    cnpj: String
+    
     "Descrição da organização"
     description: String
     

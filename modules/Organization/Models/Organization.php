@@ -30,11 +30,14 @@ abstract class Organization extends Model
      */
     protected $fillable = [
         'name',
+        'fantasy_name',
+        'cnpj',
         'description',
         'email',
         'phone',
         'website',
         'active',
+        'organization_type',
     ];
 
     /**
