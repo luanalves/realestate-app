@@ -18,11 +18,10 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class RealEstateAddress
 {
     /**
-     * Return the headquarters address for a real estate agency.
+     * Return all addresses for a real estate agency.
      */
-    public function __invoke(RealEstate $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?RealEstateAddressModel
+    public function __invoke(RealEstate $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): RealEstateAddressModel
     {
-        // Return the headquarters address for this real estate agency
-        return $parent->addresses()->where('real_estate_id', $parent->id)->first();
+        return $parent->addresses()->first();
     }
 }
