@@ -3,6 +3,8 @@ Main GraphQL Schema
 This file combines all module schemas.
 """
 
+#import ../modules/Organization/GraphQL/schema.graphql
+
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 scalar JSON @scalar(class: "App\\GraphQL\\Scalars\\JSON")
 
@@ -106,15 +108,15 @@ type Query {
     """
     realEstateById(id: ID!): RealEstate @find
 
-    """
-    Get a specific real estate address by ID
-    """
-    realEstateAddressById(id: ID!): RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateAddressById")
+    # """
+    # Get a specific real estate address by ID
+    # """
+    # realEstateAddressById(id: ID!): RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateAddressById")
     
-    """
-    Get all addresses for a specific real estate agency
-    """
-    addressesByRealEstateId(realEstateId: ID!): [RealEstateAddress!]! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\AddressesByRealEstateId")
+    # """
+    # Get all addresses for a specific real estate agency
+    # """
+    # addressesByRealEstateId(realEstateId: ID!): [RealEstateAddress!]! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\AddressesByRealEstateId")
 }
 
 type Mutation {
@@ -155,7 +157,7 @@ type Mutation {
         legal_representative: String @rules(apply: ["nullable", "string", "max:255"]),
         active: Boolean = true,
         address: RealEstateAddressInput
-    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstate")
+    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstateResolver")
 
     """
     Update an existing real estate agency
@@ -163,33 +165,33 @@ type Mutation {
     updateRealEstate(
         id: ID!,
         input: UpdateRealEstateInput! @spread
-    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstate")
+    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstateResolver")
 
     """
     Delete a real estate agency
     """
-    deleteRealEstate(id: ID!): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstate")
+    deleteRealEstate(id: ID!): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstateOrganizationResolver")
 
-    """
-    Create a new address for an existing real estate agency
-    """
-    createRealEstateAddress(
-        realEstateId: ID! @rules(apply: ["required", "exists:real_estates,id"]),
-        input: CreateRealEstateAddressInput!
-    ): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstateAddressMutation")
+    # """
+    # Create a new address for an existing real estate agency
+    # """
+    # createRealEstateAddress(
+    #     realEstateId: ID! @rules(apply: ["required", "exists:real_estates,id"]),
+    #     input: CreateRealEstateAddressInput!
+    # ): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstateAddressMutation")
     
-    """
-    Update an existing real estate address
-    """
-    updateRealEstateAddress(
-        id: ID!,
-        input: UpdateRealEstateAddressInput!
-    ): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstateAddressMutation")
+    # """
+    # Update an existing real estate address
+    # """
+    # updateRealEstateAddress(
+    #     id: ID!,
+    #     input: UpdateRealEstateAddressInput!
+    # ): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstateAddressMutation")
     
-    """
-    Delete a real estate address
-    """
-    deleteRealEstateAddress(id: ID!): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstateAddressMutation")
+    # """
+    # Delete a real estate address
+    # """
+    # deleteRealEstateAddress(id: ID!): RealEstateAddress! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstateAddressMutation")
 }
 
 # User Management Types
@@ -475,14 +477,14 @@ type RealEstate {
     "Last update timestamp"
     updated_at: DateTime!
 
-    "Main address information"
-    address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateAddress")
+    # "Main address information"
+    # address: RealEstateAddress @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateAddress")
 
     "All addresses"
     addresses: [RealEstateAddress!]! @hasMany
 
-    "Branch addresses only"
-    branches: [RealEstateAddress!] @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateBranches")
+    # "Branch addresses only"
+    # branches: [RealEstateAddress!] @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateBranches")
 }
 
 """

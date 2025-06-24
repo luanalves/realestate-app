@@ -1,10 +1,3 @@
-"""
-GraphQL schema for Organization module
-"""
-
-"""
-Generic organization type
-"""
 type Organization {
     "Organization unique ID"
     id: ID!
@@ -13,7 +6,7 @@ type Organization {
     name: String!
     
     "Organization fantasy name"
-    fantasyName: String
+    fantasy_name: String
     
     "Organization CNPJ"
     cnpj: String
@@ -34,7 +27,7 @@ type Organization {
     active: Boolean!
     
     "Organization type"
-    organizationType: String!
+    organization_type: String!
     
     "Organization members"
     members: [OrganizationMembership!]! @morphMany
@@ -49,10 +42,10 @@ type Organization {
     addresses: [OrganizationAddress!]!
     
     "Creation date"
-    createdAt: DateTime!
+    created_at: DateTime!
     
     "Last update date"
-    updatedAt: DateTime!
+    updated_at: DateTime!
 }
 
 """
@@ -114,7 +107,7 @@ type OrganizationAddress {
     state: String!
     
     "ZIP code"
-    zipCode: String!
+    zip_code: String!
     
     "Country"
     country: String!
@@ -123,10 +116,10 @@ type OrganizationAddress {
     active: Boolean!
     
     "Creation date"
-    createdAt: DateTime!
+    created_at: DateTime!
     
     "Last update date"
-    updatedAt: DateTime!
+    updated_at: DateTime!
 }
 
 """
@@ -203,13 +196,13 @@ extend type User {
 
 extend type Query {
     "Get an organization by ID"
-    organization(id: ID!): Organization @find
+    organization(id: ID!): Organization @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\OrganizationById")
     
     "Get all organizations"
     organizations(
         first: Int = 10
         page: Int
-    ): [Organization!]! @paginate
+    ): [Organization!]! @paginate(model: "Modules\\Organization\\Models\\Organization")
     
     "Get an organization address by ID"
     organizationAddressById(id: ID!): OrganizationAddress @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\OrganizationAddressById")
