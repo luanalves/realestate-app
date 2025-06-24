@@ -7,7 +7,7 @@
 
 **Status:** Aceito  
 **Data:** 2025-04-04  
-**Última atualização:** 2025-06-17
+**Última atualização:** 2025-06-23
 
 ## Contexto
 
@@ -57,6 +57,90 @@ A aplicação deve seguir rigorosamente os princípios SOLID:
 - **Repository Pattern:** Quando aplicável para abstração de dados
 - **DRY Principle:** Don't Repeat Yourself - eliminar duplicação de código
 
+### Padrões de Idioma e Internacionalização
+- **OBRIGATÓRIO:** Todo código deve ser escrito em **inglês**
+- **Comentários:** Exclusivamente em inglês
+- **Nomes de variáveis, métodos e classes:** Exclusivamente em inglês
+- **Documentação técnica:** Exclusivamente em inglês
+- **Mensagens de commit:** Exclusivamente em inglês (seguindo Conventional Commits)
+- **Exceções:** Apenas mensagens de erro exibidas ao usuário final podem ser em português/localizado
+
+#### Justificativa para Inglês
+- **Padronização internacional:** Facilita colaboração com desenvolvedores de qualquer nacionalidade
+- **Manutenção:** Código mais profissional e universal
+- **Evolução:** Preparação para potencial internacionalização do sistema
+- **Boas práticas:** Segue padrão de mercado da indústria de software
+
+#### Exemplos de Implementação
+```php
+// ✅ CORRETO - Inglês
+class UserAuthenticationService {
+    /**
+     * Validates user credentials and returns authentication token
+     */
+    public function authenticate(string $email, string $password): AuthToken
+    {
+        // Authentication logic here
+    }
+}
+
+// ❌ INCORRETO - Português
+class ServicoAutenticacaoUsuario {
+    /**
+     * Valida credenciais do usuário e retorna token de autenticação
+     */
+    public function autenticar(string $email, string $senha): TokenAuth
+    {
+        // Lógica de autenticação aqui
+    }
+}
+```
+
+### Padrões de Comentários
+- **Evitar comentários desnecessários:** Código auto-explicativo é preferível a comentários excessivos
+- **Comentários inline:** Devem ser evitados em favor de nomes de variáveis e métodos mais descritivos
+- **Documentação obrigatória:** Apenas para métodos públicos, classes e interfaces principais
+- **Quando comentar:** Apenas para lógica complexa que não pode ser simplificada
+
+#### Exemplos de Comentários
+```php
+// ✅ CORRETO - Código auto-explicativo
+class UserService {
+    public function authenticateUser(string $email, string $password): AuthResult
+    {
+        $user = $this->findUserByEmail($email);
+        $isValidPassword = $this->validatePassword($password, $user->password);
+        
+        if (!$isValidPassword) {
+            return AuthResult::failed('Invalid credentials');
+        }
+        
+        return AuthResult::success($user);
+    }
+}
+
+// ❌ INCORRETO - Comentários desnecessários
+class UserService {
+    public function authenticateUser(string $email, string $password): AuthResult
+    {
+        // Find user by email
+        $user = $this->findUserByEmail($email);
+        
+        // Validate the password
+        $isValidPassword = $this->validatePassword($password, $user->password);
+        
+        // Check if password is invalid
+        if (!$isValidPassword) {
+            // Return failed result
+            return AuthResult::failed('Invalid credentials');
+        }
+        
+        // Return success result
+        return AuthResult::success($user);
+    }
+}
+```
+
 ## Consequências
 
 ### Positivas
@@ -71,6 +155,7 @@ A aplicação deve seguir rigorosamente os princípios SOLID:
 - **Code Review:** Verificar aderência aos padrões durante revisões
 - **Refatoração:** Identificar e corrigir violações dos princípios
 - **Documentação:** Manter padrões documentados em `doc/patterns/`
+- **Transição para Inglês:** Código existente em português deve ser refatorado gradualmente para inglês durante manutenções
 
 ### Exemplo de Implementação
 ```php

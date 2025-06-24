@@ -143,15 +143,15 @@ type RealEstatePaginator {
 }
 
 extend type Query {
-    "Listar todas as imobiliárias"
+    "List all real estates"
     realEstates(
         first: Int = 10
         page: Int = 1
         orderBy: [OrderByClause!]
-    ): RealEstatePaginator! @paginate(model: "Modules\\RealEstate\\Models\\RealEstate", scopes: ["active"])
+    ): [RealEstate!]! @paginate(model: "Modules\\RealEstate\\Models\\RealEstate", scopes: ["active"])
 
-    "Obter uma imobiliária específica pelo ID ou CNPJ"
-    realEstate(id: ID, cnpj: String): RealEstate 
+    "Get a specific real estate by ID"
+    realEstate(id: ID!): RealEstate 
         @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateResolver")
 }
 

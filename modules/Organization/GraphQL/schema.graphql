@@ -1,232 +1,244 @@
 """
-Schema GraphQL para o módulo Organization
+GraphQL schema for Organization module
 """
 
 """
-Interface que representa qualquer tipo de organização no sistema
+Generic organization type
 """
-interface Organization {
-    "ID única da organização"
+type Organization {
+    "Organization unique ID"
     id: ID!
     
-    "Nome da organização"
+    "Organization name"
     name: String!
     
-    "Nome fantasia da organização"
+    "Organization fantasy name"
     fantasyName: String
     
-    "CNPJ da organização"
+    "Organization CNPJ"
     cnpj: String
     
-    "Descrição da organização"
+    "Organization description"
     description: String
     
-    "Email de contato principal"
+    "Primary contact email"
     email: String
     
-    "Telefone de contato principal"
+    "Primary contact phone"
     phone: String
     
-    "Website da organização"
+    "Organization website"
     website: String
     
-    "Indica se a organização está ativa"
+    "Whether the organization is active"
     active: Boolean!
     
-    "Membros da organização"
+    "Organization type"
+    organizationType: String!
+    
+    "Organization members"
     members: [OrganizationMembership!]! @morphMany
     
-    "Membros ativos da organização"
+    "Active organization members"
     activeMembers: [OrganizationMembership!]! @morphMany(relation: "activeMembers")
     
-    "Endereço principal da organização"
+    "Organization main address"
     mainAddress: OrganizationAddress
     
-    "Endereços da organização"
+    "Organization addresses"
     addresses: [OrganizationAddress!]!
     
-    "Data de criação"
+    "Creation date"
     createdAt: DateTime!
     
-    "Data da última atualização"
+    "Last update date"
     updatedAt: DateTime!
 }
 
 """
-OrganizationMembership - Representa a relação entre um usuário e uma organização
+OrganizationMembership - Represents the relationship between a user and organization
 """
 type OrganizationMembership {
-    "ID única do registro de associação"
+    "Membership unique ID"
     id: ID!
     
-    "Usuário associado à organização"
+    "User associated with the organization"
     user: User! @belongsTo
     
-    "Papel do usuário na organização (admin, manager, member, etc)"
+    "User role in the organization (admin, manager, member, etc)"
     role: String
     
-    "Cargo/posição do usuário na organização"
+    "User position/job title in the organization"
     position: String
     
-    "Indica se o usuário está ativo na organização"
+    "Whether the user is active in the organization"
     isActive: Boolean!
     
-    "Data em que o usuário entrou na organização"
+    "Date when the user joined the organization"
     joinedAt: DateTime
     
-    "Data de criação do registro"
+    "Creation date"
     createdAt: DateTime!
     
-    "Data da última atualização do registro"
+    "Last update date"
     updatedAt: DateTime!
 }
 
 
 """
-OrganizationAddress - Endereço de uma organização
+OrganizationAddress - Organization address
 """
 type OrganizationAddress {
-    "ID único do endereço"
+    "Address unique ID"
     id: ID!
     
-    "Tipo do endereço (matriz, filial)"
+    "Address type (headquarters, branch)"
     type: String!
     
-    "Logradouro"
+    "Street"
     street: String!
     
-    "Número"
+    "Number"
     number: String
     
-    "Complemento"
+    "Complement"
     complement: String
     
-    "Bairro"
+    "Neighborhood"
     neighborhood: String!
     
-    "Cidade"
+    "City"
     city: String!
     
-    "Estado"
+    "State"
     state: String!
     
-    "CEP"
+    "ZIP code"
     zipCode: String!
     
-    "País"
+    "Country"
     country: String!
     
-    "Indica se o endereço está ativo"
+    "Whether the address is active"
     active: Boolean!
     
-    "Data de criação"
+    "Creation date"
     createdAt: DateTime!
     
-    "Data da última atualização"
+    "Last update date"
     updatedAt: DateTime!
 }
 
 """
-Input para criação de endereço de organização
+Input for creating organization address
 """
 input OrganizationAddressInput {
-    "Tipo do endereço (matriz, filial)"
+    "Address type (headquarters, branch)"
     type: String! = "branch"
     
-    "Logradouro"
+    "Street"
     street: String!
     
-    "Número"
+    "Number"
     number: String
     
-    "Complemento"
+    "Complement"
     complement: String
     
-    "Bairro"
+    "Neighborhood"
     neighborhood: String!
     
-    "Cidade"
+    "City"
     city: String!
     
-    "Estado"
+    "State"
     state: String!
     
-    "CEP"
+    "ZIP code"
     zipCode: String!
     
-    "País"
+    "Country"
     country: String! = "BR"
 }
 
 """
-Input para atualização de endereço de organização
+Input for updating organization address
 """
 input UpdateOrganizationAddressInput {
-    "Tipo do endereço (matriz, filial)"
+    "Address type (headquarters, branch)"
     type: String
     
-    "Logradouro"
+    "Street"
     street: String
     
-    "Número"
+    "Number"
     number: String
     
-    "Complemento"
+    "Complement"
     complement: String
     
-    "Bairro"
+    "Neighborhood"
     neighborhood: String
     
-    "Cidade"
+    "City"
     city: String
     
-    "Estado"
+    "State"
     state: String
     
-    "CEP"
+    "ZIP code"
     zipCode: String
     
-    "País"
+    "Country"
     country: String
     
-    "Indica se o endereço está ativo"
+    "Whether the address is active"
     active: Boolean
 }
 
 extend type User {
-    "Associações do usuário com organizações"
+    "User organization memberships"
     organizationMemberships: [OrganizationMembership!]! @hasMany
 }
 
 extend type Query {
-    "Obter um endereço de organização pelo ID"
+    "Get an organization by ID"
+    organization(id: ID!): Organization @find
+    
+    "Get all organizations"
+    organizations(
+        first: Int = 10
+        page: Int
+    ): [Organization!]! @paginate
+    
+    "Get an organization address by ID"
     organizationAddressById(id: ID!): OrganizationAddress @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\OrganizationAddressById")
     
-    "Obter todos os endereços de uma organização"
+    "Get all addresses of an organization"
     addressesByOrganizationId(
         organizationId: ID!
         organizationType: String!
     ): [OrganizationAddress!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\AddressesByOrganizationId")
 }
 extend type Mutation {
-    "Adicionar um membro à organização"
+    "Add a member to organization"
     addOrganizationMember(
-        organizationType: String!  # Valores de OrganizationConfig::ORGANIZATION_TYPE_*
+        organizationType: String!
         organizationId: ID!
         userId: ID!
-        role: String!           # Valores de OrganizationConfig::ROLE_*
+        role: String!
         position: String
         joinedAt: DateTime
     ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\AddOrganizationMember")
     
-    "Remover um membro da organização"
+    "Remove a member from organization"
     removeOrganizationMember(
         organizationId: ID!
         organizationType: String!
         userId: ID!
     ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\RemoveOrganizationMember")
     
-    "Atualizar informações do membro na organização"
+    "Update organization member information"
     updateOrganizationMember(
         organizationId: ID!
         organizationType: String!
@@ -236,19 +248,19 @@ extend type Mutation {
         isActive: Boolean
     ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationMember")
     
-    "Criar um novo endereço para uma organização existente"
+    "Create a new address for an existing organization"
     createOrganizationAddress(
         organizationId: ID! @rules(apply: ["required"]),
         organizationType: String! @rules(apply: ["required"]),
         input: OrganizationAddressInput! @spread
     ): OrganizationAddress! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateOrganizationAddress")
     
-    "Atualizar um endereço de organização existente"
+    "Update an existing organization address"
     updateOrganizationAddress(
         id: ID!,
         input: UpdateOrganizationAddressInput! @spread
     ): OrganizationAddress! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationAddress")
     
-    "Remover um endereço de organização"
+    "Remove an organization address"
     deleteOrganizationAddress(id: ID!): OrganizationAddress! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\DeleteOrganizationAddress")
 }

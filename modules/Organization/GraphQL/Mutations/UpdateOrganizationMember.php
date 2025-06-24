@@ -16,7 +16,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Modules\Organization\Models\OrganizationMembership;
 use Modules\Organization\Services\OrganizationTypeRegistry;
 
-class AddOrganizationMember
+class UpdateOrganizationMember
 {
     protected OrganizationTypeRegistry $typeRegistry;
 
@@ -44,37 +44,39 @@ class AddOrganizationMember
             // Find the user
             $user = User::findOrFail($args['userId']);
             
-            // Check if user is already associated with organization
-            $existingMembership = OrganizationMembership::where([
+            // Find the membership
+            $membership = OrganizationMembership::where([
                 'user_id' => $user->id,
                 'organization_type' => $organizationClass,
                 'organization_id' => $organization->id,
             ])->first();
             
-            if ($existingMembership) {
-                // Update existing membership
-                $existingMembership->update([
-                    'role' => $args['role'],
-                    'position' => $args['position'] ?? $existingMembership->position,
-                    'is_active' => true,
-                    'joined_at' => $args['joinedAt'] ?? $existingMembership->joined_at ?? now(),
-                ]);
-            } else {
-                // Create new membership
-                OrganizationMembership::create([
-                    'user_id' => $user->id,
-                    'organization_type' => $organizationClass,
-                    'organization_id' => $organization->id,
-                    'role' => $args['role'],
-                    'position' => $args['position'] ?? null,
-                    'is_active' => true,
-                    'joined_at' => $args['joinedAt'] ?? now(),
-                ]);
+            if (!$membership) {
+                return false;
+            }
+            
+            // Prepare update data
+            $updateData = [];
+            
+            if (isset($args['role'])) {
+                $updateData['role'] = $args['role'];
+            }
+            
+            if (isset($args['position'])) {
+                $updateData['position'] = $args['position'];
+            }
+            
+            if (isset($args['isActive'])) {
+                $updateData['is_active'] = $args['isActive'];
+            }
+            
+            if (!empty($updateData)) {
+                $membership->update($updateData);
             }
             
             return true;
         } catch (\Exception $e) {
-            \Log::error('Error adding organization member: ' . $e->getMessage(), [
+            \Log::error('Error updating organization member: ' . $e->getMessage(), [
                 'exception' => $e,
                 'args' => $args,
             ]);

@@ -99,12 +99,12 @@ type Query {
         first: Int = 10
         page: Int = 1
         orderBy: [OrderByClause!]
-    ): RealEstatePaginator! @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstates")
+    ): [RealEstate!]! @paginate(model: "Modules\\RealEstate\\Models\\RealEstate")
 
     """
     Get a specific real estate agency by ID
     """
-    realEstateById(id: ID!): RealEstate @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateById")
+    realEstateById(id: ID!): RealEstate @find
 
     """
     Get a specific real estate address by ID
