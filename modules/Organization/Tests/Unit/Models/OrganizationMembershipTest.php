@@ -14,7 +14,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Organization\Models\OrganizationMembership;
 use Modules\Organization\Support\OrganizationConstants;
-use Modules\RealEstate\Models\RealEstate;
 use Tests\TestCase;
 
 class OrganizationMembershipTest extends TestCase
@@ -24,28 +23,33 @@ class OrganizationMembershipTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Não vamos usar os seeders aqui
+    }
+
+    /**
+     * Clean up the testing environment.
+     */
+    protected function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
     public function itCanCreateOrganizationMembership()
     {
-        // Pulando este teste por enquanto
-        $this->markTestSkipped('Pulando teste que depende do módulo RealEstate');
-
         // Arrange
         $user = User::factory()->create();
 
-        // Mock o RealEstate em vez de tentar criá-lo
-        $realEstate = \Mockery::mock('Modules\RealEstate\Models\RealEstate');
-        $realEstate->shouldReceive('getMorphClass')->andReturn('Modules\RealEstate\Models\RealEstate');
-        $realEstate->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        // Simular uma organização específica (mock)
+        $mockOrganization = \Mockery::mock('alias:DummyOrganization');
+        $mockOrganization->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $mockOrganization->shouldReceive('getMorphClass')->andReturn('DummyOrganization');
 
         // Act
         $membership = OrganizationMembership::create([
             'user_id' => $user->id,
-            'organization_type' => $realEstate->getMorphClass(),
-            'organization_id' => $realEstate->id,
+            'organization_type' => 'DummyOrganization',
+            'organization_id' => 1,
             'role' => OrganizationConstants::ROLE_ADMIN,
             'position' => 'Diretor',
             'is_active' => true,
@@ -56,8 +60,8 @@ class OrganizationMembershipTest extends TestCase
         $this->assertDatabaseHas('organization_memberships', [
             'id' => $membership->id,
             'user_id' => $user->id,
-            'organization_type' => $realEstate->getMorphClass(),
-            'organization_id' => $realEstate->id,
+            'organization_type' => 'DummyOrganization',
+            'organization_id' => 1,
             'role' => OrganizationConstants::ROLE_ADMIN,
         ]);
     }

@@ -13,15 +13,19 @@ namespace Modules\Organization\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Organization\Traits\HasOrganizationMemberships;
 
 /**
- * Modelo base para todos os tipos de organizações no sistema
+ * Modelo base para todos os tipos de organizações no sistema.
+ *
+ * Este modelo representa dados genéricos de organizações.
+ * Tipos específicos como RealEstate devem usar este modelo como base
+ * através de relacionamentos ou herança.
  */
-abstract class Organization extends Model
+class Organization extends Model
 {
-    use HasFactory, SoftDeletes, HasOrganizationMemberships;
+    use HasFactory;
+    use HasOrganizationMemberships;
 
     /**
      * Os atributos que são atribuíveis em massa.
@@ -41,7 +45,7 @@ abstract class Organization extends Model
     ];
 
     /**
-     * Os atributos que devem ser convertidos.
+     * Os atributos que devem ser convertidos para tipos nativos.
      *
      * @var array<string, string>
      */
@@ -52,20 +56,30 @@ abstract class Organization extends Model
     ];
 
     /**
-     * Obtém os endereços desta organização
-     *
-     * @return HasMany
+     * Memberships da organização.
      */
-    public function addresses(): HasMany
+    public function memberships(): HasMany
     {
-        return $this->hasMany(OrganizationAddress::class);
+        return $this->hasMany(
+            OrganizationMembership::class,
+            'organization_id'
+        )->where('organization_type', static::class);
     }
 
     /**
-     * Escopo para filtrar apenas organizações ativas
+     * Escopo para filtrar por tipo de organização.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfType($query, string $type)
+    {
+        return $query->where('organization_type', $type);
+    }
+
+    /**
+     * Escopo para filtrar por organizações ativas.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
      */
     public function scopeActive($query)
     {

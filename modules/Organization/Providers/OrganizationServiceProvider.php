@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Modules\Organization\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Organization\Contracts\OrganizationTypeRegistryContract;
+use Modules\Organization\Services\OrganizationTypeRegistry;
 
 class OrganizationServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,9 @@ class OrganizationServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Registrar o serviço de registro de tipos de organização
+        $this->app->singleton(OrganizationTypeRegistryContract::class, OrganizationTypeRegistry::class);
+        
         // Registrar o caminho para os testes do módulo
         if ($this->app->runningInConsole()) {
             $this->registerTests();

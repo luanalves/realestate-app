@@ -12,23 +12,20 @@ namespace Modules\RealEstate\GraphQL\Mutations;
 
 use Illuminate\Support\Facades\DB;
 use Modules\Organization\Models\Organization;
-use Modules\Organization\Support\OrganizationConstants;
 use Modules\RealEstate\Models\RealEstate;
+use Modules\RealEstate\Support\RealEstateConstants;
 
 class CreateRealEstateResolver
 {
     /**
-     * Cria uma nova organização do tipo Imobiliária
+     * Cria uma nova organização do tipo Imobiliária.
      *
      * @param null $root
-     * @param array $args
-     * @return RealEstate
      */
     public function __invoke($root, array $args): RealEstate
     {
-        $input = $args['input'];
-        
-        // Inicia a transação para garantir atomicidade
+        $input = $args['input'];        // Inicia a transação para garantir atomicidade
+
         return DB::transaction(function () use ($input) {
             // 1. Cria a organização base primeiro
             $organization = new Organization();
@@ -40,19 +37,19 @@ class CreateRealEstateResolver
             $organization->phone = $input['phone'] ?? null;
             $organization->website = $input['website'] ?? null;
             $organization->active = $input['active'] ?? true;
-            $organization->organization_type = OrganizationConstants::ORGANIZATION_TYPE_REAL_ESTATE;
+            $organization->organization_type = RealEstateConstants::ORGANIZATION_TYPE;
             $organization->save();
-            
+
             // 2. Cria a imobiliária usando o ID da organização base
             $realEstate = new RealEstate();
             $realEstate->id = $organization->id;
             $realEstate->creci = $input['creci'] ?? null;
             $realEstate->state_registration = $input['stateRegistration'] ?? null;
             $realEstate->save();
-            
+
             // 3. Carrega o relacionamento para garantir que temos todos os dados
             $realEstate->load('organization');
-            
+
             return $realEstate;
         });
     }

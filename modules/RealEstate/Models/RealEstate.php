@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Organization\Models\Organization;
-use Modules\Organization\Support\OrganizationConstants;
+use Modules\RealEstate\Support\RealEstateConstants;
 
 class RealEstate extends Model
 {
@@ -85,7 +85,7 @@ class RealEstate extends Model
      */
     public static function getOrganizationType(): string
     {
-        return OrganizationConstants::ORGANIZATION_TYPE_REAL_ESTATE;
+        return RealEstateConstants::ORGANIZATION_TYPE;
     }
 
     /**
@@ -110,6 +110,22 @@ class RealEstate extends Model
     public function getEmailAttribute(): ?string
     {
         return $this->organization?->email;
+    }
+
+    /**
+     * Acessa o nome fantasia da organização.
+     */
+    public function getFantasyNameAttribute(): ?string
+    {
+        return $this->organization?->fantasy_name;
+    }
+
+    /**
+     * Acessa o CNPJ da organização.
+     */
+    public function getCnpjAttribute(): ?string
+    {
+        return $this->organization?->cnpj;
     }
 
     /**

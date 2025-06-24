@@ -12,8 +12,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -31,8 +30,7 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->string('organization_type')->comment('Tipo de organização (classe concreta)');
             $table->timestamps();
-            $table->softDeletes();
-            
+
             // Índices
             $table->index('organization_type');
             $table->index('active');

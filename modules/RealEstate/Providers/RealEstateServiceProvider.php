@@ -11,7 +11,10 @@ declare(strict_types=1);
 namespace Modules\RealEstate\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Organization\Contracts\OrganizationTypeRegistryContract;
 use Modules\Organization\Providers\OrganizationServiceProvider;
+use Modules\RealEstate\Models\RealEstate;
+use Modules\RealEstate\Support\RealEstateConstants;
 
 class RealEstateServiceProvider extends ServiceProvider
 {
@@ -40,6 +43,9 @@ class RealEstateServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Registrar o tipo RealEstate no sistema de organizações
+        $this->registerOrganizationType();
+        
         // Load migrations
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
@@ -59,5 +65,14 @@ class RealEstateServiceProvider extends ServiceProvider
                 'registered_schemas' => config('lighthouse.schema.register'),
             ]);
         }
+    }
+
+    /**
+     * Registra o tipo RealEstate no sistema de organizações
+     */
+    protected function registerOrganizationType(): void
+    {
+        $registry = $this->app->make(OrganizationTypeRegistryContract::class);
+        $registry->registerType(RealEstateConstants::ORGANIZATION_TYPE, RealEstate::class);
     }
 }
