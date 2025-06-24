@@ -295,8 +295,12 @@ Para guia completo, consulte: [`doc/conventional-commits-guide.md`](doc/conventi
 
 ### 📚 Documentação Técnica
 
-- **ADRs**: Decisões arquiteturais em `doc/architectural-decision-records/`
-- **Guias**: Padrões e convenções em `doc/`
-- **GraphQL**: Schemas por módulo em `modules/*/GraphQL/`
+- **📋 Modules**: Complete guide to all modules at [`doc/modules.md`](doc/modules.md)
+- **🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
+- **🏗️ ADRs**: Architectural decisions at [`doc/architectural-decision-records/`](doc/architectural-decision-records/)
+- **📖 Guides**: Development patterns and conventions at [`doc/`](doc/)
+- **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`
+
+**Quick Start**: For API usage examples, check the Organization module's GraphQL documentation which includes authentication setup and complete request examples.
 
 ---

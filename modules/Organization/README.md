@@ -139,24 +139,61 @@ class User extends Model
 
 ## GraphQL Integration
 
-The module provides a generic GraphQL interface for organizations:
+The module provides a comprehensive GraphQL interface for organizations with the following main types:
 
 ```graphql
-interface Organization {
+type Organization {
     id: ID!
     name: String!
-    fantasy_name: String
-    cnpj: String
+    type: String!
     description: String
     email: String
     phone: String
     website: String
-    active: Boolean!
-    organization_type: String!
-    created_at: DateTime!
-    updated_at: DateTime!
+    isActive: Boolean!
+    foundedAt: Date
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    members: [OrganizationMembership!]!
+    addresses: [OrganizationAddress!]!
+}
+
+type OrganizationMembership {
+    id: ID!
+    organizationId: ID!
+    userId: ID!
+    role: String!
+    joinedAt: DateTime!
+    user: User!
+    organization: Organization!
+}
+
+type OrganizationAddress {
+    id: ID!
+    organizationId: ID!
+    street: String!
+    number: String!
+    complement: String
+    district: String!
+    city: String!
+    state: String!
+    zipCode: String!
+    country: String!
+    isMainAddress: Boolean!
+    addressType: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
 }
 ```
+
+### Available Operations
+
+- **Queries**: `organization`, `organizations`, `organizationAddress`, `addressesByOrganizationId`
+- **Mutations**: `createOrganization`, `updateOrganization`, `deleteOrganization`
+- **Member Operations**: `addOrganizationMember`, `updateOrganizationMember`, `removeOrganizationMember`
+- **Address Operations**: `createOrganizationAddress`, `updateOrganizationAddress`, `deleteOrganizationAddress`
+
+All operations require authentication using Laravel Passport tokens.
 
 ## Usage Examples
 
@@ -201,6 +238,20 @@ Available address type constants:
 OrganizationConstants::ADDRESS_TYPE_HEADQUARTERS  // Main office
 OrganizationConstants::ADDRESS_TYPE_BRANCH       // Branch office
 ```
+
+## GraphQL API Documentation
+
+For complete GraphQL API documentation including all queries, mutations, and examples, see:
+
+📖 **[GraphQL API Documentation](doc/GraphQL_API.md)**
+
+This documentation includes:
+- All available queries and mutations with examples
+- Request/response formats and variable structures
+- cURL commands for testing all endpoints
+- Error handling examples and common responses
+- Complete workflow examples for organization management
+- Authentication requirements and token usage
 
 ## Testing
 
