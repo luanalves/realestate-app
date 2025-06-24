@@ -36,6 +36,21 @@ class OrganizationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+        $this->registerGraphQLSchema();
+    }
+    
+    /**
+     * Register the GraphQL schema for this module.
+     */
+    protected function registerGraphQLSchema(): void
+    {
+        $schemaPath = __DIR__ . '/../GraphQL/schema.graphql';
+        
+        if (file_exists($schemaPath)) {
+            $currentSchemas = config('lighthouse.schema.register', []);
+            $currentSchemas[] = $schemaPath;
+            config(['lighthouse.schema.register' => $currentSchemas]);
+        }
     }
     
     /**

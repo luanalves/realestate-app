@@ -67,6 +67,14 @@ class Organization extends Model
     }
 
     /**
+     * Addresses da organização.
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(OrganizationAddress::class, 'organization_id');
+    }
+
+    /**
      * Escopo para filtrar por tipo de organização.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
