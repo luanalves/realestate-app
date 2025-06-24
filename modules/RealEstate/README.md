@@ -1,54 +1,129 @@
-# RealEstate Module
+ # RealEstate Module
 
-This module handles real estate agencies management in the application. It provides functionality to create, update, delete, and manage real estate agencies.
+The RealEstate module handles real estate agency management in the application. It extends the generic Organization module to provide specialized functionality for real estate agencies (imobiliárias) while maintaining a clean, modular architecture.
 
-## Features
+## Architecture Overview
 
-- Create real estate agencies
-- Update real estate agency information
-- Delete real estate agencies
-- List real estate agencies
-- Search real estate agencies by ID
-- Multi-tenant support (agencies are isolated by tenant)
+This module implements a **specialized organization type** that:
+- **Extends Organization**: Uses the generic Organization module as foundation
+- **Adds specific fields**: CRECI registration, state registration, etc.
+- **Self-registers**: Automatically registers 'RealEstate' type in the organization system
+- **Depends on Organization**: Clean dependency relationship (RealEstate → Organization)
 
-## Structure
+## Key Features
 
-- **Database/**: Migrations and seeders
-- **GraphQL/**: 
-  - **schema.graphql**: GraphQL schema definitions for this module
-  - **Mutations/**: GraphQL mutation resolvers
-  - **Queries/**: GraphQL query resolvers
-- **Models/**: Eloquent models
-- **Providers/**: Service providers
-- **Services/**: Business logic services
-- **Tests/**: Unit and feature tests
+- Real estate agency management
+- CRECI (Brazilian real estate license) validation
+- State registration tracking
+- Integration with generic organization functionality
+- GraphQL API for agency operations
+- Multi-tenant support with proper isolation
+
+## Module Structure
+
+```
+RealEstate/
+├── Database/
+│   ├── Migrations/
+│   │   └── 2025_06_23_222826_create_real_estates_table.php
+│   └── Seeders/
+├── GraphQL/
+│   ├── schema.graphql                           # RealEstate-specific GraphQL schema
+│   ├── Mutations/
+│   │   ├── CreateRealEstateResolver.php
+│   │   ├── UpdateRealEstateResolver.php
+│   │   └── DeleteRealEstateOrganizationResolver.php
+│   └── Queries/
+│       └── RealEstateResolver.php
+├── Models/
+│   └── RealEstate.php                           # Specialized real estate model
+├── Providers/
+│   └── RealEstateServiceProvider.php           # Auto-registration of type
+├── Support/
+│   └── RealEstateConstants.php                 # RealEstate-specific constants
+├── Tests/
+│   └── Unit/
+│       └── RealEstateTest.php
+└── README.md
+```
+
+## Data Model
+
+The RealEstate model extends organization functionality through a relationship:
+
+```php
+class RealEstate extends Model
+{
+    // Specific real estate fields
+    protected $fillable = [
+        'creci',                // CRECI registration number
+        'state_registration',   // State registration number
+    ];
+    
+    // Relationship to base organization
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'id');
+    }
+    
+    // Access organization fields via accessors
+    public function getNameAttribute(): ?string
+    {
+        return $this->organization?->name;
+    }
+}
+```
+
+### Database Schema
+
+**organizations table** (from Organization module):
+- `id` - Primary key
+- `name` - Agency name
+- `fantasy_name` - Trade name
+- `cnpj` - Brazilian tax ID
+- `description` - Agency description
+- `email` - Contact email
+- `phone` - Contact phone
+- `website` - Website URL
+- `active` - Active status
+- `organization_type` - Always 'RealEstate' for this module
+
+**real_estates table** (RealEstate-specific):
+- `id` - Primary key + Foreign key to organizations.id
+- `creci` - CRECI registration number
+- `state_registration` - State registration number
 
 ## GraphQL Operations
 
-Este módulo segue a abordagem modular para GraphQL, conforme definido no [ADR-008](/doc/architectural-decision-records/008-graphql-module-pattern.md). As definições de tipos GraphQL estão no arquivo `GraphQL/schema.graphql` do módulo, e são importadas automaticamente no esquema principal da aplicação.
+This module follows the modular GraphQL approach. Schema definitions are in `GraphQL/schema.graphql` and automatically imported into the main application schema.
 
 ### Queries
 
-#### 1. `realEstates` - Listar Imobiliárias
+#### 1. `realEstates` - List Real Estate Agencies
 
-**Descrição:** Retorna uma lista paginada de imobiliárias (agências).
+Returns a paginated list of real estate agencies.
 
-**Parâmetros:**
-- `first: Int = 10` - Número de itens por página (padrão: 10)
-- `page: Int = 1` - Número da página (padrão: 1)
-- `orderBy: [OrderByClause!]` - Opções de ordenação (opcional)
+**Parameters:**
+- `first: Int = 10` - Items per page (default: 10)
+- `page: Int = 1` - Page number (default: 1)
+- `orderBy: [OrderByClause!]` - Sorting options (optional)
 
-**Retorno:** `RealEstatePaginator!` - Paginador contendo lista de imobiliárias
+**Returns:** `RealEstatePaginator!` - Paginator containing list of agencies
 
-**Exemplo de chamada:**
+**Example:**
 ```graphql
 query {
   realEstates(first: 5, page: 1, orderBy: [{column: "name", order: ASC}]) {
     data {
       id
       name
+      fantasy_name
+      cnpj
       email
       phone
+      creci
+      state_registration
+      active
     }
     paginatorInfo {
       currentPage
@@ -59,99 +134,270 @@ query {
 }
 ```
 
-#### 2. `realEstateById` - Buscar Imobiliária por ID
+#### 2. `realEstateById` - Get Real Estate Agency by ID
 
-**Descrição:** Retorna uma imobiliária específica pelo seu ID.
+Returns a specific real estate agency by its ID.
 
-**Parâmetros:**
-- `id: ID!` - ID da imobiliária (obrigatório)
+**Parameters:**
+- `id: ID!` - Agency ID (required)
 
-**Retorno:** `RealEstate` - Detalhes de uma imobiliária
+**Returns:** `RealEstate` - Agency details
 
-**Exemplo de chamada:**
+**Example:**
 ```graphql
 query {
   realEstateById(id: 1) {
     id
     name
+    fantasy_name
+    cnpj
+    description
     email
     phone
     website
-    address {
-      street
-      city
-      state
-      zip_code
-      country
-    }
+    creci
+    state_registration
+    active
+    created_at
+    updated_at
+  }
+}
+```
+### Mutations
+
+#### 1. `createRealEstate` - Create New Real Estate Agency
+
+Creates a new real estate agency in the system.
+
+**Input Parameters (`CreateRealEstateInput`):**
+- `name: String!` - Agency name (required)
+- `fantasyName: String` - Trade name (optional)
+- `cnpj: String!` - Brazilian tax ID (required, unique)
+- `description: String` - Agency description (optional)
+- `email: String!` - Contact email (required, unique)
+- `phone: String` - Contact phone (optional)
+- `website: String` - Agency website (optional)
+- `creci: String` - CRECI registration number (optional)
+- `stateRegistration: String` - State registration number (optional)
+- `active: Boolean = true` - Active status (default: true)
+
+**Returns:** `RealEstate!` - The newly created agency
+
+**Example:**
+```graphql
+mutation {
+  createRealEstate(input: {
+    name: "Premium Real Estate"
+    fantasyName: "Premium Realty"
+    cnpj: "12345678901234"
+    description: "Leading real estate agency in the city"
+    email: "contact@premiumrealty.com"
+    phone: "+55 11 99999-9999"
+    website: "https://premiumrealty.com"
+    creci: "CRECI-SP-123456"
+    stateRegistration: "123.456.789.012"
+    active: true
+  }) {
+    id
+    name
+    fantasy_name
+    cnpj
+    email
+    creci
+    state_registration
+    active
   }
 }
 ```
 
-### Mutations
+#### 2. `updateRealEstate` - Update Real Estate Agency
 
-#### 1. `createRealEstate` - Criar Nova Imobiliária
+Updates an existing real estate agency.
 
-**Descrição:** Cria uma nova imobiliária no sistema.
+**Input Parameters:**
+- `id: ID!` - Agency ID (required)
+- `input: UpdateRealEstateInput!` - Updated agency data
 
-**Parâmetros:**
-- `name: String!` - Nome da imobiliária (obrigatório)
-- `fantasy_name: String` - Nome fantasia (opcional)
-- `corporate_name: String` - Razão social (opcional)
-- `cnpj: String!` - CNPJ da imobiliária (obrigatório, único)
-- `description: String` - Descrição da imobiliária (opcional)
-- `email: String!` - Email de contato (obrigatório, único)
-- `phone: String` - Telefone de contato (opcional)
-- `website: String` - Site da imobiliária (opcional)
-- `creci: String` - Número do CRECI (opcional)
-- `state_registration: String` - Inscrição estadual (opcional)
-- `legal_representative: String` - Representante legal (opcional)
-- `active: Boolean = true` - Status ativo/inativo (padrão: true)
-- `address: RealEstateAddressInput` - Informações de endereço (opcional)
+**Returns:** `RealEstate!` - The updated agency
 
-**Retorno:** `RealEstate!` - A imobiliária recém-criada
-
-**Exemplo de chamada:**
+**Example:**
 ```graphql
 mutation {
-  createRealEstate(
-    name: "Imobiliária Exemplo"
-    cnpj: "12345678901234"
-    email: "contato@exemplo.com"
-    phone: "1199998888"
-    website: "https://www.exemplo.com"
-    creci: "12345"
-    address: {
-      street: "Avenida Paulista, 1000"
-      city: "São Paulo"
-      state: "SP"
-      zip_code: "01310-100"
-      country: "Brasil"
+  updateRealEstate(
+    id: 1
+    input: {
+      name: "Updated Agency Name"
+      phone: "+55 11 88888-8888"
+      active: false
     }
   ) {
     id
     name
-    email
+    phone
+    active
+    updated_at
   }
 }
 ```
 
-#### 2. `updateRealEstate` - Atualizar Imobiliária Existente
+#### 3. `deleteRealEstate` - Delete Real Estate Agency
 
-**Descrição:** Atualiza os dados de uma imobiliária existente.
+Deletes a real estate agency and its associated organization data.
 
-**Parâmetros:**
-- `id: ID!` - ID da imobiliária a ser atualizada (obrigatório)
-- `input: UpdateRealEstateInput!` - Dados a serem atualizados, incluindo:
-  - `name: String` - Nome da imobiliária (opcional)
-  - `description: String` - Descrição (opcional)
-  - `email: String` - Email (opcional)
-  - `phone: String` - Telefone (opcional)
-  - `website: String` - Website (opcional)
-  - `creci: String` - CRECI (opcional)
-  - `active: Boolean` - Status (opcional)
-  - `address: RealEstateAddressInput` - Dados de endereço (opcional)
-  - `tenant_id: ID` - ID do tenant (opcional, apenas para super-admin)
+**Parameters:**
+- `id: ID!` - Agency ID (required)
+
+**Returns:** `RealEstate!` - The deleted agency data
+
+**Example:**
+```graphql
+mutation {
+  deleteRealEstate(id: 1) {
+    id
+    name
+    active
+  }
+}
+## Constants
+
+Available constants from `RealEstateConstants`:
+
+```php
+// Organization type
+RealEstateConstants::ORGANIZATION_TYPE = 'RealEstate'
+
+// CRECI status
+RealEstateConstants::CRECI_STATUS_ACTIVE = 'active'
+RealEstateConstants::CRECI_STATUS_INACTIVE = 'inactive'
+RealEstateConstants::CRECI_STATUS_SUSPENDED = 'suspended'
+
+// Valid Brazilian states
+RealEstateConstants::VALID_STATES = ['AC', 'AL', 'AP', 'AM', ...]
+```
+
+## Service Registration
+
+This module automatically registers itself with the Organization system:
+
+```php
+// In RealEstateServiceProvider::boot()
+protected function registerOrganizationType(): void
+{
+    $registry = $this->app->make(OrganizationTypeRegistryContract::class);
+    $registry->registerType(RealEstateConstants::ORGANIZATION_TYPE, RealEstate::class);
+}
+```
+
+## Testing
+
+Run module-specific tests:
+
+```bash
+# Run all RealEstate module tests
+docker compose exec app php artisan test --filter=RealEstateTest
+
+# Run specific test methods
+docker compose exec app php artisan test --filter=testCreateRealEstate
+docker compose exec app php artisan test --filter=testCascadeDelete
+```
+
+## Database Migrations
+
+The module includes migrations for:
+
+1. **2025_06_23_222826_create_real_estates_table.php**
+   - Creates the `real_estates` table
+   - Sets up foreign key relationship with `organizations` table
+   - Implements cascade delete for data integrity
+
+## Dependencies
+
+This module depends on:
+
+- **Organization Module** - Provides base organization functionality
+- **Laravel Framework** - Core framework
+- **Laravel Passport** - Authentication
+- **Lighthouse GraphQL** - GraphQL implementation
+
+## Integration Examples
+
+### Creating a Real Estate Agency
+
+```php
+// Using the GraphQL resolver
+$resolver = new CreateRealEstateResolver();
+$realEstate = $resolver(null, [
+    'input' => [
+        'name' => 'Premium Real Estate',
+        'cnpj' => '12345678901234',
+        'email' => 'contact@premium.com',
+        'creci' => 'CRECI-SP-123456',
+        'stateRegistration' => '123.456.789.012'
+    ]
+]);
+```
+
+### Accessing Organization Data
+
+```php
+$realEstate = RealEstate::find(1);
+
+// Access organization fields through accessors
+echo $realEstate->name;          // From organization
+echo $realEstate->fantasy_name;  // From organization
+echo $realEstate->cnpj;         // From organization
+echo $realEstate->creci;        // From real_estates table
+```
+
+### Working with Memberships
+
+```php
+// Add user to real estate agency
+OrganizationMembership::create([
+    'user_id' => $user->id,
+    'organization_type' => RealEstateConstants::ORGANIZATION_TYPE,
+    'organization_id' => $realEstate->id,
+    'role' => OrganizationConstants::ROLE_ADMIN,
+    'position' => 'General Manager',
+    'is_active' => true,
+    'joined_at' => now(),
+]);
+```
+
+## Error Handling
+
+The module handles common scenarios:
+
+- **Validation errors** for required fields
+- **Duplicate CNPJ/email** validation
+- **Cascade deletion** when organization is deleted
+- **Authentication requirements** for all operations
+
+## Future Enhancements
+
+Potential areas for expansion:
+
+- Property listing management
+- Agent management within agencies
+- Commission tracking
+- Integration with external real estate platforms
+- Advanced reporting and analytics
+
+## Coding Standards
+
+This module follows:
+- **English-only code**: All variables, methods, classes, and comments in English
+- **PSR-12** coding standards
+- **SOLID principles** 
+- **Clean code** practices with minimal unnecessary comments
+- **Self-documenting code** through descriptive naming
+- **Modular architecture** with clear separation of concerns
+
+## Related Documentation
+
+- [Organization Module README](../Organization/README.md)
+- [ADR-0006: Code Standards and PSR](../../doc/architectural-decision-records/0006-padroes-de-codigo-e-psr.md)
+- [GraphQL Schema Documentation](./GraphQL/schema.graphql)
 
 **Retorno:** `RealEstate!` - A imobiliária após a atualização
 
