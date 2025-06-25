@@ -21,7 +21,9 @@ return new class extends Migration
     {
         Schema::create('organization_addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id');
+            $table->foreignId('organization_id')
+                ->constrained('organizations')
+                ->onDelete('cascade');
             $table->string('organization_type');
             $table->string('type')->default('branch'); // 'headquarters' ou 'branch'
             $table->string('street');
