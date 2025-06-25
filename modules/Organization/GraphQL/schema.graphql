@@ -213,7 +213,90 @@ extend type Query {
         organizationType: String!
     ): [OrganizationAddress!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\AddressesByOrganizationId")
 }
+"""
+Input for creating a new generic organization
+"""
+input CreateOrganizationInput {
+    "Organization name"
+    name: String! @rules(apply: ["required", "string", "max:255"])
+    
+    "Organization fantasy name"
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Organization CNPJ"
+    cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:organizations,cnpj"])
+    
+    "Organization description"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+    
+    "Primary contact email"
+    email: String! @rules(apply: ["required", "email", "unique:organizations,email"])
+    
+    "Primary contact phone"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+    
+    "Organization website"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+    
+    "Whether the organization is active"
+    active: Boolean = true
+    
+    "Organization type (defaults to 'generic')"
+    organization_type: String = "generic"
+    
+    "Main address for the organization"
+    address: OrganizationAddressInput
+}
+
+"""
+Input for updating an organization
+"""
+input UpdateOrganizationInput {
+    "Organization name"
+    name: String @rules(apply: ["string", "max:255"])
+    
+    "Organization fantasy name"
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Organization CNPJ"
+    cnpj: String @rules(apply: ["string", "size:14", "unique:organizations,cnpj"])
+    
+    "Organization description"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+    
+    "Primary contact email"
+    email: String @rules(apply: ["email", "unique:organizations,email"])
+    
+    "Primary contact phone"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+    
+    "Organization website"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+    
+    "Whether the organization is active"
+    active: Boolean
+    
+    "Organization type"
+    organization_type: String
+}
+
 extend type Mutation {
+    "Create a new generic organization"
+    createOrganization(
+        input: CreateOrganizationInput!
+    ): Organization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateOrganizationResolver")
+    
+    "Update an existing organization"
+    updateOrganization(
+        id: ID!
+        input: UpdateOrganizationInput!
+    ): Organization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationResolver")
+    
+    "Delete an organization"
+    deleteOrganization(
+        id: ID!
+    ): Organization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\DeleteOrganizationResolver")
+
     "Add a member to organization"
     addOrganizationMember(
         organizationType: String!

@@ -188,10 +188,11 @@ type OrganizationAddress {
 
 ### Available Operations
 
-- **Queries**: `organization`, `organizations`, `organizationAddress`, `addressesByOrganizationId`
-- **Mutations**: `createOrganization`, `updateOrganization`, `deleteOrganization`
+- **Queries**: `organization`, `organizations`, `organizationAddressById`, `addressesByOrganizationId`
 - **Member Operations**: `addOrganizationMember`, `updateOrganizationMember`, `removeOrganizationMember`
 - **Address Operations**: `createOrganizationAddress`, `updateOrganizationAddress`, `deleteOrganizationAddress`
+
+Note: The base Organization module does not provide the mutations for organization creation/update/deletion. These should be implemented in concrete implementations.
 
 All operations require authentication using Laravel Passport tokens.
 

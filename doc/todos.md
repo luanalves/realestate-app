@@ -24,7 +24,7 @@
 - [x] **GraphQL API completa e funcional**
   - [x] Schema GraphQL atualizado com todos os resolvers
   - [x] Queries: `organization(id)`, `organizations()`, `organizationAddressById()`, `addressesByOrganizationId()`
-  - [x] Mutations: `addOrganizationMember`, `removeOrganizationMember`, `updateOrganizationMember`
+  - [x] Mutations: `createOrganization`, `updateOrganization`, `addOrganizationMember`, `removeOrganizationMember`, `updateOrganizationMember`
   - [x] Address operations: `createOrganizationAddress`, `updateOrganizationAddress`, `deleteOrganizationAddress`
   - [x] Resolver customizado OrganizationById para funcionalidade correta
   - [x] Relacionamento addresses() adicionado ao modelo Organization

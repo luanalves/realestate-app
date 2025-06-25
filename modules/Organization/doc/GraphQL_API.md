@@ -2,6 +2,12 @@
 
 This document provides comprehensive documentation for all GraphQL queries and mutations available in the Organization module.
 
+> **UPDATE:**
+> The Organization module now directly provides a mutation for creating generic organizations via the `createOrganization` mutation.
+> - Use the `createOrganization` mutation to create generic organizations
+> - For specialized organization types (like real estate organizations), use the appropriate module's mutations
+>   (e.g., `createRealEstate` from the RealEstate module)
+
 ## Table of Contents
 
 1. [Authentication](#authentication)
@@ -23,7 +29,7 @@ Authorization: Bearer your_access_token_here
 To obtain an access token, make a POST request to `/oauth/token`:
 
 ```bash
-curl -X POST http://localhost:8000/oauth/token \
+curl -X POST http://realestate.localhost/oauth/token \
   -H "Content-Type: application/json" \
   -d '{
     "grant_type": "password",
@@ -33,6 +39,121 @@ curl -X POST http://localhost:8000/oauth/token \
     "password": "your_password"
   }'
 ```
+
+## Organization Creation
+
+The Organization module now provides direct mutations for creating and updating organizations.
+
+### Creating an Organization
+
+To create a generic organization, use the `createOrganization` mutation. For specialized organization types (like real estate organizations), you may prefer to use the specific module's mutations.
+
+### Creating a Generic Organization
+
+Use this mutation to create a generic organization:
+
+```graphql
+mutation CreateOrganization($input: CreateOrganizationInput!) {
+  createOrganization(input: $input) {
+    id
+    name
+    fantasy_name
+    cnpj
+    description
+    email
+    phone
+    website
+    active
+    organization_type
+    created_at
+    updated_at
+  }
+}
+```
+
+### Alternative: Use the RealEstate Module
+
+For real estate specific organizations, you can also use the RealEstate module's mutation:
+
+```graphql
+mutation CreateRealEstate($input: CreateRealEstateInput!) {
+  createRealEstate(input: $input) {
+    id
+    name
+    fantasyName
+    cnpj
+    description
+    email
+    phone
+    website
+    active
+    createdAt
+    updatedAt
+  }
+}
+```
+
+**Example Variables:**
+```json
+{
+  "input": {
+    "name": "Example Organization",
+    "fantasyName": "Example Co.",
+    "cnpj": "12345678901234",
+    "description": "A sample organization",
+    "email": "contact@example.com",
+    "phone": "+1-555-0123",
+    "website": "https://example.com",
+    "active": true,
+    "address": {
+      "street": "Main Avenue",
+      "number": "1000",
+      "complement": "Suite 500",
+      "neighborhood": "Downtown",
+      "city": "New York",
+      "state": "NY",
+      "zipCode": "10001",
+      "country": "US",
+      "type": "headquarters"
+    }
+  }
+}
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "mutation CreateRealEstate($input: CreateRealEstateInput!) { createRealEstate(input: $input) { id name fantasyName cnpj description email phone website active createdAt updatedAt } }",
+    "variables": {
+      "input": {
+        "name": "Example Organization",
+        "fantasyName": "Example Co.",
+        "cnpj": "12345678901234",
+        "description": "A sample organization",
+        "email": "contact@example.com",
+        "phone": "+1-555-0123",
+        "website": "https://example.com",
+        "active": true,
+        "address": {
+          "street": "Main Avenue",
+          "number": "1000",
+          "complement": "Suite 500",
+          "neighborhood": "Downtown",
+          "city": "New York",
+          "state": "NY",
+          "zipCode": "10001",
+          "country": "US",
+          "type": "headquarters"
+        }
+      }
+    }
+  }'
+```
+```
+
 
 ## Organization Queries
 
@@ -64,7 +185,9 @@ query GetOrganization($id: ID!) {
         email
       }
       role
-      joined_at
+      position
+      isActive
+      joinedAt
     }
     addresses {
       id
@@ -107,24 +230,25 @@ curl -X POST http://realestate.localhost/graphql \
 
 ### 2. Get All Organizations
 
-Retrieve a list of all organizations with optional filtering.
+Retrieve a list of all organizations with pagination.
 
 **Query:**
 ```graphql
-query GetOrganizations($first: Int, $page: Int) {
+query GetOrganizations($first: Int!, $page: Int) {
   organizations(first: $first, page: $page) {
     data {
       id
       name
-      type
+      fantasy_name
+      cnpj
       description
       email
       phone
       website
-      isActive
-      foundedAt
-      createdAt
-      updatedAt
+      active
+      organization_type
+      created_at
+      updated_at
     }
     paginatorInfo {
       count
@@ -150,11 +274,11 @@ query GetOrganizations($first: Int, $page: Int) {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost:8000/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "query GetOrganizations($first: Int, $page: Int) { organizations(first: $first, page: $page) { data { id name type description email phone website isActive foundedAt createdAt updatedAt } paginatorInfo { count currentPage firstItem hasMorePages lastItem lastPage perPage total } } }",
+    "query": "query GetOrganizations($first: Int!, $page: Int) { organizations(first: $first, page: $page) { data { id name fantasy_name cnpj description email phone website active organization_type created_at updated_at } paginatorInfo { count currentPage firstItem hasMorePages lastItem lastPage perPage total } } }",
     "variables": {
       "first": 10,
       "page": 1
@@ -169,26 +293,20 @@ Retrieve a specific organization address by its ID.
 **Query:**
 ```graphql
 query GetOrganizationAddress($id: ID!) {
-  organizationAddress(id: $id) {
+  organizationAddressById(id: $id) {
     id
-    organizationId
     street
     number
     complement
-    district
+    neighborhood
     city
     state
-    zipCode
+    zip_code
     country
-    isMainAddress
-    addressType
-    createdAt
-    updatedAt
-    organization {
-      id
-      name
-      type
-    }
+    type
+    active
+    created_at
+    updated_at
   }
 }
 ```
@@ -206,22 +324,21 @@ Retrieve all addresses for a specific organization.
 
 **Query:**
 ```graphql
-query GetAddressesByOrganization($organizationId: ID!) {
-  addressesByOrganizationId(organizationId: $organizationId) {
+query GetAddressesByOrganization($organizationId: ID!, $organizationType: String!) {
+  addressesByOrganizationId(organizationId: $organizationId, organizationType: $organizationType) {
     id
-    organizationId
     street
     number
     complement
-    district
+    neighborhood
     city
     state
-    zipCode
+    zip_code
     country
-    isMainAddress
-    addressType
-    createdAt
-    updatedAt
+    type
+    active
+    created_at
+    updated_at
   }
 }
 ```
@@ -229,15 +346,30 @@ query GetAddressesByOrganization($organizationId: ID!) {
 **Variables:**
 ```json
 {
-  "organizationId": "1"
+  "organizationId": "1",
+  "organizationType": "Modules\\Organization\\Models\\Organization"
 }
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "query GetAddressesByOrganization($organizationId: ID!, $organizationType: String!) { addressesByOrganizationId(organizationId: $organizationId, organizationType: $organizationType) { id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
+    "variables": {
+      "organizationId": "1",
+      "organizationType": "Modules\\Organization\\Models\\Organization"
+    }
+  }'
 ```
 
 ## Organization Mutations
 
 ### 1. Create Organization
 
-Create a new organization.
+Create a new generic organization.
 
 **Mutation:**
 ```graphql
@@ -245,15 +377,16 @@ mutation CreateOrganization($input: CreateOrganizationInput!) {
   createOrganization(input: $input) {
     id
     name
-    type
+    fantasy_name
+    cnpj
     description
     email
     phone
     website
-    isActive
-    foundedAt
-    createdAt
-    updatedAt
+    active
+    organization_type
+    created_at
+    updated_at
   }
 }
 ```
@@ -262,35 +395,59 @@ mutation CreateOrganization($input: CreateOrganizationInput!) {
 ```json
 {
   "input": {
-    "name": "Tech Solutions Inc",
-    "type": "TECHNOLOGY",
-    "description": "A leading technology solutions provider",
-    "email": "contact@techsolutions.com",
-    "phone": "+1-555-0123",
-    "website": "https://techsolutions.com",
-    "isActive": true,
-    "foundedAt": "2020-01-15"
+    "name": "New Organization",
+    "fantasy_name": "Fancy Org Name",
+    "cnpj": "12345678901234",
+    "description": "This is a new generic organization",
+    "email": "contact@neworg.com",
+    "phone": "+55 11 99999-9999",
+    "website": "https://neworg.com",
+    "active": true,
+    "organization_type": "generic",
+    "address": {
+      "type": "headquarters",
+      "street": "Main Street",
+      "number": "123",
+      "complement": "Floor 4",
+      "neighborhood": "Downtown",
+      "city": "São Paulo",
+      "state": "SP",
+      "zipCode": "01234567",
+      "country": "BR"
+    }
   }
 }
 ```
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost:8000/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "mutation CreateOrganization($input: CreateOrganizationInput!) { createOrganization(input: $input) { id name type description email phone website isActive foundedAt createdAt updatedAt } }",
+    "query": "mutation CreateOrganization($input: CreateOrganizationInput!) { createOrganization(input: $input) { id name fantasy_name cnpj description email phone website active organization_type created_at updated_at } }",
     "variables": {
       "input": {
-        "name": "Tech Solutions Inc",
-        "type": "TECHNOLOGY",
-        "description": "A leading technology solutions provider",
-        "email": "contact@techsolutions.com",
-        "phone": "+1-555-0123",
-        "website": "https://techsolutions.com",
-        "isActive": true,
-        "foundedAt": "2020-01-15"
+        "name": "New Organization",
+        "fantasy_name": "Fancy Org Name",
+        "cnpj": "12345678901234",
+        "description": "This is a new generic organization",
+        "email": "contact@neworg.com",
+        "phone": "+55 11 99999-9999",
+        "website": "https://neworg.com",
+        "active": true,
+        "organization_type": "generic",
+        "address": {
+          "type": "headquarters",
+          "street": "Main Street",
+          "number": "123",
+          "complement": "Floor 4",
+          "neighborhood": "Downtown",
+          "city": "São Paulo",
+          "state": "SP",
+          "zipCode": "01234567",
+          "country": "BR"
+        }
       }
     }
   }'
@@ -298,7 +455,7 @@ curl -X POST http://localhost:8000/graphql \
 
 ### 2. Update Organization
 
-Update an existing organization.
+Update an existing organization's details.
 
 **Mutation:**
 ```graphql
@@ -306,15 +463,16 @@ mutation UpdateOrganization($id: ID!, $input: UpdateOrganizationInput!) {
   updateOrganization(id: $id, input: $input) {
     id
     name
-    type
+    fantasy_name
+    cnpj
     description
     email
     phone
     website
-    isActive
-    foundedAt
-    createdAt
-    updatedAt
+    active
+    organization_type
+    created_at
+    updated_at
   }
 }
 ```
@@ -322,19 +480,39 @@ mutation UpdateOrganization($id: ID!, $input: UpdateOrganizationInput!) {
 **Variables:**
 ```json
 {
-  "id": "1",
+  "id": "3",
   "input": {
-    "name": "Tech Solutions International",
-    "description": "A global technology solutions provider",
-    "phone": "+1-555-0124",
-    "website": "https://techsolutions-intl.com"
+    "name": "Updated Organization",
+    "description": "This organization has been updated",
+    "phone": "+55 11 99999-8888",
+    "website": "https://updated-org.com",
+    "active": true
   }
 }
 ```
 
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "mutation UpdateOrganization($id: ID!, $input: UpdateOrganizationInput!) { updateOrganization(id: $id, input: $input) { id name fantasy_name description email phone website active organization_type created_at updated_at } }",
+    "variables": {
+      "id": "3",
+      "input": {
+        "name": "Updated Organization",
+        "description": "This organization has been updated",
+        "phone": "+55 11 99999-8888",
+        "website": "https://updated-org.com"
+      }
+    }
+  }'
+```
+
 ### 3. Delete Organization
 
-Delete an organization by ID.
+Delete an organization by its ID.
 
 **Mutation:**
 ```graphql
@@ -342,7 +520,10 @@ mutation DeleteOrganization($id: ID!) {
   deleteOrganization(id: $id) {
     id
     name
-    type
+    fantasy_name
+    cnpj
+    email
+    organization_type
   }
 }
 ```
@@ -350,9 +531,38 @@ mutation DeleteOrganization($id: ID!) {
 **Variables:**
 ```json
 {
-  "id": "1"
+  "id": "3"
 }
 ```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "mutation DeleteOrganization($id: ID!) { deleteOrganization(id: $id) { id name fantasy_name cnpj email organization_type } }",
+    "variables": {
+      "id": "3"
+    }
+  }'
+```
+
+> **Important Note on JSON Format**: 
+> When sending GraphQL requests, ensure your JSON is properly formatted. Common errors include:
+> - Missing quotation marks around string values
+> - Missing closing braces or brackets
+> - Extra commas after the last item in an object or array
+>
+> Example of a properly formatted request body:
+> ```json
+> {
+>   "query": "mutation DeleteOrganization($id: ID!) { deleteOrganization(id: $id) { id name } }",
+>   "variables": {
+>     "id": "3"
+>   }
+> }
+> ```
 
 ## Organization Member Operations
 
@@ -362,157 +572,162 @@ Add a user as a member to an organization.
 
 **Mutation:**
 ```graphql
-mutation AddOrganizationMember($input: AddOrganizationMemberInput!) {
-  addOrganizationMember(input: $input) {
-    id
-    organizationId
-    userId
-    role
-    joinedAt
-    user {
-      id
-      name
-      email
-    }
-    organization {
-      id
-      name
-      type
-    }
-  }
+mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!, $userId: ID!, $role: String!, $position: String, $joinedAt: DateTime) {
+  addOrganizationMember(
+    organizationType: $organizationType,
+    organizationId: $organizationId,
+    userId: $userId,
+    role: $role,
+    position: $position,
+    joinedAt: $joinedAt
+  )
 }
 ```
 
 **Variables:**
 ```json
 {
-  "input": {
-    "organizationId": "1",
-    "userId": "2",
-    "role": "ADMIN"
-  }
+  "organizationType": "Modules\\Organization\\Models\\Organization",
+  "organizationId": "1",
+  "userId": "2",
+  "role": "manager",
+  "position": "Sales Manager",
+  "joinedAt": "2023-01-15T00:00:00Z"
 }
 ```
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost:8000/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "mutation AddOrganizationMember($input: AddOrganizationMemberInput!) { addOrganizationMember(input: $input) { id organizationId userId role joinedAt user { id name email } organization { id name type } } }",
+    "query": "mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!, $userId: ID!, $role: String!, $position: String, $joinedAt: DateTime) { addOrganizationMember(organizationType: $organizationType, organizationId: $organizationId, userId: $userId, role: $role, position: $position, joinedAt: $joinedAt) }",
     "variables": {
-      "input": {
-        "organizationId": "1",
-        "userId": "2",
-        "role": "ADMIN"
-      }
+      "organizationType": "Modules\\Organization\\Models\\Organization",
+      "organizationId": "1",
+      "userId": "2",
+      "role": "manager",
+      "position": "Sales Manager",
+      "joinedAt": "2023-01-15T00:00:00Z"
     }
   }'
 ```
 
 ### 2. Update Organization Member
 
-Update a member's role in an organization.
+Update the details of an existing organization member.
 
 **Mutation:**
 ```graphql
-mutation UpdateOrganizationMember($input: UpdateOrganizationMemberInput!) {
-  updateOrganizationMember(input: $input) {
-    id
-    organizationId
-    userId
-    role
-    joinedAt
-    user {
-      id
-      name
-      email
-    }
-    organization {
-      id
-      name
-      type
-    }
-  }
+mutation UpdateOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!, $role: String, $position: String, $isActive: Boolean) {
+  updateOrganizationMember(
+    organizationId: $organizationId,
+    organizationType: $organizationType,
+    userId: $userId,
+    role: $role,
+    position: $position,
+    isActive: $isActive
+  )
 }
 ```
 
 **Variables:**
 ```json
 {
-  "input": {
-    "organizationId": "1",
-    "userId": "2",
-    "role": "MANAGER"
-  }
+  "organizationId": "1",
+  "organizationType": "Modules\\Organization\\Models\\Organization",
+  "userId": "2",
+  "role": "admin",
+  "position": "Director",
+  "isActive": true
 }
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "mutation UpdateOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!, $role: String, $position: String, $isActive: Boolean) { updateOrganizationMember(organizationId: $organizationId, organizationType: $organizationType, userId: $userId, role: $role, position: $position, isActive: $isActive) }",
+    "variables": {
+      "organizationId": "1",
+      "organizationType": "Modules\\Organization\\Models\\Organization",
+      "userId": "2",
+      "role": "admin",
+      "position": "Director",
+      "isActive": true
+    }
+  }'
 ```
 
 ### 3. Remove Organization Member
 
-Remove a member from an organization.
+Remove a user from an organization.
 
 **Mutation:**
 ```graphql
-mutation RemoveOrganizationMember($input: RemoveOrganizationMemberInput!) {
-  removeOrganizationMember(input: $input) {
-    id
-    organizationId
-    userId
-    role
-    user {
-      id
-      name
-      email
-    }
-    organization {
-      id
-      name
-      type
-    }
-  }
+mutation RemoveOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!) {
+  removeOrganizationMember(
+    organizationId: $organizationId,
+    organizationType: $organizationType,
+    userId: $userId
+  )
 }
 ```
 
 **Variables:**
 ```json
 {
-  "input": {
-    "organizationId": "1",
-    "userId": "2"
-  }
+  "organizationId": "1",
+  "organizationType": "Modules\\Organization\\Models\\Organization",
+  "userId": "2"
 }
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "mutation RemoveOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!) { removeOrganizationMember(organizationId: $organizationId, organizationType: $organizationType, userId: $userId) }",
+    "variables": {
+      "organizationId": "1",
+      "organizationType": "Modules\\Organization\\Models\\Organization",
+      "userId": "2"
+    }
+  }'
 ```
 
 ## Organization Address Operations
 
 ### 1. Create Organization Address
 
-Add a new address to an organization.
+Create a new address for an organization.
 
 **Mutation:**
 ```graphql
-mutation CreateOrganizationAddress($input: CreateOrganizationAddressInput!) {
-  createOrganizationAddress(input: $input) {
+mutation CreateOrganizationAddress($organizationId: ID!, $organizationType: String!, $input: OrganizationAddressInput!) {
+  createOrganizationAddress(
+    organizationId: $organizationId,
+    organizationType: $organizationType,
+    input: $input
+  ) {
     id
-    organizationId
     street
     number
     complement
-    district
+    neighborhood
     city
     state
-    zipCode
+    zip_code
     country
-    isMainAddress
-    addressType
-    createdAt
-    updatedAt
-    organization {
-      id
-      name
-    }
+    type
+    active
+    created_at
+    updated_at
   }
 }
 ```
@@ -520,42 +735,42 @@ mutation CreateOrganizationAddress($input: CreateOrganizationAddressInput!) {
 **Variables:**
 ```json
 {
+  "organizationId": "1",
+  "organizationType": "Modules\\Organization\\Models\\Organization",
   "input": {
-    "organizationId": "1",
+    "type": "headquarters",
     "street": "Main Street",
     "number": "123",
-    "complement": "Suite 456",
-    "district": "Downtown",
-    "city": "San Francisco",
-    "state": "CA",
-    "zipCode": "94105",
-    "country": "USA",
-    "isMainAddress": true,
-    "addressType": "HEADQUARTERS"
+    "complement": "Suite 45",
+    "neighborhood": "Downtown",
+    "city": "New York",
+    "state": "NY",
+    "zipCode": "10001",
+    "country": "US"
   }
 }
 ```
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost:8000/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "mutation CreateOrganizationAddress($input: CreateOrganizationAddressInput!) { createOrganizationAddress(input: $input) { id organizationId street number complement district city state zipCode country isMainAddress addressType createdAt updatedAt organization { id name } } }",
+    "query": "mutation CreateOrganizationAddress($organizationId: ID!, $organizationType: String!, $input: OrganizationAddressInput!) { createOrganizationAddress(organizationId: $organizationId, organizationType: $organizationType, input: $input) { id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
     "variables": {
+      "organizationId": "1",
+      "organizationType": "Modules\\Organization\\Models\\Organization",
       "input": {
-        "organizationId": "1",
+        "type": "headquarters",
         "street": "Main Street",
         "number": "123",
-        "complement": "Suite 456",
-        "district": "Downtown",
-        "city": "San Francisco",
-        "state": "CA",
-        "zipCode": "94105",
-        "country": "USA",
-        "isMainAddress": true,
-        "addressType": "HEADQUARTERS"
+        "complement": "Suite 45",
+        "neighborhood": "Downtown",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10001",
+        "country": "US"
       }
     }
   }'
@@ -570,23 +785,18 @@ Update an existing organization address.
 mutation UpdateOrganizationAddress($id: ID!, $input: UpdateOrganizationAddressInput!) {
   updateOrganizationAddress(id: $id, input: $input) {
     id
-    organizationId
     street
     number
     complement
-    district
+    neighborhood
     city
     state
-    zipCode
+    zip_code
     country
-    isMainAddress
-    addressType
-    createdAt
-    updatedAt
-    organization {
-      id
-      name
-    }
+    type
+    active
+    created_at
+    updated_at
   }
 }
 ```
@@ -596,32 +806,58 @@ mutation UpdateOrganizationAddress($id: ID!, $input: UpdateOrganizationAddressIn
 {
   "id": "1",
   "input": {
-    "street": "New Main Street",
+    "street": "Broadway",
     "number": "456",
-    "complement": "Floor 2",
-    "district": "Business District",
-    "isMainAddress": false,
-    "addressType": "BRANCH"
+    "complement": "Floor 10",
+    "neighborhood": "Theater District",
+    "city": "New York",
+    "state": "NY",
+    "zipCode": "10019",
+    "active": true
   }
 }
 ```
 
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "mutation UpdateOrganizationAddress($id: ID!, $input: UpdateOrganizationAddressInput!) { updateOrganizationAddress(id: $id, input: $input) { id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
+    "variables": {
+      "id": "1",
+      "input": {
+        "street": "Broadway",
+        "number": "456",
+        "complement": "Floor 10",
+        "neighborhood": "Theater District",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10019",
+        "active": true
+      }
+    }
+  }'
+```
+
 ### 3. Delete Organization Address
 
-Delete an organization address.
+Delete an organization address by ID.
 
 **Mutation:**
 ```graphql
 mutation DeleteOrganizationAddress($id: ID!) {
   deleteOrganizationAddress(id: $id) {
     id
-    organizationId
     street
     number
+    complement
+    neighborhood
     city
-    state
+    zip_code
     country
-    addressType
+    type
   }
 }
 ```
@@ -633,11 +869,27 @@ mutation DeleteOrganizationAddress($id: ID!) {
 }
 ```
 
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "mutation DeleteOrganizationAddress($id: ID!) { deleteOrganizationAddress(id: $id) { id street number complement neighborhood city state zip_code country type } }",
+    "variables": {
+      "id": "1"
+    }
+  }'
+```
+
 ## Error Handling
 
-### Common Error Responses
+When using the GraphQL API, you may encounter various error scenarios. Here are some common errors and how to handle them:
 
-#### Authentication Error
+### 1. Authentication Errors
+
+If your authentication token is missing, invalid, or expired, you'll receive an error like:
+
 ```json
 {
   "errors": [
@@ -651,91 +903,221 @@ mutation DeleteOrganizationAddress($id: ID!) {
 }
 ```
 
-#### Validation Error
+**Solution**: Refresh your access token by making a new request to the `/oauth/token` endpoint.
+
+### 2. Validation Errors
+
+When input data fails validation, you'll receive detailed errors:
+
 ```json
 {
   "errors": [
     {
-      "message": "Validation failed for the field [createOrganization].",
+      "message": "Validation failed for the field [createOrganizationAddress].",
       "extensions": {
         "validation": {
-          "input.name": [
-            "The name field is required."
+          "input.street": [
+            "The street field is required."
           ],
-          "input.email": [
-            "The email must be a valid email address."
+          "input.zipCode": [
+            "The zip code must be 8 characters."
           ]
-        }
+        },
+        "category": "validation"
       }
     }
   ]
 }
 ```
 
-#### Not Found Error
+**Solution**: Check the error message and adjust your input data accordingly.
+
+### 3. Not Found Errors
+
+When requesting a resource that doesn't exist:
+
 ```json
 {
   "errors": [
     {
-      "message": "Organization not found with ID: 999",
+      "message": "Organization with ID 999 not found",
       "extensions": {
-        "category": "graphql"
+        "category": "not_found"
       }
     }
   ]
 }
 ```
 
-#### Authorization Error
-```json
-{
-  "errors": [
-    {
-      "message": "You are not authorized to perform this action.",
-      "extensions": {
-        "category": "authorization"
-      }
-    }
-  ]
-}
-```
+**Solution**: Verify the ID you're using and check if the resource exists.
 
 ## Examples
 
-### Complete Organization Creation Workflow
+### Complete Organization Flow Example
 
-1. **Create Organization:**
-```bash
-curl -X POST http://localhost:8000/graphql \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your_access_token" \
-  -d '{
-    "query": "mutation CreateOrganization($input: CreateOrganizationInput!) { createOrganization(input: $input) { id name type email } }",
-    "variables": {
-      "input": {
-        "name": "Innovation Labs",
-        "type": "TECHNOLOGY",
-        "email": "contact@innovationlabs.com",
-        "phone": "+1-555-0100"
-      }
-    }
-  }'
+Here's an example of a complete workflow to create an organization, add addresses, and add members:
+
+1. First, create the organization:
+
+```graphql
+mutation CreateOrganization($input: CreateOrganizationInput!) {
+  createOrganization(input: $input) {
+    id
+    name
+    fantasy_name
+    description
+    email
+    phone
+    website
+    active
+  }
+}
 ```
 
-2. **Add Main Address:**
-```bash
-curl -X POST http://localhost:8000/graphql \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your_access_token" \
-  -d '{
-    "query": "mutation CreateOrganizationAddress($input: CreateOrganizationAddressInput!) { createOrganizationAddress(input: $input) { id street number city state country } }",
-    "variables": {
-      "input": {
-        "organizationId": "1",
-        "street": "Tech Avenue",
-        "number": "789",
-        "city": "Silicon Valley",
-        "state": "CA",
+2. Update the organization if needed:
+
+```graphql
+mutation UpdateOrganization($id: ID!, $input: UpdateOrganizationInput!) {
+  updateOrganization(id: $id, input: $input) {
+    id
+    name
+    fantasy_name
+    description
+    email
+    phone
+    website
+    active
+    organization_type
+  }
+}
+```
+
+3. Delete the organization if needed:
+
+```graphql
+mutation DeleteOrganization($id: ID!) {
+  deleteOrganization(id: $id) {
+    id
+    name
+    fantasy_name
+    cnpj
+    email
+  }
+}
+```
+
+4. Add an address to the organization:
+
+```graphql
+mutation CreateOrganizationAddress($organizationId: ID!, $organizationType: String!, $input: OrganizationAddressInput!) {
+  createOrganizationAddress(
+    organizationId: $organizationId, 
+    organizationType: $organizationType, 
+    input: $input
+  ) {
+    id
+    street
+    city
+    state
+    zip_code
+    country
+    type
+  }
+}
+```
+
+5. Add a member to the organization:
+
+```graphql
+mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!, $userId: ID!, $role: String!, $position: String) {
+  addOrganizationMember(
+    organizationType: $organizationType,
+    organizationId: $organizationId,
+    userId: $userId,
+    role: $role,
+    position: $position
+  )
+}
+```
+        "addressType": "HEADQUARTERS"
+      }
+6. Query organization details to verify everything:
+
+```graphql
+query GetOrganizationWithDetails($id: ID!) {
+  organization(id: $id) {
+    id
+    name
+    fantasy_name
+    email
+    phone
+    website
+    active
+    organization_type
+    members {
+      id
+      user {
+        id
+        name
+        email
+      }
+      role
+      position
+      isActive
+    }
+    addresses {
+      id
+      street
+      number
+      complement
+      neighborhood
+      city
+      state
+      zip_code
+      country
+      type
+      active
+    }
+    created_at
+    updated_at
+  }
+}
+```
+
+## Important Notes
+
+1. **Organization Type Parameter**
+   
+   When working with organization-related mutations that require the `organizationType` parameter, always use the fully qualified class name:
+   ```
+   Modules\\Organization\\Models\\Organization
+   ```
+   
+   This parameter is used for morphable relationships in the database.
+
+2. **Field Names in snake_case**
+   
+   All database field names follow the snake_case convention (e.g., `zip_code`, `fantasy_name`, `created_at`). Make sure your queries and mutations use these exact field names.
+
+3. **Required Pagination Parameters**
+   
+   When using paginated queries like `organizations`, the `first` parameter is required and specifies how many items to include per page.
+   
+4. **Membership Management**
+   
+   Organization memberships link users to organizations with specific roles and positions. Always include both `organizationId` and `organizationType` when working with memberships.
+
+5. **Address Types**
+   
+   Organization addresses can have different types:
+   - `headquarters`: Main office/location
+   - `branch`: Secondary locations
+   
+   The default type is `branch` if not specified.
+   
+## Conclusion
+
+This API documentation covers all available GraphQL operations for the Organization module. For additional support or to report issues, please contact the development team.
         "zipCode": "94000",
         "country": "USA",
         "isMainAddress": true,
@@ -747,7 +1129,7 @@ curl -X POST http://localhost:8000/graphql \
 
 3. **Add Team Member:**
 ```bash
-curl -X POST http://localhost:8000/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
@@ -764,7 +1146,7 @@ curl -X POST http://localhost:8000/graphql \
 
 4. **Query Complete Organization:**
 ```bash
-curl -X POST http://localhost:8000/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
