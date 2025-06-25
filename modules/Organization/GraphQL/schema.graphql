@@ -115,11 +115,17 @@ type OrganizationAddress {
     "Whether the address is active"
     active: Boolean!
     
+    "The organization ID this address belongs to"
+    organization_id: ID!
+    
     "Creation date"
     created_at: DateTime!
     
     "Last update date"
     updated_at: DateTime!
+
+    "The organization this address belongs to"
+    organization: Organization @belongsTo
 }
 
 """
@@ -210,7 +216,7 @@ extend type Query {
     "Get all addresses of an organization"
     addressesByOrganizationId(
         organizationId: ID!
-        organizationType: String!
+        organizationType: String
     ): [OrganizationAddress!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\AddressesByOrganizationId")
 }
 """
@@ -327,7 +333,6 @@ extend type Mutation {
     "Create a new address for an existing organization"
     createOrganizationAddress(
         organizationId: ID! @rules(apply: ["required"]),
-        organizationType: String! @rules(apply: ["required"]),
         input: OrganizationAddressInput! @spread
     ): OrganizationAddress! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateOrganizationAddress")
     

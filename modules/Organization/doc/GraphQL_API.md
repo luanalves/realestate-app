@@ -152,7 +152,6 @@ curl -X POST http://realestate.localhost/graphql \
     }
   }'
 ```
-```
 
 
 ## Organization Queries
@@ -295,6 +294,7 @@ Retrieve a specific organization address by its ID.
 query GetOrganizationAddress($id: ID!) {
   organizationAddressById(id: $id) {
     id
+    organization_id
     street
     number
     complement
@@ -307,6 +307,11 @@ query GetOrganizationAddress($id: ID!) {
     active
     created_at
     updated_at
+    organization {
+      id
+      name
+      organization_type
+    }
   }
 }
 ```
@@ -318,15 +323,29 @@ query GetOrganizationAddress($id: ID!) {
 }
 ```
 
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "query GetOrganizationAddress($id: ID!) { organizationAddressById(id: $id) { id organization_id street number complement neighborhood city state zip_code country type active created_at updated_at organization { id name organization_type } } }",
+    "variables": {
+      "id": "1"
+    }
+  }'
+```
+
 ### 4. Get Addresses by Organization ID
 
-Retrieve all addresses for a specific organization.
+Retrieve all addresses for a specific organization. The `organizationType` argument is now optional and handled automatically for Organization addresses.
 
 **Query:**
 ```graphql
-query GetAddressesByOrganization($organizationId: ID!, $organizationType: String!) {
-  addressesByOrganizationId(organizationId: $organizationId, organizationType: $organizationType) {
+query GetAddressesByOrganization($organizationId: ID!) {
+  addressesByOrganizationId(organizationId: $organizationId) {
     id
+    organization_id
     street
     number
     complement
@@ -346,8 +365,7 @@ query GetAddressesByOrganization($organizationId: ID!, $organizationType: String
 **Variables:**
 ```json
 {
-  "organizationId": "1",
-  "organizationType": "Modules\\Organization\\Models\\Organization"
+  "organizationId": "1"
 }
 ```
 
@@ -357,10 +375,9 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "query GetAddressesByOrganization($organizationId: ID!, $organizationType: String!) { addressesByOrganizationId(organizationId: $organizationId, organizationType: $organizationType) { id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
+    "query": "query GetAddressesByOrganization($organizationId: ID!) { addressesByOrganizationId(organizationId: $organizationId) { id organization_id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
     "variables": {
-      "organizationId": "1",
-      "organizationType": "Modules\\Organization\\Models\\Organization"
+      "organizationId": "1"
     }
   }'
 ```
@@ -709,10 +726,9 @@ Create a new address for an organization.
 
 **Mutation:**
 ```graphql
-mutation CreateOrganizationAddress($organizationId: ID!, $organizationType: String!, $input: OrganizationAddressInput!) {
+mutation CreateOrganizationAddress($organizationId: ID!, $input: OrganizationAddressInput!) {
   createOrganizationAddress(
     organizationId: $organizationId,
-    organizationType: $organizationType,
     input: $input
   ) {
     id
@@ -736,7 +752,6 @@ mutation CreateOrganizationAddress($organizationId: ID!, $organizationType: Stri
 ```json
 {
   "organizationId": "1",
-  "organizationType": "Modules\\Organization\\Models\\Organization",
   "input": {
     "type": "headquarters",
     "street": "Main Street",
@@ -757,10 +772,9 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "mutation CreateOrganizationAddress($organizationId: ID!, $organizationType: String!, $input: OrganizationAddressInput!) { createOrganizationAddress(organizationId: $organizationId, organizationType: $organizationType, input: $input) { id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
+    "query": "mutation CreateOrganizationAddress($organizationId: ID!, $input: OrganizationAddressInput!) { createOrganizationAddress(organizationId: $organizationId, input: $input) { id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
     "variables": {
       "organizationId": "1",
-      "organizationType": "Modules\\Organization\\Models\\Organization",
       "input": {
         "type": "headquarters",
         "street": "Main Street",
@@ -1009,10 +1023,9 @@ mutation DeleteOrganization($id: ID!) {
 4. Add an address to the organization:
 
 ```graphql
-mutation CreateOrganizationAddress($organizationId: ID!, $organizationType: String!, $input: OrganizationAddressInput!) {
+mutation CreateOrganizationAddress($organizationId: ID!, $input: OrganizationAddressInput!) {
   createOrganizationAddress(
-    organizationId: $organizationId, 
-    organizationType: $organizationType, 
+    organizationId: $organizationId,
     input: $input
   ) {
     id
@@ -1039,88 +1052,6 @@ mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!,
   )
 }
 ```
-        "addressType": "HEADQUARTERS"
-      }
-6. Query organization details to verify everything:
-
-```graphql
-query GetOrganizationWithDetails($id: ID!) {
-  organization(id: $id) {
-    id
-    name
-    fantasy_name
-    email
-    phone
-    website
-    active
-    organization_type
-    members {
-      id
-      user {
-        id
-        name
-        email
-      }
-      role
-      position
-      isActive
-    }
-    addresses {
-      id
-      street
-      number
-      complement
-      neighborhood
-      city
-      state
-      zip_code
-      country
-      type
-      active
-    }
-    created_at
-    updated_at
-  }
-}
-```
-
-## Important Notes
-
-1. **Organization Type Parameter**
-   
-   When working with organization-related mutations that require the `organizationType` parameter, always use the fully qualified class name:
-   ```
-   Modules\\Organization\\Models\\Organization
-   ```
-   
-   This parameter is used for morphable relationships in the database.
-
-2. **Field Names in snake_case**
-   
-   All database field names follow the snake_case convention (e.g., `zip_code`, `fantasy_name`, `created_at`). Make sure your queries and mutations use these exact field names.
-
-3. **Required Pagination Parameters**
-   
-   When using paginated queries like `organizations`, the `first` parameter is required and specifies how many items to include per page.
-   
-4. **Membership Management**
-   
-   Organization memberships link users to organizations with specific roles and positions. Always include both `organizationId` and `organizationType` when working with memberships.
-
-5. **Address Types**
-   
-   Organization addresses can have different types:
-   - `headquarters`: Main office/location
-   - `branch`: Secondary locations
-   
-   The default type is `branch` if not specified.
-   
-## Conclusion
-
-This API documentation covers all available GraphQL operations for the Organization module. For additional support or to report issues, please contact the development team.
-        "zipCode": "94000",
-        "country": "USA",
-        "isMainAddress": true,
         "addressType": "HEADQUARTERS"
       }
     }

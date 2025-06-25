@@ -141,6 +141,33 @@ class UserService {
 }
 ```
 
+### Uso de FQCN com ::class (Class Constant Usage)
+
+- Sempre utilize o operador `::class` para obter o Fully Qualified Class Name (FQCN) de uma classe ao invés de strings literais.
+- Exemplo correto:
+
+```php
+use Modules\Organization\Models\Organization;
+
+$organizationClass = Organization::class;
+$organization = $organizationClass::find($id);
+```
+
+- Exemplo incorreto:
+
+```php
+$organizationClass = 'Modules\\Organization\\Models\\Organization';
+$organization = $organizationClass::find($id);
+```
+
+**Vantagens:**
+- Refatoração segura: renomear/mover a classe não quebra o código
+- Autocompletar e verificação de erros pelo IDE
+- Segue PSR-12 e práticas modernas de PHP
+- Evita erros de digitação em nomes de classes
+
+> Esta prática é conhecida como **Class Constant Usage** e faz parte das recomendações de código limpo e seguro em PHP moderno.
+
 ## Consequências
 
 ### Positivas
