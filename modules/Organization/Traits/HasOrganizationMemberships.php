@@ -11,33 +11,32 @@ declare(strict_types=1);
 namespace Modules\Organization\Traits;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasOrganizationMemberships
 {
     /**
      * Relação com os membros da organização
      * 
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function members(): MorphToMany
+    public function members(): BelongsToMany
     {
-        return $this->morphToMany(
+        return $this->belongsToMany(
             User::class,
-            'organization',
-            'organization_memberships',
+            'organization_members',
             'organization_id',
             'user_id'
-        )->withPivot(['role', 'position', 'is_active', 'joined_at'])
+        )->withPivot(['role', 'position', 'is_active'])
          ->withTimestamps();
     }
     
     /**
      * Retorna apenas membros ativos desta organização
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function activeMembers(): MorphToMany
+    public function activeMembers(): BelongsToMany
     {
         return $this->members()->wherePivot('is_active', true);
     }
@@ -46,9 +45,9 @@ trait HasOrganizationMemberships
      * Retorna membros com um papel específico
      *
      * @param string $role
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function membersWithRole(string $role): MorphToMany
+    public function membersWithRole(string $role): BelongsToMany
     {
         return $this->members()->wherePivot('role', $role);
     }

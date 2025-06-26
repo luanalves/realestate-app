@@ -41,7 +41,6 @@ class Organization extends Model
         'phone',
         'website',
         'active',
-        'organization_type',
     ];
 
     /**
@@ -63,7 +62,7 @@ class Organization extends Model
         return $this->hasMany(
             OrganizationMembership::class,
             'organization_id'
-        )->where('organization_type', static::class);
+        );
     }
 
     /**
@@ -72,16 +71,6 @@ class Organization extends Model
     public function addresses(): HasMany
     {
         return $this->hasMany(OrganizationAddress::class, 'organization_id');
-    }
-
-    /**
-     * Escopo para filtrar por tipo de organização.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     */
-    public function scopeOfType($query, string $type)
-    {
-        return $query->where('organization_type', $type);
     }
 
     /**

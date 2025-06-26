@@ -13,14 +13,13 @@ namespace Modules\Organization\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Modelo para endereços de organizações
  */
 class OrganizationAddress extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     /**
      * A tabela associada ao modelo.
@@ -36,7 +35,6 @@ class OrganizationAddress extends Model
      */
     protected $fillable = [
         'organization_id',
-        'organization_type',
         'type',
         'street',
         'number',
@@ -98,7 +96,7 @@ class OrganizationAddress extends Model
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeBranches($query)
+    public function scopeBranch($query)
     {
         return $query->where('type', 'branch');
     }

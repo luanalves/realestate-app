@@ -45,20 +45,4 @@ trait BelongsToOrganizations
     {
         return $this->organizationMemberships()->where('role', $role);
     }
-    
-    /**
-     * Get specific type of organizations for this user
-     * 
-     * @param string $organizationType Full class name of the organization model
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getOrganizationsOfType(string $organizationType)
-    {
-        return $this->organizationMemberships()
-            ->where('organization_type', $organizationType)
-            ->get()
-            ->map(function ($membership) {
-                return $membership->organization;
-            });
-    }
 }

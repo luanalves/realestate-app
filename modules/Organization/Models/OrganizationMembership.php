@@ -14,12 +14,17 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrganizationMembership extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'organization_members';
 
     /**
      * The attributes that are mass assignable.
@@ -28,12 +33,10 @@ class OrganizationMembership extends Model
      */
     protected $fillable = [
         'user_id',
-        'organization_type',
         'organization_id',
         'role',
         'position',
         'is_active',
-        'joined_at',
     ];
 
     /**
@@ -43,7 +46,6 @@ class OrganizationMembership extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
-        'joined_at' => 'datetime',
     ];
 
     /**
@@ -59,10 +61,10 @@ class OrganizationMembership extends Model
     /**
      * Get the organization this membership belongs to
      * 
-     * @return MorphTo
+     * @return BelongsTo
      */
-    public function organization(): MorphTo
+    public function organization(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(Organization::class, 'organization_id');
     }
 }
