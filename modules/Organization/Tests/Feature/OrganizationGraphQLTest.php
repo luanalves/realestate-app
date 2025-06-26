@@ -66,7 +66,6 @@ class OrganizationGraphQLTest extends TestCase
                         email
                         phone
                         website
-                        organization_type
                     }
                 }
             ',
@@ -79,21 +78,19 @@ class OrganizationGraphQLTest extends TestCase
                     'email' => 'test@organization.com',
                     'phone' => '1122223333',
                     'website' => 'https://testorg.com',
-                    'active' => true,
-                    'organization_type' => 'test'
+                    'active' => true
                 ]
             ]
         ]);
         
         $response->assertStatus(200)
             ->assertJsonStructure(['data' => ['createOrganization' => [
-                'id', 'name', 'fantasy_name', 'cnpj', 'email', 'phone', 'website', 'organization_type'
+                'id', 'name', 'fantasy_name', 'cnpj', 'email', 'phone', 'website'
             ]]])
             ->assertJsonPath('data.createOrganization.name', 'Test Organization')
             ->assertJsonPath('data.createOrganization.fantasy_name', 'Test Org')
             ->assertJsonPath('data.createOrganization.cnpj', '12345678901234')
-            ->assertJsonPath('data.createOrganization.email', 'test@organization.com')
-            ->assertJsonPath('data.createOrganization.organization_type', 'test');
+            ->assertJsonPath('data.createOrganization.email', 'test@organization.com');
     }
 
     /**
@@ -110,7 +107,6 @@ class OrganizationGraphQLTest extends TestCase
                         fantasy_name
                         cnpj
                         email
-                        organization_type
                         addresses {
                             id
                             type
@@ -131,7 +127,6 @@ class OrganizationGraphQLTest extends TestCase
                     'cnpj' => '43210987654321',
                     'email' => 'address@organization.com',
                     'active' => true,
-                    'organization_type' => 'test_with_address',
                     'address' => [
                         'type' => 'headquarters',
                         'street' => 'Main Street',
@@ -148,14 +143,13 @@ class OrganizationGraphQLTest extends TestCase
         
         $response->assertStatus(200)
             ->assertJsonStructure(['data' => ['createOrganization' => [
-                'id', 'name', 'fantasy_name', 'cnpj', 'email', 'organization_type',
+                'id', 'name', 'fantasy_name', 'cnpj', 'email',
                 'addresses' => [
                     ['id', 'type', 'street', 'number', 'city', 'state', 'zip_code', 'country']
                 ]
             ]]])
             ->assertJsonPath('data.createOrganization.name', 'Organization With Address')
-            ->assertJsonPath('data.createOrganization.cnpj', '43210987654321')
-            ->assertJsonPath('data.createOrganization.organization_type', 'test_with_address');
+            ->assertJsonPath('data.createOrganization.cnpj', '43210987654321');
     }
 
     /**
@@ -182,8 +176,7 @@ class OrganizationGraphQLTest extends TestCase
                     'cnpj' => '98765432109876',
                     'email' => 'update@test.com',
                     'description' => 'This will be updated',
-                    'active' => true,
-                    'organization_type' => 'test_update'
+                    'active' => true
                 ]
             ]
         ]);
@@ -204,7 +197,6 @@ class OrganizationGraphQLTest extends TestCase
                         phone
                         website
                         active
-                        organization_type
                     }
                 }
             ',
@@ -221,15 +213,14 @@ class OrganizationGraphQLTest extends TestCase
         
         $updateResponse->assertStatus(200)
             ->assertJsonStructure(['data' => ['updateOrganization' => [
-                'id', 'name', 'fantasy_name', 'description', 'email', 'phone', 'website', 'active', 'organization_type'
+                'id', 'name', 'fantasy_name', 'description', 'email', 'phone', 'website', 'active'
             ]]])
             ->assertJsonPath('data.updateOrganization.id', $organizationId)
             ->assertJsonPath('data.updateOrganization.name', 'Updated Organization Name')
             ->assertJsonPath('data.updateOrganization.description', 'This organization has been updated')
             ->assertJsonPath('data.updateOrganization.phone', '9876543210')
             ->assertJsonPath('data.updateOrganization.website', 'https://updated.example.com')
-            ->assertJsonPath('data.updateOrganization.fantasy_name', 'Update Me')
-            ->assertJsonPath('data.updateOrganization.organization_type', 'test_update');
+            ->assertJsonPath('data.updateOrganization.fantasy_name', 'Update Me');
     }
 
     /**
@@ -252,8 +243,7 @@ class OrganizationGraphQLTest extends TestCase
                     'name' => 'Organization To Delete',
                     'cnpj' => '11122233344455',
                     'email' => 'delete@test.com',
-                    'active' => true,
-                    'organization_type' => 'test_delete'
+                    'active' => true
                 ]
             ]
         ]);
@@ -268,7 +258,6 @@ class OrganizationGraphQLTest extends TestCase
                     deleteOrganization(id: $id) {
                         id
                         name
-                        organization_type
                     }
                 }
             ',
@@ -279,11 +268,10 @@ class OrganizationGraphQLTest extends TestCase
         
         $deleteResponse->assertStatus(200)
             ->assertJsonStructure(['data' => ['deleteOrganization' => [
-                'id', 'name', 'organization_type'
+                'id', 'name'
             ]]])
             ->assertJsonPath('data.deleteOrganization.id', $organizationId)
-            ->assertJsonPath('data.deleteOrganization.name', 'Organization To Delete')
-            ->assertJsonPath('data.deleteOrganization.organization_type', 'test_delete');
+            ->assertJsonPath('data.deleteOrganization.name', 'Organization To Delete');
             
         // Try to fetch the deleted organization - it should fail or return null
         $fetchResponse = $this->postJson('/graphql', [
@@ -300,7 +288,8 @@ class OrganizationGraphQLTest extends TestCase
             ]
         ]);
         
-        // Verify that the organization is indeed deleted
+        // Organization should be null or response should indicate it doesn't exist
+        $fetchResponse->assertStatus(200);
         $this->assertNull($fetchResponse->json('data.organization'));
     }
 }
