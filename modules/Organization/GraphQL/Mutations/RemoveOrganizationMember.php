@@ -12,34 +12,21 @@ namespace Modules\Organization\GraphQL\Mutations;
 
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Modules\Organization\Models\Organization;
 use Modules\Organization\Models\OrganizationMembership;
-use Modules\Organization\Services\OrganizationTypeRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class RemoveOrganizationMember
 {
-    protected OrganizationTypeRegistry $typeRegistry;
-
-    public function __construct(OrganizationTypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
-
     /**
-     * @param  null  $_
-     * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return bool
+     * @param null                 $_
+     * @param array<string, mixed> $args
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool
     {
         try {
-            // Resolve organization class based on type
-            $organizationClass = $this->typeRegistry->getClass($args['organizationType']);
-            
             // Find the organization
-            $organization = $organizationClass::findOrFail($args['organizationId']);
+            $organization = Organization::findOrFail($args['organizationId']);
             
             // Find the user
             $user = User::findOrFail($args['userId']);
@@ -47,22 +34,22 @@ class RemoveOrganizationMember
             // Find and remove the membership
             $membership = OrganizationMembership::where([
                 'user_id' => $user->id,
-                'organization_type' => $organizationClass,
                 'organization_id' => $organization->id,
             ])->first();
             
             if ($membership) {
+                // Since we removed SoftDeletes, we'll just delete the record
                 $membership->delete();
                 return true;
             }
-            
+
             return false;
         } catch (\Exception $e) {
-            \Log::error('Error removing organization member: ' . $e->getMessage(), [
+            \Log::error('Error removing organization member: '.$e->getMessage(), [
                 'exception' => $e,
                 'args' => $args,
             ]);
-            
+
             return false;
         }
     }

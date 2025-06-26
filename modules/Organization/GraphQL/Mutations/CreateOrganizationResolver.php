@@ -54,14 +54,12 @@ class CreateOrganizationResolver
             $organization->phone = $input['phone'] ?? null;
             $organization->website = $input['website'] ?? null;
             $organization->active = $input['active'] ?? true;
-            $organization->organization_type = $input['organization_type'] ?? 'generic';
             $organization->save();
 
             // 2. If an address was provided, create it
             if (isset($input['address'])) {
                 $this->organizationService->createOrganizationAddress(
                     $organization->id,
-                    $input['organization_type'] ?? 'generic',
                     (array) $input['address']
                 );
             }

@@ -26,14 +26,11 @@ type Organization {
     "Whether the organization is active"
     active: Boolean!
     
-    "Organization type"
-    organization_type: String!
-    
     "Organization members"
-    members: [OrganizationMembership!]! @morphMany
+    members: [OrganizationMembership!]! @hasMany
     
     "Active organization members"
-    activeMembers: [OrganizationMembership!]! @morphMany(relation: "activeMembers")
+    activeMembers: [OrganizationMembership!]! @hasMany(relation: "activeMembers")
     
     "Organization main address"
     mainAddress: OrganizationAddress
@@ -58,6 +55,9 @@ type OrganizationMembership {
     "User associated with the organization"
     user: User! @belongsTo
     
+    "Organization associated with this membership"
+    organization: Organization! @belongsTo
+    
     "User role in the organization (admin, manager, member, etc)"
     role: String
     
@@ -66,9 +66,6 @@ type OrganizationMembership {
     
     "Whether the user is active in the organization"
     isActive: Boolean!
-    
-    "Date when the user joined the organization"
-    joinedAt: DateTime
     
     "Creation date"
     createdAt: DateTime!
@@ -247,9 +244,6 @@ input CreateOrganizationInput {
     "Whether the organization is active"
     active: Boolean = true
     
-    "Organization type (defaults to 'generic')"
-    organization_type: String = "generic"
-    
     "Main address for the organization"
     address: OrganizationAddressInput
 }
@@ -281,9 +275,6 @@ input UpdateOrganizationInput {
     
     "Whether the organization is active"
     active: Boolean
-    
-    "Organization type"
-    organization_type: String
 }
 
 extend type Mutation {
@@ -305,25 +296,21 @@ extend type Mutation {
 
     "Add a member to organization"
     addOrganizationMember(
-        organizationType: String!
         organizationId: ID!
         userId: ID!
         role: String!
         position: String
-        joinedAt: DateTime
     ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\AddOrganizationMember")
     
     "Remove a member from organization"
     removeOrganizationMember(
         organizationId: ID!
-        organizationType: String!
         userId: ID!
     ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\RemoveOrganizationMember")
     
     "Update organization member information"
     updateOrganizationMember(
         organizationId: ID!
-        organizationType: String!
         userId: ID!
         role: String
         position: String

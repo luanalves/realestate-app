@@ -24,10 +24,8 @@ class CreateOrganizationAddress
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): OrganizationAddress
     {
-        // Always use Organization::class
-        $organizationClass = Organization::class;
         // Find the organization
-        $organization = $organizationClass::find($args['organizationId']);
+        $organization = Organization::find($args['organizationId']);
         if (!$organization) {
             throw new GraphQLError('Organization with ID '.$args['organizationId'].' does not exist.');
         }
@@ -35,7 +33,6 @@ class CreateOrganizationAddress
         // Create the address
         return OrganizationAddress::create([
             'organization_id' => $organization->id,
-            'organization_type' => Organization::class,
             'type' => $args['type'],
             'street' => $args['street'],
             'number' => $args['number'] ?? null,
