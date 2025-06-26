@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(\Modules\UserManagement\Database\Seeders\DatabaseSeeder::class);
+        $this->call(\Modules\Organization\Database\Seeders\DatabaseSeeder::class);
         $this->call(\Modules\RealEstate\Database\Seeders\DatabaseSeeder::class);
     }
 }
