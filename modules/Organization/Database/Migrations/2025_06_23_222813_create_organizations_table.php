@@ -28,11 +28,9 @@ return new class extends Migration {
             $table->string('phone')->nullable();
             $table->string('website')->nullable();
             $table->boolean('active')->default(true);
-            $table->string('organization_type')->comment('Tipo de organização (classe concreta)');
             $table->timestamps();
 
             // Índices
-            $table->index('organization_type');
             $table->index('active');
             $table->index('cnpj');
         });

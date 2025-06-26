@@ -12,8 +12,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -24,8 +23,7 @@ return new class extends Migration
             $table->foreignId('organization_id')
                 ->constrained('organizations')
                 ->onDelete('cascade');
-            $table->string('organization_type');
-            $table->string('type')->default('branch'); // 'headquarters' ou 'branch'
+            $table->string('type')->default('branch'); // 'headquarters' or 'branch'
             $table->string('street');
             $table->string('number')->nullable();
             $table->string('complement')->nullable();
@@ -36,10 +34,9 @@ return new class extends Migration
             $table->string('country')->default('BR');
             $table->boolean('active')->default(true);
             $table->timestamps();
-            $table->softDeletes();
 
-            // Índices
-            $table->index(['organization_id', 'organization_type']);
+            // Indices
+            $table->index('organization_id');
             $table->index('type');
             $table->index('active');
         });
