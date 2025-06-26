@@ -35,14 +35,12 @@ class OrganizationService
             $organization->phone = $data['phone'] ?? null;
             $organization->website = $data['website'] ?? null;
             $organization->active = $data['active'] ?? true;
-            $organization->organization_type = $data['organization_type'] ?? 'generic';
             $organization->save();
 
             // If an address was provided, create it
             if (isset($data['address'])) {
                 $this->createOrganizationAddress(
                     $organization->id,
-                    $data['organization_type'] ?? 'generic',
                     (array) $data['address']
                 );
             }
@@ -54,11 +52,10 @@ class OrganizationService
     /**
      * Create an address for an organization.
      */
-    public function createOrganizationAddress(int $organizationId, string $organizationType, array $addressData): OrganizationAddress
+    public function createOrganizationAddress(int $organizationId, array $addressData): OrganizationAddress
     {
         $address = new OrganizationAddress();
         $address->organization_id = $organizationId;
-        $address->organization_type = $organizationType;
         $address->type = $addressData['type'] ?? 'headquarters';
         $address->street = $addressData['street'];
         $address->number = $addressData['number'] ?? null;
@@ -110,36 +107,11 @@ class OrganizationService
         }
 
         if (isset($data['active'])) {
-            $organization->active = $data['active'];
+            $organization->active = (bool) $data['active'];
         }
 
         $organization->save();
 
         return $organization;
-    }
-
-    /**
-     * Delete an organization.
-     */
-    public function deleteOrganization(int $id): ?Organization
-    {
-        $organization = Organization::findOrFail($id);
-        
-        // Store a copy for returning
-        $deletedOrganization = clone $organization;
-        
-        // Execute in transaction to ensure data consistency
-        DB::transaction(function () use ($organization) {
-            // First, delete related addresses if any
-            $organization->addresses()->delete();
-            
-            // Then delete memberships if any
-            $organization->memberships()->delete();
-            
-            // Finally delete the organization
-            $organization->delete();
-        });
-        
-        return $deletedOrganization;
     }
 }

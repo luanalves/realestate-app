@@ -589,9 +589,8 @@ Add a user as a member to an organization.
 
 **Mutation:**
 ```graphql
-mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!, $userId: ID!, $role: String!, $position: String, $joinedAt: DateTime) {
+mutation AddOrganizationMember($organizationId: ID!, $userId: ID!, $role: String!, $position: String, $joinedAt: DateTime) {
   addOrganizationMember(
-    organizationType: $organizationType,
     organizationId: $organizationId,
     userId: $userId,
     role: $role,
@@ -604,7 +603,6 @@ mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!,
 **Variables:**
 ```json
 {
-  "organizationType": "Modules\\Organization\\Models\\Organization",
   "organizationId": "1",
   "userId": "2",
   "role": "manager",
@@ -619,9 +617,8 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!, $userId: ID!, $role: String!, $position: String, $joinedAt: DateTime) { addOrganizationMember(organizationType: $organizationType, organizationId: $organizationId, userId: $userId, role: $role, position: $position, joinedAt: $joinedAt) }",
+    "query": "mutation AddOrganizationMember($organizationId: ID!, $userId: ID!, $role: String!, $position: String, $joinedAt: DateTime) { addOrganizationMember(organizationId: $organizationId, userId: $userId, role: $role, position: $position, joinedAt: $joinedAt) }",
     "variables": {
-      "organizationType": "Modules\\Organization\\Models\\Organization",
       "organizationId": "1",
       "userId": "2",
       "role": "manager",
@@ -637,10 +634,9 @@ Update the details of an existing organization member.
 
 **Mutation:**
 ```graphql
-mutation UpdateOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!, $role: String, $position: String, $isActive: Boolean) {
+mutation UpdateOrganizationMember($organizationId: ID!, $userId: ID!, $role: String, $position: String, $isActive: Boolean) {
   updateOrganizationMember(
     organizationId: $organizationId,
-    organizationType: $organizationType,
     userId: $userId,
     role: $role,
     position: $position,
@@ -653,7 +649,6 @@ mutation UpdateOrganizationMember($organizationId: ID!, $organizationType: Strin
 ```json
 {
   "organizationId": "1",
-  "organizationType": "Modules\\Organization\\Models\\Organization",
   "userId": "2",
   "role": "admin",
   "position": "Director",
@@ -667,10 +662,9 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "mutation UpdateOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!, $role: String, $position: String, $isActive: Boolean) { updateOrganizationMember(organizationId: $organizationId, organizationType: $organizationType, userId: $userId, role: $role, position: $position, isActive: $isActive) }",
+    "query": "mutation UpdateOrganizationMember($organizationId: ID!, $userId: ID!, $role: String, $position: String, $isActive: Boolean) { updateOrganizationMember(organizationId: $organizationId, userId: $userId, role: $role, position: $position, isActive: $isActive) }",
     "variables": {
       "organizationId": "1",
-      "organizationType": "Modules\\Organization\\Models\\Organization",
       "userId": "2",
       "role": "admin",
       "position": "Director",
@@ -685,10 +679,9 @@ Remove a user from an organization.
 
 **Mutation:**
 ```graphql
-mutation RemoveOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!) {
+mutation RemoveOrganizationMember($organizationId: ID!, $userId: ID!) {
   removeOrganizationMember(
     organizationId: $organizationId,
-    organizationType: $organizationType,
     userId: $userId
   )
 }
@@ -698,7 +691,6 @@ mutation RemoveOrganizationMember($organizationId: ID!, $organizationType: Strin
 ```json
 {
   "organizationId": "1",
-  "organizationType": "Modules\\Organization\\Models\\Organization",
   "userId": "2"
 }
 ```
@@ -709,10 +701,9 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{
-    "query": "mutation RemoveOrganizationMember($organizationId: ID!, $organizationType: String!, $userId: ID!) { removeOrganizationMember(organizationId: $organizationId, organizationType: $organizationType, userId: $userId) }",
+    "query": "mutation RemoveOrganizationMember($organizationId: ID!, $userId: ID!) { removeOrganizationMember(organizationId: $organizationId, userId: $userId) }",
     "variables": {
       "organizationId": "1",
-      "organizationType": "Modules\\Organization\\Models\\Organization",
       "userId": "2"
     }
   }'
@@ -1042,9 +1033,8 @@ mutation CreateOrganizationAddress($organizationId: ID!, $input: OrganizationAdd
 5. Add a member to the organization:
 
 ```graphql
-mutation AddOrganizationMember($organizationType: String!, $organizationId: ID!, $userId: ID!, $role: String!, $position: String) {
+mutation AddOrganizationMember($organizationId: ID!, $userId: ID!, $role: String!, $position: String) {
   addOrganizationMember(
-    organizationType: $organizationType,
     organizationId: $organizationId,
     userId: $userId,
     role: $role,
