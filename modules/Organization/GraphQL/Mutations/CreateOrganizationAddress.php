@@ -40,7 +40,7 @@ class CreateOrganizationAddress
             'neighborhood' => $args['neighborhood'],
             'city' => $args['city'],
             'state' => $args['state'],
-            'zip_code' => $args['zipCode'],
+            'zip_code' => $args['zip_code'],
             'country' => $args['country'],
             'active' => true,
         ]);
