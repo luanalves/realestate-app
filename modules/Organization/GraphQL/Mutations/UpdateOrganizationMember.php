@@ -12,63 +12,61 @@ namespace Modules\Organization\GraphQL\Mutations;
 
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Modules\Organization\Models\Organization;
 use Modules\Organization\Models\OrganizationMembership;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class UpdateOrganizationMember
 {
     /**
-     * @param  null  $_
-     * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return bool
+     * @param null                 $_
+     * @param array<string, mixed> $args
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool
     {
         try {
             // Find the organization
             $organization = Organization::findOrFail($args['organizationId']);
-            
+
             // Find the user
             $user = User::findOrFail($args['userId']);
-            
+
             // Find the membership
             $membership = OrganizationMembership::where([
                 'user_id' => $user->id,
                 'organization_id' => $organization->id,
             ])->first();
-            
+
             if (!$membership) {
                 return false;
             }
-            
+
             // Prepare update data
             $updateData = [];
-            
+
             if (isset($args['role'])) {
                 $updateData['role'] = $args['role'];
             }
-            
+
             if (isset($args['position'])) {
                 $updateData['position'] = $args['position'];
             }
-            
-            if (isset($args['isActive'])) {
-                $updateData['is_active'] = $args['isActive'];
+
+            if (isset($args['is_active'])) {
+                $updateData['is_active'] = $args['is_active'];
             }
-            
+
             if (!empty($updateData)) {
                 $membership->update($updateData);
             }
-            
+
             return true;
         } catch (\Exception $e) {
-            \Log::error('Error updating organization member: ' . $e->getMessage(), [
+            \Log::error('Error updating organization member: '.$e->getMessage(), [
                 'exception' => $e,
                 'args' => $args,
             ]);
+
             return false;
         }
     }

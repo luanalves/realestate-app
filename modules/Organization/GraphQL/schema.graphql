@@ -26,11 +26,14 @@ type Organization {
     "Whether the organization is active"
     active: Boolean!
     
-    "Organization members"
-    members: [OrganizationMembership!]! @hasMany
+    "Organization memberships"
+    memberships: [OrganizationMembership!]! @hasMany
+    
+    "Organization members (users)"
+    members: [User!]! @belongsToMany
     
     "Active organization members"
-    activeMembers: [OrganizationMembership!]! @hasMany(relation: "activeMembers")
+    activeMembers: [User!]! @belongsToMany(relation: "activeMembers")
     
     "Organization main address"
     mainAddress: OrganizationAddress
@@ -65,13 +68,13 @@ type OrganizationMembership {
     position: String
     
     "Whether the user is active in the organization"
-    isActive: Boolean!
+    is_active: Boolean!
     
     "Creation date"
-    createdAt: DateTime!
+    created_at: DateTime!
     
     "Last update date"
-    updatedAt: DateTime!
+    updated_at: DateTime!
 }
 
 
@@ -151,7 +154,7 @@ input OrganizationAddressInput {
     state: String!
     
     "ZIP code"
-    zipCode: String!
+    zip_code: String!
     
     "Country"
     country: String! = "BR"
@@ -183,7 +186,7 @@ input UpdateOrganizationAddressInput {
     state: String
     
     "ZIP code"
-    zipCode: String
+    zip_code: String
     
     "Country"
     country: String
@@ -194,7 +197,7 @@ input UpdateOrganizationAddressInput {
 
 extend type User {
     "User organization memberships"
-    organizationMemberships: [OrganizationMembership!]! @hasMany
+    organization_memberships: [OrganizationMembership!]! @hasMany(relation: "organizationMemberships")
 }
 
 extend type Query {
@@ -215,6 +218,13 @@ extend type Query {
         organizationId: ID!
         organizationType: String
     ): [OrganizationAddress!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\AddressesByOrganizationId")
+    
+    "Get all members of an organization"
+    membersByOrganizationId(
+        organizationId: ID!
+        active: Boolean
+        role: String
+    ): [OrganizationMembership!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\MembersByOrganizationId")
 }
 """
 Input for creating a new generic organization
@@ -314,7 +324,7 @@ extend type Mutation {
         userId: ID!
         role: String
         position: String
-        isActive: Boolean
+        is_active: Boolean
     ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationMember")
     
     "Create a new address for an existing organization"
