@@ -12,6 +12,11 @@ This document provides comprehensive documentation for all GraphQL queries and m
 
 1. [Authentication](#authentication)
 2. [Organization Queries](#organization-queries)
+   - [Get Organization by ID](#1-get-organization-by-id)
+   - [Get All Organizations](#2-get-all-organizations)
+   - [Get Organization Address by ID](#3-get-organization-address-by-id)
+   - [Get Addresses by Organization ID](#4-get-addresses-by-organization-id)
+   - [Get Members by Organization ID](#5-get-members-by-organization-id)
 3. [Organization Mutations](#organization-mutations)
 4. [Organization Member Operations](#organization-member-operations)
 5. [Organization Address Operations](#organization-address-operations)
@@ -378,6 +383,55 @@ curl -X POST http://realestate.localhost/graphql \
     "query": "query GetAddressesByOrganization($organizationId: ID!) { addressesByOrganizationId(organizationId: $organizationId) { id organization_id street number complement neighborhood city state zip_code country type active created_at updated_at } }",
     "variables": {
       "organizationId": "1"
+    }
+  }'
+```
+
+### 5. Get Members by Organization ID
+
+Retrieve all members of a specific organization with optional filtering by role and active status.
+
+**Authentication Required:** This query requires a valid authentication token via the Authorization header (Bearer token).
+
+**Query:**
+```graphql
+query GetMembersByOrganization($organizationId: ID!, $active: Boolean, $role: String) {
+  membersByOrganizationId(organizationId: $organizationId, active: $active, role: $role) {
+    id
+    role
+    position
+    isActive
+    createdAt
+    updatedAt
+    user {
+      id
+      name
+      email
+    }
+  }
+}
+```
+
+**Variables:**
+```json
+{
+  "organizationId": "1",
+  "active": true,
+  "role": "admin"
+}
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+    "query": "query GetMembersByOrganization($organizationId: ID!, $active: Boolean, $role: String) { membersByOrganizationId(organizationId: $organizationId, active: $active, role: $role) { id role position isActive createdAt updatedAt user { id name email } } }",
+    "variables": {
+      "organizationId": "1",
+      "active": true,
+      "role": "admin"
     }
   }'
 ```
