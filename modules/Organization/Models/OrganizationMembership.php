@@ -48,6 +48,18 @@ class OrganizationMembership extends Model
         'is_active' => 'boolean',
     ];
 
+    
+    /**
+     * Set the isActive attribute (for GraphQL).
+     *
+     * @param bool $value
+     * @return void
+     */
+    public function setIsActiveAttribute(bool $value): void
+    {
+        $this->attributes['is_active'] = $value;
+    }
+
     /**
      * Get the user that belongs to this membership
      * 
