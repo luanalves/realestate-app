@@ -14,6 +14,9 @@
         <testsuite name="ModulesUnit">
             <directory>modules/*/Tests/Unit</directory>
         </testsuite>
+        <testsuite name="ModulesFeature">
+            <directory>modules/*/Tests/Feature</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
