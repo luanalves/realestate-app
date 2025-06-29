@@ -25,6 +25,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'preferences',
+        'tenant_id',
     ];
 
     /**
@@ -79,6 +81,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'preferences' => 'json',
         ];
     }
 
