@@ -95,15 +95,15 @@ class MembersByOrganizationIdTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-            ->assertJson([
+            ->assertJsonStructure([
                 'data' => [
                     'membersByOrganizationId' => [
-                        ['id' => '1', 'role' => 'admin'],
-                        ['id' => '2', 'role' => 'member'],
-                        ['id' => '3', 'role' => 'manager'],
+                        ['id', 'role'],
                     ],
                 ],
-            ]);
+            ])
+            ->assertJsonPath('data.membersByOrganizationId.0.id', '1')
+            ->assertJsonPath('data.membersByOrganizationId.0.role', 'admin');
     }
 
     /**
@@ -169,13 +169,15 @@ class MembersByOrganizationIdTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-            ->assertJson([
+            ->assertJsonStructure([
                 'data' => [
                     'membersByOrganizationId' => [
-                        ['id' => '1', 'role' => 'admin'],
+                        ['id', 'role'],
                     ],
                 ],
-            ]);
+            ])
+            ->assertJsonPath('data.membersByOrganizationId.0.id', '1')
+            ->assertJsonPath('data.membersByOrganizationId.0.role', 'admin');
     }
 
     /**

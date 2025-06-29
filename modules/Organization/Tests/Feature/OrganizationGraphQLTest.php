@@ -13,17 +13,21 @@ namespace Modules\Organization\Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
-use Mockery;
 use Tests\TestCase;
 
 class OrganizationGraphQLTest extends TestCase
 {
     use WithFaker;
-    
+
     /**
-     * Mock user for testing
+     * Mock user for testing.
      */
     protected $mockUser;
+
+    /**
+     * Used for generating unique test data.
+     */
+    protected $testId;
 
     /**
      * Setup the test environment.
@@ -31,23 +35,42 @@ class OrganizationGraphQLTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
+        // Create a unique test ID for this run
+        $this->testId = uniqid();
+
         // Create a mock user for authentication
-        $this->mockUser = Mockery::mock(User::class)->makePartial();
+        $this->mockUser = \Mockery::mock(User::class)->makePartial();
         $this->mockUser->shouldReceive('getAuthIdentifier')->andReturn(1);
         $this->mockUser->shouldReceive('withAccessToken')->andReturnSelf();
-        
+
         // Authenticate with Laravel Passport
         Passport::actingAs($this->mockUser);
     }
-    
+
     /**
      * Clean up the testing environment.
      */
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
+    }
+
+    /**
+     * Generate a unique CNPJ for testing.
+     */
+    protected function generateUniqueCnpj(): string
+    {
+        return substr('1234'.$this->testId.str_repeat('0', 14), 0, 14);
+    }
+
+    /**
+     * Generate a unique email for testing.
+     */
+    protected function generateUniqueEmail(string $domain = 'test.com'): string
+    {
+        return 'test_'.$this->testId.'@'.$domain;
     }
 
     /**
@@ -55,6 +78,9 @@ class OrganizationGraphQLTest extends TestCase
      */
     public function testCreateOrganization(): void
     {
+        $uniqueCnpj = $this->generateUniqueCnpj();
+        $uniqueEmail = $this->generateUniqueEmail('organization.com');
+
         $response = $this->postJson('/graphql', [
             'query' => '
                 mutation createOrganization($input: CreateOrganizationInput!) {
@@ -73,24 +99,24 @@ class OrganizationGraphQLTest extends TestCase
                 'input' => [
                     'name' => 'Test Organization',
                     'fantasy_name' => 'Test Org',
-                    'cnpj' => '12345678901234',
+                    'cnpj' => $uniqueCnpj,
                     'description' => 'This is a test organization',
-                    'email' => 'test@organization.com',
+                    'email' => $uniqueEmail,
                     'phone' => '1122223333',
                     'website' => 'https://testorg.com',
-                    'active' => true
-                ]
-            ]
+                    'active' => true,
+                ],
+            ],
         ]);
-        
+
         $response->assertStatus(200)
             ->assertJsonStructure(['data' => ['createOrganization' => [
-                'id', 'name', 'fantasy_name', 'cnpj', 'email', 'phone', 'website'
+                'id', 'name', 'fantasy_name', 'cnpj', 'email', 'phone', 'website',
             ]]])
             ->assertJsonPath('data.createOrganization.name', 'Test Organization')
             ->assertJsonPath('data.createOrganization.fantasy_name', 'Test Org')
-            ->assertJsonPath('data.createOrganization.cnpj', '12345678901234')
-            ->assertJsonPath('data.createOrganization.email', 'test@organization.com');
+            ->assertJsonPath('data.createOrganization.cnpj', $uniqueCnpj)
+            ->assertJsonPath('data.createOrganization.email', $uniqueEmail);
     }
 
     /**
@@ -98,6 +124,9 @@ class OrganizationGraphQLTest extends TestCase
      */
     public function testCreateOrganizationWithAddress(): void
     {
+        $uniqueCnpj = $this->generateUniqueCnpj();
+        $uniqueEmail = $this->generateUniqueEmail('organization.com');
+
         $response = $this->postJson('/graphql', [
             'query' => '
                 mutation createOrganizationWithAddress($input: CreateOrganizationInput!) {
@@ -124,8 +153,8 @@ class OrganizationGraphQLTest extends TestCase
                 'input' => [
                     'name' => 'Organization With Address',
                     'fantasy_name' => 'Address Org',
-                    'cnpj' => '43210987654321',
-                    'email' => 'address@organization.com',
+                    'cnpj' => $uniqueCnpj,
+                    'email' => $uniqueEmail,
                     'active' => true,
                     'address' => [
                         'type' => 'headquarters',
@@ -134,22 +163,22 @@ class OrganizationGraphQLTest extends TestCase
                         'neighborhood' => 'Downtown',
                         'city' => 'São Paulo',
                         'state' => 'SP',
-                        'zipCode' => '01234567',
-                        'country' => 'BR'
-                    ]
-                ]
-            ]
+                        'zip_code' => '01234567',
+                        'country' => 'BR',
+                    ],
+                ],
+            ],
         ]);
-        
+
         $response->assertStatus(200)
             ->assertJsonStructure(['data' => ['createOrganization' => [
                 'id', 'name', 'fantasy_name', 'cnpj', 'email',
                 'addresses' => [
-                    ['id', 'type', 'street', 'number', 'city', 'state', 'zip_code', 'country']
-                ]
+                    ['id', 'type', 'street', 'number', 'city', 'state', 'zip_code', 'country'],
+                ],
             ]]])
             ->assertJsonPath('data.createOrganization.name', 'Organization With Address')
-            ->assertJsonPath('data.createOrganization.cnpj', '43210987654321');
+            ->assertJsonPath('data.createOrganization.cnpj', $uniqueCnpj);
     }
 
     /**
@@ -157,6 +186,9 @@ class OrganizationGraphQLTest extends TestCase
      */
     public function testUpdateOrganization(): void
     {
+        $uniqueCnpj = $this->generateUniqueCnpj();
+        $uniqueEmail = $this->generateUniqueEmail('test.com');
+
         // First create an organization to update
         $createResponse = $this->postJson('/graphql', [
             'query' => '
@@ -173,17 +205,17 @@ class OrganizationGraphQLTest extends TestCase
                 'input' => [
                     'name' => 'Organization To Update',
                     'fantasy_name' => 'Update Me',
-                    'cnpj' => '98765432109876',
-                    'email' => 'update@test.com',
+                    'cnpj' => $uniqueCnpj,
+                    'email' => $uniqueEmail,
                     'description' => 'This will be updated',
-                    'active' => true
-                ]
-            ]
+                    'active' => true,
+                ],
+            ],
         ]);
-        
+
         $createResponse->assertStatus(200);
         $organizationId = $createResponse->json('data.createOrganization.id');
-        
+
         // Now update the organization
         $updateResponse = $this->postJson('/graphql', [
             'query' => '
@@ -206,14 +238,14 @@ class OrganizationGraphQLTest extends TestCase
                     'name' => 'Updated Organization Name',
                     'description' => 'This organization has been updated',
                     'phone' => '9876543210',
-                    'website' => 'https://updated.example.com'
-                ]
-            ]
+                    'website' => 'https://updated.example.com',
+                ],
+            ],
         ]);
-        
+
         $updateResponse->assertStatus(200)
             ->assertJsonStructure(['data' => ['updateOrganization' => [
-                'id', 'name', 'fantasy_name', 'description', 'email', 'phone', 'website', 'active'
+                'id', 'name', 'fantasy_name', 'description', 'email', 'phone', 'website', 'active',
             ]]])
             ->assertJsonPath('data.updateOrganization.id', $organizationId)
             ->assertJsonPath('data.updateOrganization.name', 'Updated Organization Name')
@@ -228,6 +260,9 @@ class OrganizationGraphQLTest extends TestCase
      */
     public function testDeleteOrganization(): void
     {
+        $uniqueCnpj = $this->generateUniqueCnpj();
+        $uniqueEmail = $this->generateUniqueEmail('delete.com');
+
         // First create an organization to delete
         $createResponse = $this->postJson('/graphql', [
             'query' => '
@@ -241,16 +276,16 @@ class OrganizationGraphQLTest extends TestCase
             'variables' => [
                 'input' => [
                     'name' => 'Organization To Delete',
-                    'cnpj' => '11122233344455',
-                    'email' => 'delete@test.com',
-                    'active' => true
-                ]
-            ]
+                    'cnpj' => $uniqueCnpj,
+                    'email' => $uniqueEmail,
+                    'active' => true,
+                ],
+            ],
         ]);
-        
+
         $createResponse->assertStatus(200);
         $organizationId = $createResponse->json('data.createOrganization.id');
-        
+
         // Now delete the organization
         $deleteResponse = $this->postJson('/graphql', [
             'query' => '
@@ -262,17 +297,17 @@ class OrganizationGraphQLTest extends TestCase
                 }
             ',
             'variables' => [
-                'id' => $organizationId
-            ]
+                'id' => $organizationId,
+            ],
         ]);
-        
+
         $deleteResponse->assertStatus(200)
             ->assertJsonStructure(['data' => ['deleteOrganization' => [
-                'id', 'name'
+                'id', 'name',
             ]]])
             ->assertJsonPath('data.deleteOrganization.id', $organizationId)
             ->assertJsonPath('data.deleteOrganization.name', 'Organization To Delete');
-            
+
         // Try to fetch the deleted organization - it should fail or return null
         $fetchResponse = $this->postJson('/graphql', [
             'query' => '
@@ -284,10 +319,10 @@ class OrganizationGraphQLTest extends TestCase
                 }
             ',
             'variables' => [
-                'id' => $organizationId
-            ]
+                'id' => $organizationId,
+            ],
         ]);
-        
+
         // Organization should be null or response should indicate it doesn't exist
         $fetchResponse->assertStatus(200);
         $this->assertNull($fetchResponse->json('data.organization'));

@@ -114,4 +114,35 @@ class OrganizationService
 
         return $organization;
     }
+
+    /**
+     * Delete an organization by ID.
+     *
+     * @param int $id The organization ID
+     * @return Organization|null The deleted organization or null if not found
+     */
+    public function deleteOrganization(int $id): ?Organization
+    {
+        return DB::transaction(function () use ($id) {
+            $organization = Organization::find($id);
+            
+            if (!$organization) {
+                return null;
+            }
+            
+            // Armazena uma cópia dos dados da organização antes de deletar
+            $deletedOrg = clone $organization;
+            
+            // Exclui os endereços associados
+            $organization->addresses()->delete();
+            
+            // Exclui os membros associados
+            $organization->memberships()->delete();
+            
+            // Exclui a organização
+            $organization->delete();
+            
+            return $deletedOrg;
+        });
+    }
 }

@@ -124,13 +124,13 @@ class OrganizationMemberGraphQLTest extends TestCase
         // Now update the member
         $response = $this->postJson('/graphql', [
             'query' => '
-                mutation UpdateMember($organizationId: ID!, $userId: ID!, $role: String, $position: String, $isActive: Boolean) {
+                mutation UpdateMember($organizationId: ID!, $userId: ID!, $role: String, $position: String, $is_active: Boolean) {
                     updateOrganizationMember(
                         organizationId: $organizationId
                         userId: $userId
                         role: $role
                         position: $position
-                        isActive: $isActive
+                        is_active: $is_active
                     )
                 }
             ',
@@ -139,7 +139,7 @@ class OrganizationMemberGraphQLTest extends TestCase
                 'userId' => (string)$this->regularUser->id,
                 'role' => OrganizationConstants::ROLE_ADMIN,
                 'position' => 'Manager',
-                'isActive' => true
+                'is_active' => true
             ]
         ]);
         
