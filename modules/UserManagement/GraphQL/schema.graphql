@@ -5,7 +5,7 @@ type Query {
     """
     Get currently authenticated user
     """
-    me: User @auth
+    me: User @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\Me")
     
     """
     Get all users (requires authentication)
@@ -39,6 +39,52 @@ type Mutation {
     """
     login(email: String!, password: String!): LoginResponse!
         @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
+        
+    """
+    Change user's password (requires authentication)
+    """
+    changePassword(
+        current_password: String!, 
+        new_password: String!, 
+        new_password_confirmation: String!
+    ): PasswordChangeResponse! 
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\ChangePassword")
+        
+    """
+    Request a password reset link (doesn't require authentication)
+    """
+    requestPasswordReset(
+        email: String!
+    ): RequestPasswordResetResponse! 
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\RequestPasswordReset")
+        
+    """
+    Reset password using token (doesn't require authentication)
+    """
+    resetPassword(
+        email: String!, 
+        token: String!, 
+        password: String!, 
+        password_confirmation: String!
+    ): PasswordResetResponse! 
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\ResetPassword")
+        
+    """
+    Update user profile (requires authentication)
+    """
+    updateProfile(
+        name: String,
+        email: String
+    ): ProfileUpdateResponse!
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdateProfile")
+        
+    """
+    Update user preferences (requires authentication)
+    """
+    updatePreferences(
+        preferences: JSON!
+    ): PreferencesUpdateResponse!
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdatePreferences")
 }
 
 input CreateUserInput {
@@ -63,6 +109,8 @@ type User {
     name: String!
     email: String!
     role: Role @belongsTo
+    preferences: JSON
+    tenant_id: ID
     created_at: String
     updated_at: String
 }
@@ -84,4 +132,46 @@ type LoginResponse {
 type DeleteUserResponse {
     success: Boolean!
     message: String!
+}
+
+"""
+Response for password change operation
+"""
+type PasswordChangeResponse {
+    success: Boolean!
+    message: String!
+}
+
+"""
+Response for password reset request operation
+"""
+type RequestPasswordResetResponse {
+    success: Boolean!
+    message: String!
+}
+
+"""
+Response for password reset operation
+"""
+type PasswordResetResponse {
+    success: Boolean!
+    message: String!
+}
+
+"""
+Response for profile update operation
+"""
+type ProfileUpdateResponse {
+    success: Boolean!
+    message: String!
+    user: User
+}
+
+"""
+Response for preferences update operation
+"""
+type PreferencesUpdateResponse {
+    success: Boolean!
+    message: String!
+    preferences: JSON
 }
