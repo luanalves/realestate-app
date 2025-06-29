@@ -1,25 +1,35 @@
 # RealEstate App
 
 Sistema de gestão imobiliária desenvolvido com foco em performance, escalabilidade e modularidade.
-O projeto segue princípios de arquitetura limpa, DDD e modularização baseada em domínio.
+O projeto segue princípios de arquitetura limpa, DDD e modularização baseada em domínio em uma **arquitetura headless e stateless**.
 
 ---
 
 ## 🧱 Características da Arquitetura
 
-- 🔧 **Laravel 12** como framework principal
+### 🎯 Arquitetura Headless & Stateless
+- � **Sem interface web server-side** - API exclusivamente para consumo por clientes externos
+- 🔐 **Autenticação stateless** - JWT tokens via Laravel Passport (sem sessões no servidor)
+- 📱 **Frontend agnóstico** - Suporte nativo a SPA, mobile apps, desktop, serverless
+- ⚡ **Escalabilidade horizontal** - Sem estado compartilhado entre instâncias
+
+### 🛠️ Stack Tecnológica
+- �🔧 **Laravel 12** como framework principal
 - 🧩 **Arquitetura modular por domínio** (UserManagement, RealEstate, Leads, etc)
 - 📡 **GraphQL com Lighthouse** para APIs flexíveis
 - 🗄️ **PostgreSQL, Redis, MongoDB** como suporte a diferentes tipos de persistência
 - ✉️ **Mensageria (Kafka ou RabbitMQ)** em planejamento futuro
-- 📁 Cada módulo possui seus próprios:
+
+### 📁 Estrutura Modular
+Cada módulo possui seus próprios:
   - Controllers
   - Models
   - Providers
   - Migrations
   - Seeders
   - GraphQL Schemas
-- 📏 **Padrões PSR implementados**:
+
+### 📏 Padrões PSR Implementados
   - PSR-1: Basic Coding Standard
   - PSR-4: Autoloader
   - PSR-7: HTTP Message Interface
@@ -29,7 +39,7 @@ O projeto segue princípios de arquitetura limpa, DDD e modularização baseada 
 
 ---
 
-Aplicação backend construída com Laravel 12 utilizando arquitetura modular, GraphQL e suporte a múltiplos bancos (PostgreSQL, MongoDB e Redis).
+**Aplicação backend headless e stateless** construída com Laravel 12 utilizando arquitetura modular, GraphQL e suporte a múltiplos bancos (PostgreSQL, MongoDB e Redis).
 
 ---
 
