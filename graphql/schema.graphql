@@ -60,7 +60,7 @@ type Query {
     """
     Get currently authenticated user
     """
-    me: User @auth
+    me: User @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\Me")
     
     """
     Get all users (requires authentication)
@@ -217,6 +217,8 @@ type User {
     name: String!
     email: String!
     email_verified_at: DateTime
+    preferences: JSON
+    tenant_id: ID
     created_at: DateTime!
     updated_at: DateTime!
     role: Role @belongsTo
