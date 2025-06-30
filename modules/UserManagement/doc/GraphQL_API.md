@@ -28,6 +28,18 @@ This document provides comprehensive documentation for all GraphQL queries and m
 
 **Headless & Stateless Architecture**: This application follows a headless, stateless architecture using JWT token-based authentication via Laravel Passport. There are no server-side sessions or cookies - all authentication state is managed through access tokens.
 
+### Getting an Access Token
+
+To obtain an access token, make a POST request to `/oauth/token`:
+
+```bash
+curl -X POST http://realestate.localhost/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&username=user@example.com&password=password123"
+```
+
+### Using the Access Token
+
 Most GraphQL operations in the UserManagement module require authentication. Include the Bearer token in the Authorization header:
 
 ```
@@ -106,7 +118,7 @@ query {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -d '{
@@ -168,7 +180,7 @@ query {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
@@ -211,7 +223,7 @@ query($id: ID!) {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
@@ -261,7 +273,7 @@ mutation($input: CreateUserInput!) {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
@@ -373,7 +385,7 @@ mutation($email: String!, $password: String!) {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -d '{
     "query": "mutation($email: String!, $password: String!) { login(email: $email, password: $password) { access_token token_type expires_in user { id name email role { id name } } } }",
@@ -437,7 +449,7 @@ mutation($currentPassword: String!, $newPassword: String!, $newPasswordConfirmat
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -d '{
@@ -475,7 +487,7 @@ mutation($email: String!) {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -d '{
     "query": "mutation($email: String!) { requestPasswordReset(email: $email) { success message } }",
@@ -552,7 +564,7 @@ mutation($name: String, $email: String) {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -d '{
@@ -597,7 +609,7 @@ mutation($preferences: JSON!) {
 
 **cURL Example:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -d '{
@@ -690,7 +702,7 @@ curl -X POST http://localhost/graphql \
 
 1. **Admin creates a user:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ADMIN_TOKEN" \
   -d '{
@@ -700,7 +712,7 @@ curl -X POST http://localhost/graphql \
 
 2. **User logs in:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -d '{
     "query": "mutation { login(email: \"newuser@example.com\", password: \"password123\") { access_token user { id name } } }"
@@ -709,7 +721,7 @@ curl -X POST http://localhost/graphql \
 
 3. **User updates their profile:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer USER_TOKEN" \
   -d '{
@@ -721,7 +733,7 @@ curl -X POST http://localhost/graphql \
 
 1. **Request password reset:**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -d '{
     "query": "mutation { requestPasswordReset(email: \"user@example.com\") { success message } }"
@@ -730,7 +742,7 @@ curl -X POST http://localhost/graphql \
 
 2. **Reset password with token (received via email):**
 ```bash
-curl -X POST http://localhost/graphql \
+curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -d '{
     "query": "mutation { resetPassword(email: \"user@example.com\", token: \"RESET_TOKEN\", password: \"newPassword123\", password_confirmation: \"newPassword123\") { success message } }"
