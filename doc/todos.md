@@ -35,7 +35,7 @@
   - [x] Documentação completa da API GraphQL com exemplos e cURL
   - [x] Índice de documentação em modules/Organization/doc/
   - [x] Atualização do README principal do projeto
-  - [x] Criação do índice de módulos em doc/modules.md
+  - [x] ~~Criação do índice de módulos em doc/modules.md~~ (removido por ser redundante)
   - [x] ADR 0006 referenciado para padrões de código
 
 - [x] **Sistema de registro dinâmico de tipos de organização**
