@@ -73,6 +73,10 @@ ModuleName/
 ├── Database/
 │   ├── Migrations/
 │   └── Seeders/
+├── doc/                    # Documentação específica do módulo
+│   ├── README.md          # Visão geral e guia de início rápido
+│   ├── GraphQL_API.md     # Documentação completa da API GraphQL
+│   └── CLI_Commands.md    # Documentação dos comandos de terminal
 ├── Factories/              # Padrão Factory para criação de objetos
 ├── GraphQL/
 │   ├── Mutations/
@@ -96,7 +100,11 @@ ModuleName/
 3. **Strategy Pattern**: Para algoritmos ou comportamentos alternativos
 4. **Service Layer**: Para lógica de negócio complexa que envolve múltiplas entidades
 5. **Command Pattern**: Para operações de sistema e manutenção
-6. **Testes Abrangentes**: Cada padrão deve ter testes unitários específicos
+6. **Documentação Completa**: Todo módulo deve ter documentação no diretório `doc/`
+   - **README.md**: Visão geral, propósito e guia de início rápido
+   - **GraphQL_API.md**: Documentação completa de queries, mutations e exemplos
+   - **CLI_Commands.md**: Documentação de comandos de terminal com exemplos práticos
+7. **Testes Abrangentes**: Cada padrão deve ter testes unitários específicos
 
 ### Exemplo: Módulo UserManagement
 
@@ -104,7 +112,11 @@ O módulo `UserManagement` serve como referência de implementação, incluindo:
 - **Factory Pattern**: `UserRepositoryFactory` para seleção de repositório
 - **Strategy Pattern**: `CachedUserRepository` vs `DatabaseUserRepository`
 - **Service Layer**: `UserService` para orquestração
-- **Commands**: `UserCacheCommand`, `TokenAnalysisCommand`
+- **Commands**: `UserCacheCommand`, `TokenAnalysisCommand`, `ResetPasswordCommand`
+- **Documentação Completa**: 
+  - `doc/README.md`: Visão geral e estrutura do módulo
+  - `doc/GraphQL_API.md`: API completa com exemplos de uso
+  - `doc/CLI_Commands.md`: Comandos de terminal com casos de uso
 - **Testes Completos**: 62 testes unitários cobrindo todos os padrões
 
-Essa abordagem reforça a visão de que **cada módulo deve ser tratado como um subproduto completo e autocontido**, responsável por sua própria lógica, dados, comportamento e padrões arquiteturais específicos.
+Essa abordagem reforça a visão de que **cada módulo deve ser tratado como um subproduto completo e autocontido**, responsável por sua própria lógica, dados, comportamento, documentação e padrões arquiteturais específicos.
