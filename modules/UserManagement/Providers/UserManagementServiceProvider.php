@@ -80,6 +80,7 @@ class UserManagementServiceProvider extends ServiceProvider
             $this->commands([
                 \Modules\UserManagement\Console\Commands\UserCacheCommand::class,
                 \Modules\UserManagement\Console\Commands\TokenAnalysisCommand::class,
+                \Modules\UserManagement\Console\Commands\ResetPasswordCommand::class,
             ]);
         }
     }
