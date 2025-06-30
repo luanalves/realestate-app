@@ -7,8 +7,16 @@ O projeto segue princípios de arquitetura limpa, DDD e modularização baseada 
 
 ## 🧱 Características da Arquitetura
 
-### 🎯 Arquitetura Headless & Stateless
-- � **Sem interface web server-side** - API exclusivamente para consumo por clientes externos
+### 🎯 Arquitetu### 📚 Documentação Técnica
+
+- **👤 UserManagement Module**: Complete documentation at [`modules/UserManagement/doc/README.md`](modules/UserManagement/doc/README.md)
+  - **🔍 GraphQL API**: [`modules/UserManagement/doc/GraphQL_API.md`](modules/UserManagement/doc/GraphQL_API.md)
+  - **⚡ CLI Commands**: [`modules/UserManagement/doc/CLI_Commands.md`](modules/UserManagement/doc/CLI_Commands.md)
+- **🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
+- **🏗️ ADRs**: Architectural decisions at [`doc/architectural-decision-records/`](doc/architectural-decision-records/)
+- **📖 Guides**: Development patterns and conventions at [`doc/`](doc/)
+- **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`ss & Stateless
+- 🚫 **Sem interface web server-side** - API exclusivamente para consumo por clientes externos
 - 🔐 **Autenticação stateless** - JWT tokens via Laravel Passport (sem sessões no servidor)
 - 📱 **Frontend agnóstico** - Suporte nativo a SPA, mobile apps, desktop, serverless
 - ⚡ **Escalabilidade horizontal** - Sem estado compartilhado entre instâncias
@@ -217,9 +225,13 @@ Todos os dados daquele módulo sejam populados corretamente.
 - [ ] Seguir padrões de naming e documentação
 
 ### 📚 Documentação
+- [ ] Criar diretório `modules/NomeModulo/doc/`
+- [ ] Criar `doc/README.md` com visão geral e propósito do módulo
+- [ ] Criar `doc/GraphQL_API.md` com documentação completa da API
+- [ ] Criar `doc/CLI_Commands.md` se o módulo tiver comandos de terminal
 - [ ] Criar Controller/Resolver e Request (FormRequest) para validações
 - [ ] Criar Seeders se houver dados base (ex: perfis, categorias, etc)
-- [ ] Atualizar README.md com a descrição do novo módulo
+- [ ] Atualizar README.md principal com a descrição do novo módulo
 - [ ] Documentar padrões específicos implementados no módulo
 
 ### 📖 Exemplo de Referência
@@ -227,7 +239,8 @@ Consulte o módulo `UserManagement` como exemplo completo de implementação inc
 - ✅ Factory Pattern com `UserRepositoryFactory`
 - ✅ Strategy Pattern com repositórios de cache
 - ✅ Service Layer com `UserService`  
-- ✅ Commands com `UserCacheCommand`
+- ✅ Commands com `UserCacheCommand`, `TokenAnalysisCommand`, `ResetPasswordCommand`
+- ✅ Documentação completa em `modules/UserManagement/doc/`
 - ✅ 62 testes unitários (173 assertions)
 
 ---
@@ -305,12 +318,14 @@ Para guia completo, consulte: [`doc/conventional-commits-guide.md`](doc/conventi
 
 ### 📚 Documentação Técnica
 
-- **📋 Modules**: Complete guide to all modules at [`doc/modules.md`](doc/modules.md)
-- **🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
+- ** UserManagement Module**: Complete documentation at [`modules/UserManagement/doc/README.md`](modules/UserManagement/doc/README.md)
+  - **� GraphQL API**: [`modules/UserManagement/doc/GraphQL_API.md`](modules/UserManagement/doc/GraphQL_API.md)
+  - **⚡ CLI Commands**: [`modules/UserManagement/doc/CLI_Commands.md`](modules/UserManagement/doc/CLI_Commands.md)
+- **�🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
 - **🏗️ ADRs**: Architectural decisions at [`doc/architectural-decision-records/`](doc/architectural-decision-records/)
 - **📖 Guides**: Development patterns and conventions at [`doc/`](doc/)
 - **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`
 
-**Quick Start**: For API usage examples, check the Organization module's GraphQL documentation which includes authentication setup and complete request examples.
+**Quick Start**: For API usage examples, check the UserManagement module's comprehensive documentation which includes authentication setup, complete request examples, and CLI tools.
 
 ---
