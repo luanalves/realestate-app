@@ -27,6 +27,7 @@ class User extends Authenticatable
         'role_id',
         'preferences',
         'tenant_id',
+        'is_active',
     ];
 
     /**
@@ -82,6 +83,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'preferences' => 'json',
+            'is_active' => 'boolean',
         ];
     }
 
