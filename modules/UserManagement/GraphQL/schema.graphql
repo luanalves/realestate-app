@@ -79,6 +79,15 @@ type Mutation {
         preferences: JSON!
     ): PreferencesUpdateResponse!
         @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdatePreferences")
+        
+    """
+    Set user active status (admin only)
+    """
+    setUserActiveStatus(
+        user_id: ID!,
+        is_active: Boolean!
+    ): UserActiveStatusResponse!
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\SetUserActiveStatus")
 }
 
 input CreateUserInput {
@@ -86,6 +95,7 @@ input CreateUserInput {
     email: String!
     password: String!
     role_id: ID!
+    is_active: Boolean = true
 }
 
 input UpdateUserInput {
@@ -93,6 +103,7 @@ input UpdateUserInput {
     email: String
     password: String
     role_id: ID
+    is_active: Boolean
 }
 
 """
@@ -105,6 +116,7 @@ type User {
     role: Role @belongsTo
     preferences: JSON
     tenant_id: ID
+    is_active: Boolean!
     created_at: String
     updated_at: String
 }
@@ -171,4 +183,13 @@ type PreferencesUpdateResponse {
     success: Boolean!
     message: String!
     preferences: JSON
+}
+
+"""
+Response for user active status update operation
+"""
+type UserActiveStatusResponse {
+    success: Boolean!
+    message: String!
+    user: User
 }
