@@ -10,9 +10,9 @@ declare(strict_types=1);
 
 namespace Modules\Security\Services;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Modules\UserManagement\Database\Seeders\RolesSeeder;
+use Modules\UserManagement\Models\User;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class SecurityAuthorizationService

@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\RealEstate\Tests\Feature;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Modules\RealEstate\Models\RealEstate;
