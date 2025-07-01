@@ -19,6 +19,9 @@ class UserManagementServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Configure Laravel Passport for this module
+        \Laravel\Passport\Passport::enablePasswordGrant();
+        
         // Register UserRepositoryInterface with automatic factory resolution
         $this->app->bind(
             \Modules\UserManagement\Contracts\UserRepositoryInterface::class,
