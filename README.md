@@ -7,7 +7,14 @@ O projeto segue princípios de arquitetura limpa, DDD e modularização baseada 
 
 ## 🧱 Características da Arquitetura
 
-### 🎯 Arquitetu### 📚 Documentação Técnica
+### 🎯 Arquitetura Headless & Stateless
+
+- 🚫 **Sem interface web server-side** - API exclusivamente para consumo por clientes externos
+- 🔐 **Autenticação stateless** - JWT tokens via Laravel Passport (sem sessões no servidor)
+- 📱 **Frontend agnóstico** - Suporte nativo a SPA, mobile apps, desktop, serverless
+- ⚡ **Escalabilidade horizontal** - Sem estado compartilhado entre instâncias
+
+### 📚 Documentação Técnica
 
 - **👤 UserManagement Module**: Complete documentation at [`modules/UserManagement/doc/README.md`](modules/UserManagement/doc/README.md)
   - **🔍 GraphQL API**: [`modules/UserManagement/doc/GraphQL_API.md`](modules/UserManagement/doc/GraphQL_API.md)
@@ -318,10 +325,10 @@ Para guia completo, consulte: [`doc/conventional-commits-guide.md`](doc/conventi
 
 ### 📚 Documentação Técnica
 
-- ** UserManagement Module**: Complete documentation at [`modules/UserManagement/doc/README.md`](modules/UserManagement/doc/README.md)
-  - **� GraphQL API**: [`modules/UserManagement/doc/GraphQL_API.md`](modules/UserManagement/doc/GraphQL_API.md)
+- **👤 UserManagement Module**: Complete documentation at [`modules/UserManagement/doc/README.md`](modules/UserManagement/doc/README.md)
+  - **🔍 GraphQL API**: [`modules/UserManagement/doc/GraphQL_API.md`](modules/UserManagement/doc/GraphQL_API.md)
   - **⚡ CLI Commands**: [`modules/UserManagement/doc/CLI_Commands.md`](modules/UserManagement/doc/CLI_Commands.md)
-- **�🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
+- **🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
 - **🏗️ ADRs**: Architectural decisions at [`doc/architectural-decision-records/`](doc/architectural-decision-records/)
 - **📖 Guides**: Development patterns and conventions at [`doc/`](doc/)
 - **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`
