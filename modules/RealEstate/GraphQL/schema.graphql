@@ -69,7 +69,7 @@ input CreateRealEstateInput {
     fantasyName: String @rules(apply: ["nullable", "string", "max:255"])
     
     "CNPJ da imobiliária"
-    cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:organizations,cnpj"])
+    cnpj: String! @rules(apply: ["required", "string", "regex:/^[0-9]{14}$/", "unique:organizations,cnpj"])
     
     "Descrição da organização"
     description: String @rules(apply: ["nullable", "string", "max:1000"])

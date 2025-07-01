@@ -18,16 +18,17 @@ use Modules\RealEstate\Support\RealEstateConstants;
 class CreateRealEstateResolver
 {
     /**
-     * Cria uma nova organização do tipo Imobiliária.
+     * /**
+     * Creates a new real estate organization.
      *
      * @param null $root
      */
     public function __invoke($root, array $args): RealEstate
     {
-        $input = $args['input'];        // Inicia a transação para garantir atomicidade
+        $input = $args['input'];
 
         return DB::transaction(function () use ($input) {
-            // 1. Cria a organização base primeiro
+            // 1. Create the base organization first
             $organization = new Organization();
             $organization->name = $input['name'];
             $organization->fantasy_name = $input['fantasyName'] ?? null;
@@ -40,14 +41,15 @@ class CreateRealEstateResolver
             $organization->organization_type = RealEstateConstants::ORGANIZATION_TYPE;
             $organization->save();
 
-            // 2. Cria a imobiliária usando o ID da organização base
+            // 2. Create the real estate entity using the base organization ID
             $realEstate = new RealEstate();
             $realEstate->id = $organization->id;
             $realEstate->creci = $input['creci'] ?? null;
             $realEstate->state_registration = $input['stateRegistration'] ?? null;
             $realEstate->save();
 
-            // 3. Carrega o relacionamento para garantir que temos todos os dados
+            // 3. Load the relationship to ensure we have all the data
+            $realEstate->load('organization');
             $realEstate->load('organization');
 
             return $realEstate;

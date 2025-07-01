@@ -1,6 +1,6 @@
  # RealEstate Module
 
-The RealEstate module handles real estate agency management in the application. It extends the generic Organization module to provide specialized functionality for real estate agencies (imobiliárias) while maintaining a clean, modular architecture.
+The RealEstate module handles real estate agency management in the application. It extends the generic Organization module to provide specialized functionality for real estate agencies while maintaining a clean, modular architecture.
 
 ## Architecture Overview
 
@@ -399,128 +399,18 @@ This module follows:
 - [ADR-0006: Code Standards and PSR](../../doc/architectural-decision-records/0006-padroes-de-codigo-e-psr.md)
 - [GraphQL Schema Documentation](./GraphQL/schema.graphql)
 
-**Retorno:** `RealEstate!` - A imobiliária após a atualização
+## Authorization and Authentication
 
-**Exemplo de chamada:**
-```graphql
-mutation {
-  updateRealEstate(
-    id: 1
-    input: {
-      name: "Imobiliária Exemplo Atualizada"
-      email: "novo-contato@exemplo.com"
-      phone: "1199997777"
-      active: true
-      address: {
-        street: "Rua Nova, 500"
-        city: "São Paulo"
-        state: "SP"
-      }
-    }
-  ) {
-    id
-    name
-    email
-    phone
-    active
-    address {
-      street
-      city
-      state
-    }
-  }
-}
-```
+All GraphQL operations require authentication via OAuth token. Additionally:
 
-#### 3. `deleteRealEstate` - Excluir Imobiliária
+1. **For listing and viewing** real estate agencies (`realEstates`, `realEstateById`):
+   - Any authenticated user can access data from their own tenant
+   - Administrators can access all real estate agencies
 
-**Descrição:** Remove uma imobiliária do sistema.
-
-**Parâmetros:**
-- `id: ID!` - ID da imobiliária a ser excluída (obrigatório)
-
-**Retorno:** `RealEstate!` - Os dados da imobiliária que foi excluída
-
-**Exemplo de chamada:**
-```graphql
-mutation {
-  deleteRealEstate(id: 1) {
-    id
-    name
-    email
-  }
-}
-```
-
-## Tipos de Dados GraphQL
-
-### Tipos Principais
-
-1. **`RealEstate`** - Representa uma imobiliária
-   - `id: ID!`
-   - `name: String!`
-   - `description: String`
-   - `email: String!`
-   - `phone: String`
-   - `website: String`
-   - `address: RealEstateAddress`
-   - `creci: String`
-   - `active: Boolean!`
-   - `tenant_id: ID`
-   - `created_at: DateTime!`
-   - `updated_at: DateTime!`
-   - `users: [User!]!` (relação com usuários)
-
-2. **`RealEstateAddress`** - Representa o endereço de uma imobiliária
-   - `street: String`
-   - `city: String`
-   - `state: String`
-   - `zip_code: String`
-   - `country: String`
-
-3. **`RealEstatePaginator`** - Contém resultados paginados
-   - `paginatorInfo: PaginatorInfo!`
-   - `data: [RealEstate!]!`
-
-### Tipos de Input
-
-1. **`RealEstateAddressInput`** - Input para dados de endereço
-   - `street: String`
-   - `city: String`
-   - `state: String`
-   - `zip_code: String`
-   - `country: String`
-
-2. **`UpdateRealEstateInput`** - Input para atualização de imobiliária
-   - `name: String`
-   - `description: String`
-   - `email: String`
-   - `phone: String`
-   - `website: String`
-   - `address: RealEstateAddressInput`
-   - `creci: String`
-   - `active: Boolean`
-   - `tenant_id: ID`
-
-## Security
-
-All operations are protected with appropriate authentication and authorization:
-- Users can only manage real estate agencies within their tenant
-- Only users with appropriate roles can perform CRUD operations
-- All GraphQL operations use the `@auth` directive
-
-### Requisitos de Autenticação e Autorização
-
-Todas as chamadas GraphQL acima requerem autenticação via token OAuth. Além disso:
-
-1. Para **listar e visualizar** imobiliárias (`realEstates`, `realEstateById`):
-   - Qualquer usuário autenticado pode acessar dados da sua própria tenant
-   - Administradores podem acessar todas as imobiliárias
-
-2. Para **criar, atualizar ou excluir** imobiliárias (`createRealEstate`, `updateRealEstate`, `deleteRealEstate`):
-   - Requer papel (role) `ROLE_SUPER_ADMIN` ou `ROLE_REAL_ESTATE_ADMIN`
-   - Usuários não-admin não podem modificar imobiliárias
-   - Usuários só podem modificar imobiliárias da sua própria tenant (exceto super-admin)
+2. **For creating, updating, or deleting** real estate agencies (`createRealEstate`, `updateRealEstate`, `deleteRealEstate`):
+   - Requires `ROLE_SUPER_ADMIN` or `ROLE_REAL_ESTATE_ADMIN` role
+   - Non-admin users cannot modify real estate agencies
+   - Users can only modify agencies within their own tenant (except super-admin)
 
 ## Multi-Tenant Support
 
