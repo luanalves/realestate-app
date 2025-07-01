@@ -14,6 +14,7 @@ This document provides comprehensive documentation for all GraphQL queries and m
    - [Create User](#1-create-user)
    - [Update User](#2-update-user)
    - [Delete User](#3-delete-user)
+   - [Set User Active Status](#4-set-user-active-status)
 4. [Authentication Mutations](#authentication-mutations)
    - [Change Password](#1-change-password)
    - [Request Password Reset](#2-request-password-reset)
@@ -135,6 +136,7 @@ query {
     }
     preferences
     tenant_id
+    is_active
     created_at
     updated_at
   }
@@ -147,7 +149,7 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -d '{
-    "query": "query { me { id name email role { id name description } preferences tenant_id created_at updated_at } }"
+    "query": "query { me { id name email role { id name description } preferences tenant_id is_active created_at updated_at } }"
   }'
 ```
 
@@ -197,6 +199,7 @@ query {
       name
     }
     tenant_id
+    is_active
     created_at
     updated_at
   }
@@ -209,7 +212,7 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
-    "query": "query { users { id name email role { id name } tenant_id created_at updated_at } }"
+    "query": "query { users { id name email role { id name } tenant_id is_active created_at updated_at } }"
   }'
 ```
 
@@ -233,6 +236,7 @@ query($id: ID!) {
     }
     preferences
     tenant_id
+    is_active
     created_at
     updated_at
   }
@@ -252,7 +256,7 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
-    "query": "query($id: ID!) { user(id: $id) { id name email role { id name description } preferences tenant_id created_at updated_at } }",
+    "query": "query($id: ID!) { user(id: $id) { id name email role { id name description } preferences tenant_id is_active created_at updated_at } }",
     "variables": { "id": "1" }
   }'
 ```
@@ -343,6 +347,7 @@ mutation($input: CreateUserInput!) {
       id
       name
     }
+    is_active
     created_at
     updated_at
   }
@@ -356,7 +361,8 @@ mutation($input: CreateUserInput!) {
     "name": "Jane Smith",
     "email": "jane@example.com",
     "password": "securePassword123",
-    "role_id": "2"
+    "role_id": "2",
+    "is_active": true
   }
 }
 ```
@@ -367,13 +373,14 @@ curl -X POST http://realestate.localhost/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
-    "query": "mutation($input: CreateUserInput!) { createUser(input: $input) { id name email role { id name } created_at updated_at } }",
+    "query": "mutation($input: CreateUserInput!) { createUser(input: $input) { id name email role { id name } is_active created_at updated_at } }",
     "variables": {
       "input": {
         "name": "Jane Smith",
         "email": "jane@example.com",
         "password": "securePassword123",
-        "role_id": "2"
+        "role_id": "2",
+        "is_active": true
       }
     }
   }'
@@ -396,6 +403,7 @@ mutation($id: ID!, $input: UpdateUserInput!) {
       id
       name
     }
+    is_active
     updated_at
   }
 }
@@ -407,7 +415,8 @@ mutation($id: ID!, $input: UpdateUserInput!) {
   "id": "1",
   "input": {
     "name": "John Updated",
-    "email": "john.updated@example.com"
+    "email": "john.updated@example.com",
+    "is_active": false
   }
 }
 ```
@@ -432,6 +441,71 @@ mutation($id: ID!) {
 ```json
 {
   "id": "1"
+}
+```
+
+### 4. Set User Active Status
+
+Activate or deactivate a user account. Only administrators can perform this action.
+
+**Authentication Required:** Yes (Admin roles only)
+
+**Mutation:**
+```graphql
+mutation($userId: ID!, $isActive: Boolean!) {
+  setUserActiveStatus(
+    user_id: $userId,
+    is_active: $isActive
+  ) {
+    success
+    message
+    user {
+      id
+      name
+      email
+      is_active
+    }
+  }
+}
+```
+
+**Variables:**
+```json
+{
+  "userId": "1",
+  "isActive": false
+}
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+  -d '{
+    "query": "mutation($userId: ID!, $isActive: Boolean!) { setUserActiveStatus(user_id: $userId, is_active: $isActive) { success message user { id name email is_active } } }",
+    "variables": {
+      "userId": "1",
+      "isActive": false
+    }
+  }'
+```
+
+**Expected Response:**
+```json
+{
+  "data": {
+    "setUserActiveStatus": {
+      "success": true,
+      "message": "User status updated successfully",
+      "user": {
+        "id": "1",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "is_active": false
+      }
+    }
+  }
 }
 ```
 
@@ -798,5 +872,7 @@ curl -X POST http://realestate.localhost/graphql \
 - Email addresses must be unique across the system
 - Role IDs correspond to roles defined in the `roles` table
 - The `tenant_id` field is used for multi-tenant functionality (restricting user access to specific organizations)
+- The `is_active` field controls whether a user can authenticate (inactive users cannot log in)
+- Only administrators can change user active status using the `setUserActiveStatus` mutation
 
 For more information about roles and permissions, refer to the Authorization Service Pattern documentation.
