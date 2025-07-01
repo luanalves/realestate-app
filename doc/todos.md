@@ -358,3 +358,36 @@ Para detalhes de implementação, consulte:
 - [ ] Histórico de atividades por membro/organização
 
 --------------------------------------------------------------------------------------------
+
+## 🔰 Melhorias no Módulo UserManagement
+
+### GraphQL e Permissões
+- [ ] **Implementar/corrigir query GraphQL para listar roles**
+  - [ ] Verificar erro "Cannot query field \"roles\" on type \"Query\""
+  - [ ] Modificar schema principal para importar corretamente o schema do UserManagement
+  - [ ] Implementar cache Redis para dados de roles com TTL de 24h
+  - [ ] Testar e documentar exemplo de uso
+
+- [ ] **Implementar validação de permissão para atualização de dados do usuário**
+  - [ ] Permitir que usuários atualizem apenas seus próprios dados
+  - [ ] Permitir que usuários com perfil admin atualizem dados de qualquer usuário
+  - [ ] Implementar AuthorizationService para verificação de permissão
+  - [ ] Adicionar testes para cenários de permissão
+
+- [ ] **Melhorar mutation para atualização de senha**
+  - [ ] Implementar validação para permitir atualização apenas pelo próprio usuário
+  - [ ] Implementar override por usuários com perfil admin
+  - [ ] Adicionar validação de força de senha
+  - [ ] Enviar notificação por email quando senha for alterada
+  - [ ] Implementar testes para diferentes cenários
+
+### Documentação e Testes
+- [ ] **Atualizar documentação GraphQL_API.md**
+  - [ ] Adicionar documentação para a query `roles`
+  - [ ] Atualizar exemplos de requisição para atualização de usuário
+  - [ ] Adicionar seção sobre políticas de permissão
+  
+- [ ] **Implementar testes automatizados**
+  - [ ] Testes para query `roles`
+  - [ ] Testes para atualização de dados com diferentes perfis
+  - [ ] Testes para atualização de senha

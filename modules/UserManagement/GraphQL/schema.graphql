@@ -33,12 +33,6 @@ type Mutation {
     Delete a user
     """
     deleteUser(id: ID!): DeleteUserResponse @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\DeleteUser")
-
-    """
-    Login a user
-    """
-    login(email: String!, password: String!): LoginResponse!
-        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
         
     """
     Change user's password (requires authentication)
@@ -122,6 +116,9 @@ type Role {
     users: [User!]! @hasMany
 }
 
+"""
+@deprecated Use the OAuth endpoint /oauth/token instead
+"""
 type LoginResponse {
     access_token: String!
     token_type: String!

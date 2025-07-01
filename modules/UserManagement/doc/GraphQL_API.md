@@ -9,15 +9,16 @@ This document provides comprehensive documentation for all GraphQL queries and m
    - [Get Current User Profile (me)](#1-get-current-user-profile-me)
    - [Get All Users](#2-get-all-users)
    - [Get User by ID](#3-get-user-by-id)
+   - [Get All Roles](#4-get-all-roles)
 3. [User Management Mutations](#user-management-mutations)
    - [Create User](#1-create-user)
    - [Update User](#2-update-user)
    - [Delete User](#3-delete-user)
 4. [Authentication Mutations](#authentication-mutations)
-   - [Login](#1-login)
-   - [Change Password](#2-change-password)
-   - [Request Password Reset](#3-request-password-reset)
-   - [Reset Password](#4-reset-password)
+   - [Change Password](#1-change-password)
+   - [Request Password Reset](#2-request-password-reset)
+   - [Reset Password](#3-reset-password)
+   - [~~Login~~ (Deprecated)](#deprecated-authentication-mutations)
 5. [Profile Management Mutations](#profile-management-mutations)
    - [Update Profile](#1-update-profile)
    - [Update Preferences](#2-update-preferences)
@@ -30,13 +31,15 @@ This document provides comprehensive documentation for all GraphQL queries and m
 
 ### Getting an Access Token
 
-To obtain an access token, make a POST request to `/oauth/token`:
+To obtain an access token, make a POST request to the OAuth endpoint `/oauth/token`:
 
 ```bash
 curl -X POST http://realestate.localhost/oauth/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=password&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&username=user@example.com&password=password123"
 ```
+
+> **Important**: The GraphQL mutation `login` has been deprecated and removed. Authentication should always be performed through the OAuth endpoint above, particularly when implementing a Backend-for-Frontend (BFF) architecture.
 
 ### Using the Access Token
 
@@ -46,7 +49,7 @@ Most GraphQL operations in the UserManagement module require authentication. Inc
 Authorization: Bearer YOUR_ACCESS_TOKEN
 ```
 
-Some operations like `login`, `requestPasswordReset`, and `resetPassword` do not require authentication.
+Some operations like `requestPasswordReset` and `resetPassword` do not require authentication.
 
 ### Architecture Characteristics
 
@@ -58,9 +61,11 @@ Some operations like `login`, `requestPasswordReset`, and `resetPassword` do not
 
 ### Cache and Performance Notes
 
+This module implements a cache-first strategy for queries that access relatively stable data.
+
 #### Query `me` - Technical Implementation
 
-The `me` query now uses **Redis cache with database fallback** for optimal performance. Here's how it works:
+The `me` query uses **Redis cache with database fallback** for optimal performance. Here's how it works:
 
 1. **Token Validation**: Laravel Passport validates the JWT token in the Authorization header
 2. **User Resolution**: `Auth::guard('api')->user()` extracts user_id from token
@@ -85,6 +90,26 @@ The `me` query now uses **Redis cache with database fallback** for optimal perfo
 - Reduced database load
 - Automatic cache invalidation ensures data consistency
 - Graceful degradation if Redis is unavailable
+
+#### Query `roles` - Technical Implementation
+
+The `roles` query also uses **Redis cache with database fallback** since role data changes very infrequently:
+
+1. **Authentication**: Token validation followed by permission check
+2. **Cache Check**: Attempts to retrieve roles from Redis cache
+3. **Cache Miss Strategy**: If no cached data exists, query database and store in cache
+4. **Fallback**: Graceful degradation to direct database query if cache operation fails
+5. **Long TTL**: 24-hour cache lifetime to minimize database access
+
+**Performance Characteristics:**
+- **First request**: ~20-50ms (database query + cache storage)
+- **Cached requests**: ~1-3ms (Redis lookup)
+- **Cache invalidation**: Automatic on role creation, update, or deletion
+
+**Benefits:**
+- Minimal database load for this frequently accessed reference data
+- Significantly faster API responses
+- High availability through fallback mechanism
 
 ---
 
@@ -232,6 +257,71 @@ curl -X POST http://realestate.localhost/graphql \
   }'
 ```
 
+### 4. Get All Roles
+
+Retrieve all available roles in the system.
+
+**Authentication Required:** Yes
+
+**Technical Notes:** This query uses Redis cache to improve performance for this infrequently changing data.
+
+**Query:**
+```graphql
+query {
+  roles {
+    id
+    name
+    description
+  }
+}
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://realestate.localhost/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "query": "query { roles { id name description } }"
+  }'
+```
+
+**Response Example:**
+```json
+{
+  "data": {
+    "roles": [
+      {
+        "id": "1",
+        "name": "super_admin",
+        "description": "Administrador geral do sistema"
+      },
+      {
+        "id": "2",
+        "name": "real_estate_admin",
+        "description": "Administrador da imobiliária"
+      },
+      {
+        "id": "3",
+        "name": "real_estate_agent",
+        "description": "Funcionário da imobiliária"
+      },
+      {
+        "id": "4",
+        "name": "client",
+        "description": "Cliente da imobiliária"
+      }
+    ]
+  }
+}
+```
+
+**Cache Implementation Details:**
+- Redis cache with 1-day TTL
+- Cache key: `user_management_roles`
+- Automatic fallback to database if cache fails
+- Optimized for environments with high read, low write volume
+
 ---
 
 ## User Management Mutations
@@ -349,76 +439,7 @@ mutation($id: ID!) {
 
 ## Authentication Mutations
 
-### 1. Login
-
-Authenticate a user and receive an access token.
-
-**Authentication Required:** No
-
-**Mutation:**
-```graphql
-mutation($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
-    access_token
-    token_type
-    expires_in
-    user {
-      id
-      name
-      email
-      role {
-        id
-        name
-      }
-    }
-  }
-}
-```
-
-**Variables:**
-```json
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-**cURL Example:**
-```bash
-curl -X POST http://realestate.localhost/graphql \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "mutation($email: String!, $password: String!) { login(email: $email, password: $password) { access_token token_type expires_in user { id name email role { id name } } } }",
-    "variables": {
-      "email": "john@example.com",
-      "password": "password123"
-    }
-  }'
-```
-
-**Response:**
-```json
-{
-  "data": {
-    "login": {
-      "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...",
-      "token_type": "Bearer",
-      "expires_in": 31536000,
-      "user": {
-        "id": "1",
-        "name": "John Doe",
-        "email": "john@example.com",
-        "role": {
-          "id": "2",
-          "name": "client"
-        }
-      }
-    }
-  }
-}
-```
-
-### 2. Change Password
+### 1. Change Password
 
 Change the password for the currently authenticated user.
 
@@ -462,7 +483,7 @@ curl -X POST http://realestate.localhost/graphql \
   }'
 ```
 
-### 3. Request Password Reset
+### 2. Request Password Reset
 
 Request a password reset link to be sent to the user's email.
 
@@ -497,7 +518,7 @@ curl -X POST http://realestate.localhost/graphql \
   }'
 ```
 
-### 4. Reset Password
+### 3. Reset Password
 
 Reset the user's password using a token received via email.
 
@@ -527,6 +548,16 @@ mutation($email: String!, $token: String!, $password: String!, $passwordConfirma
   "passwordConfirmation": "newSecurePassword123"
 }
 ```
+
+### Deprecated Authentication Mutations
+
+#### Login (Removed)
+
+> **Note**: The `login` mutation has been removed from the GraphQL schema. Use the OAuth endpoint `/oauth/token` directly instead.
+>
+> For architectural best practices, authentication should be handled by a Backend-for-Frontend (BFF) layer that securely manages OAuth client credentials and tokens, rather than exposing this functionality through GraphQL.
+>
+> See the [Authentication](#authentication) section for details on how to properly authenticate.
 
 ---
 
@@ -710,13 +741,11 @@ curl -X POST http://realestate.localhost/graphql \
   }'
 ```
 
-2. **User logs in:**
+2. **User obtains an OAuth token:**
 ```bash
-curl -X POST http://realestate.localhost/graphql \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "mutation { login(email: \"newuser@example.com\", password: \"password123\") { access_token user { id name } } }"
-  }'
+curl -X POST http://realestate.localhost/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&username=newuser@example.com&password=password123"
 ```
 
 3. **User updates their profile:**

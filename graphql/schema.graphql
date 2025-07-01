@@ -136,12 +136,6 @@ type Mutation {
     deleteUser(id: ID!): DeleteUserResponse @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\DeleteUser")
 
     """
-    Login a user
-    """
-    login(email: String!, password: String!): LoginResponse!
-        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
-
-    """
     Create a new real estate agency
     """
     createRealEstate(
@@ -240,6 +234,7 @@ type Role {
 
 """
 Login response object
+@deprecated Use the OAuth endpoint /oauth/token instead
 """
 type LoginResponse {
     access_token: String!
