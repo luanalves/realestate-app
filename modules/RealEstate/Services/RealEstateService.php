@@ -41,7 +41,7 @@ class RealEstateService
         $user = $this->authorizeRealEstateAccess($user);
 
         // Only users with appropriate roles can modify real estate data
-        if ($user->role && !in_array($user->role->name, [
+        if (!$user->role || !in_array($user->role->name, [
             RolesSeeder::ROLE_SUPER_ADMIN,
             RolesSeeder::ROLE_REAL_ESTATE_ADMIN,
         ])) {
@@ -78,7 +78,7 @@ class RealEstateService
 
         try {
             // Set tenant_id if user is not a super admin
-            if ($user->role->name !== RolesSeeder::ROLE_SUPER_ADMIN && $user->tenant_id) {
+            if ($user->role && $user->role->name !== RolesSeeder::ROLE_SUPER_ADMIN && $user->tenant_id) {
                 $data['tenant_id'] = $user->tenant_id;
             }
 
