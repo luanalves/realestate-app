@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\UserManagement;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Modules\UserManagement\Models\Role;

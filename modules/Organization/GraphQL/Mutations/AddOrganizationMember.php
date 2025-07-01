@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\Organization\GraphQL\Mutations;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
 use Modules\Organization\Models\Organization;
 use Modules\Organization\Models\OrganizationMembership;

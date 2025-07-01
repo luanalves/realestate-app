@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Contracts;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 
 interface UserRepositoryInterface
 {

@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\Organization\Tests\Unit\Models;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Mockery\MockInterface;
 use Modules\Organization\Models\Organization;
 use Modules\Organization\Models\OrganizationMembership;

@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\Organization\Traits;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasOrganizationMemberships

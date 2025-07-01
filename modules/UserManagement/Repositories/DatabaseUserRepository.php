@@ -10,9 +10,9 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Repositories;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Modules\UserManagement\Contracts\UserRepositoryInterface;
+use Modules\UserManagement\Models\User;
 
 class DatabaseUserRepository implements UserRepositoryInterface
 {

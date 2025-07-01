@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\Organization\Tests\Unit\Traits;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mockery\MockInterface;

@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\Organization\Tests\Feature;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
 use Tests\TestCase;

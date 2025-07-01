@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Repositories;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Modules\UserManagement\Contracts\UserRepositoryInterface;
