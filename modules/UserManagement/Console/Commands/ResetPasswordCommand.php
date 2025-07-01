@@ -10,9 +10,9 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Console\Commands;
 
-use Modules\UserManagement\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
+use Modules\UserManagement\Models\User;
 
 class ResetPasswordCommand extends Command
 {
@@ -133,8 +133,19 @@ class ResetPasswordCommand extends Command
             $password .= $allChars[random_int(0, strlen($allChars) - 1)];
         }
 
-        // Shuffle the password
-        return str_shuffle($password);
+        // Shuffle the password securely
+        $passwordArray = str_split($password);
+        $length = count($passwordArray);
+
+        // Fisher-Yates shuffle with cryptographically secure randomness
+        for ($i = $length - 1; $i > 0; --$i) {
+            $j = random_int(0, $i);
+            $temp = $passwordArray[$i];
+            $passwordArray[$i] = $passwordArray[$j];
+            $passwordArray[$j] = $temp;
+        }
+
+        return implode('', $passwordArray);
     }
 
     /**

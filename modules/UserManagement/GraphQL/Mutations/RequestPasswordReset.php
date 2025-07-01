@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\GraphQL\Mutations;
 
-use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
@@ -21,10 +20,9 @@ class RequestPasswordReset
     /**
      * Request a password reset link to be sent to the user's email.
      *
-     * @param  null  $root
-     * @param  array{email: string}  $args
-     * @param  GraphQLContext  $context
-     * @param  ResolveInfo  $resolveInfo
+     * @param null                 $root
+     * @param array{email: string} $args
+     *
      * @return array{success: bool, message: string}
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
