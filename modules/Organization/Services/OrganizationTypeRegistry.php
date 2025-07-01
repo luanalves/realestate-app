@@ -13,23 +13,22 @@ namespace Modules\Organization\Services;
 use Modules\Organization\Contracts\OrganizationTypeRegistryContract;
 
 /**
- * Serviço para registro dinâmico de tipos de organização
+ * Service for dynamic registration of organization types.
  */
 class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
 {
     /**
-     * Array que mapeia tipos para suas classes
+     * Array mapping types to their classes.
      *
      * @var array<string, string>
      */
     protected array $types = [];
 
     /**
-     * Registra um novo tipo de organização
+     * Registers a new organization type.
      *
-     * @param string $type Nome do tipo de organização
-     * @param string $class Classe que implementa este tipo
-     * @return void
+     * @param string $type  Organization type name
+     * @param string $class Class that implements this type
      */
     public function registerType(string $type, string $class): void
     {
@@ -37,10 +36,11 @@ class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
     }
 
     /**
-     * Obtém a classe associada a um tipo de organização
+     * Gets the class associated with an organization type.
      *
-     * @param string $type Nome do tipo
-     * @return string|null Classe associada ou null se não encontrada
+     * @param string $type Type name
+     *
+     * @return string|null Associated class or null if not found
      */
     public function getClass(string $type): ?string
     {
@@ -48,9 +48,9 @@ class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
     }
 
     /**
-     * Obtém todos os tipos registrados
+     * Gets all registered types.
      *
-     * @return array<string, string> Array com tipo => classe
+     * @return array<string, string> Array with type => class
      */
     public function getAllTypes(): array
     {
@@ -58,10 +58,9 @@ class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
     }
 
     /**
-     * Verifica se um tipo está registrado
+     * Checks if a type is registered.
      *
-     * @param string $type Nome do tipo
-     * @return bool
+     * @param string $type Type name
      */
     public function hasType(string $type): bool
     {

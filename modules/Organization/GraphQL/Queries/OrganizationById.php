@@ -16,6 +16,19 @@ class OrganizationById
 {
     public function __invoke($root, array $args): ?Organization
     {
-        return Organization::find($args['id']);
+        // Validate ID parameter
+        if (!isset($args['id']) || !is_numeric($args['id']) || $args['id'] <= 0) {
+            throw new \InvalidArgumentException('Invalid organization ID provided');
+        }
+
+        try {
+            return Organization::find($args['id']);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch organization', [
+                'id' => $args['id'],
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Unable to fetch organization data');
+        }
     }
 }
