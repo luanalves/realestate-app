@@ -13,12 +13,26 @@ namespace Modules\UserManagement\GraphQL\Mutations;
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Modules\UserManagement\Services\UserManagementAuthorizationService;
+use Modules\UserManagement\Services\UserService;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class UpdateProfile
 {
+    private UserService $userService;
+    private UserManagementAuthorizationService $authService;
+
+    public function __construct(
+        UserService $userService,
+        UserManagementAuthorizationService $authService
+    ) {
+        $this->userService = $userService;
+        $this->authService = $authService;
+    }
+
     /**
      * Update the authenticated user's profile.
      *
@@ -29,11 +43,8 @@ class UpdateProfile
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
-        // Ensure user is authenticated
-        $user = Auth::guard('api')->user();
-        if (!$user) {
-            throw new AuthenticationException('You must be logged in to update your profile');
-        }
+        // Ensure user is authenticated - uses service for consistent authorization
+        $user = $this->authService->requireAuthentication();
 
         // Validate inputs
         $validator = Validator::make($args, [
@@ -68,6 +79,17 @@ class UpdateProfile
         if (!empty($updates)) {
             /* @var User $user */
             $user->update($updates);
+            
+            // Invalidate user cache after update
+            try {
+                $this->userService->invalidateUserCache($user->id);
+                Log::info("User cache invalidated after profile update", ['user_id' => $user->id]);
+            } catch (\Exception $e) {
+                Log::warning("Failed to invalidate user cache after profile update", [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
 
         return [
