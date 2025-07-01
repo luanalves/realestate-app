@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\GraphQL\Mutations;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Hash;
 use Modules\UserManagement\Services\UserManagementAuthorizationService;

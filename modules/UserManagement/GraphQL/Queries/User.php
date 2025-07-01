@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\GraphQL\Queries;
 
-use App\Models\User as UserModel;
+use Modules\UserManagement\Models\User as UserModel;
 use GraphQL\Type\Definition\ResolveInfo;
 use Modules\UserManagement\Services\UserManagementAuthorizationService;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -31,7 +31,7 @@ class User
      * @param  array  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \App\Models\User
+     * @return \Modules\UserManagement\Models\User
      * @throws \Exception
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
