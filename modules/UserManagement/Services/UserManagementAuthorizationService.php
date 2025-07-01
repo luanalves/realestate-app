@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Services;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Modules\UserManagement\Database\Seeders\RolesSeeder;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;

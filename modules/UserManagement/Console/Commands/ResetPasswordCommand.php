@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Console\Commands;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
