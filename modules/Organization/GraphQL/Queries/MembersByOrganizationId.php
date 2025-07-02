@@ -18,14 +18,16 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class MembersByOrganizationId
 {
     /**
-     * Retorna os membros de uma organização específica
+     * Resolves a GraphQL query to retrieve members of a specific organization.
      *
-     * @param  mixed  $root
-     * @param  array  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return array
-     * @throws \Exception Se o usuário não estiver autenticado ou a organização não for encontrada
+     * Returns an array of organization memberships, optionally filtered by active status and role. Throws an exception if the user is unauthenticated or the organization does not exist.
+     *
+     * @param mixed $root The root value passed to the resolver.
+     * @param array $args Arguments for the query, including 'organizationId' (required), and optionally 'active' and 'role'.
+     * @param \Nuwave\Lighthouse\Support\Contracts\GraphQLContext $context The GraphQL context.
+     * @param \GraphQL\Type\Definition\ResolveInfo $resolveInfo GraphQL resolve information.
+     * @return array The list of organization memberships matching the criteria.
+     * @throws \Exception If the user is unauthenticated or the organization is not found.
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {

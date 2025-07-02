@@ -13,11 +13,9 @@ namespace App\GraphQL\Queries;
 class PlaceholderQuery
 {
     /**
-     * Placeholder resolver for the base Query type
+     * Acts as a placeholder resolver for the base GraphQL Query type, returning null for all invocations.
      *
-     * @param  mixed  $root
-     * @param  array  $args
-     * @return null
+     * @return null Always returns null.
      */
     public function __invoke($root, array $args)
     {

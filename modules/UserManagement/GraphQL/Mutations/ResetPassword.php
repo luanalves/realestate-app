@@ -22,13 +22,15 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class ResetPassword
 {
     /**
-     * Reset the user's password using a token.
+     * Handles a GraphQL mutation to reset a user's password using a token.
      *
-     * @param  null  $root
-     * @param  array{email: string, token: string, password: string, password_confirmation: string}  $args
-     * @param  GraphQLContext  $context
-     * @param  ResolveInfo  $resolveInfo
-     * @return array{success: bool, message: string}
+     * Validates the provided email, token, password, and password confirmation. If validation passes and the token is valid, updates the user's password and fires a password reset event. Returns a success flag and a localized message indicating the result.
+     *
+     * @param null $root
+     * @param array $args The mutation arguments: email, token, password, and password_confirmation.
+     * @param GraphQLContext $context
+     * @param ResolveInfo $resolveInfo
+     * @return array{success: bool, message: string} Result of the password reset operation.
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {

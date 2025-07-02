@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
-     * Run the migrations.
+     * Applies the migration by replacing the old organization membership table with a new schema.
+     *
+     * Drops the `organization_memberships` table if it exists and creates a new `organization_members` table with updated columns, foreign key constraints, and a unique constraint on user and organization pairs.
      */
     public function up(): void
     {
@@ -27,7 +29,7 @@ return new class extends Migration {
     }
 
     /**
-     * Reverse the migrations.
+     * Drops the `organization_members` table if it exists, reversing the migration.
      */
     public function down(): void
     {

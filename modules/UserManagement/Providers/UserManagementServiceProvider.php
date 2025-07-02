@@ -15,7 +15,9 @@ use Illuminate\Support\ServiceProvider;
 class UserManagementServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Registers user management services and dependencies for the application.
+     *
+     * Enables Laravel Passport's password grant, binds the user repository interface to a factory-created implementation, registers the user service as a singleton, and maintains a legacy binding for backward compatibility.
      */
     public function register(): void
     {
@@ -47,7 +49,7 @@ class UserManagementServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstraps the User Management module by loading migrations, registering console commands, and appending the module's GraphQL schema to the Lighthouse configuration.
      */
     public function boot(): void
     {
@@ -75,7 +77,7 @@ class UserManagementServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the module's commands.
+     * Registers the module's console commands if the application is running in the console environment.
      */
     protected function bootCommands(): void
     {

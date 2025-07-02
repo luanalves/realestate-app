@@ -30,6 +30,12 @@ class RolesSeeder extends Seeder
         self::ROLE_CLIENT => 'Cliente da imobiliária',
     ];
 
+    /**
+     * Seeds the database with predefined user roles if they do not already exist.
+     *
+     * For each predefined role, checks if it exists in the `roles` table and inserts it if missing.
+     * Outputs a message indicating whether each role was added or already present.
+     */
     public function run(): void
     {
         foreach (self::ROLES as $name => $description) {

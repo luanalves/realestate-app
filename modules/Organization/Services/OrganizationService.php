@@ -20,7 +20,12 @@ use Modules\Organization\Models\OrganizationAddress;
 class OrganizationService
 {
     /**
-     * Create a new organization.
+     * Creates a new organization and optionally its address within a database transaction.
+     *
+     * If address data is provided in the input, an associated organization address is also created.
+     *
+     * @param array $data Organization data, optionally including an 'address' key for address creation.
+     * @return Organization The newly created organization instance.
      */
     public function createOrganization(array $data): Organization
     {
@@ -50,7 +55,11 @@ class OrganizationService
     }
 
     /**
-     * Create an address for an organization.
+     * Creates and saves a new address associated with the specified organization.
+     *
+     * @param int $organizationId The ID of the organization to associate with the address.
+     * @param array $addressData Address details, including street, city, state, and optional fields such as type, number, complement, zip code, country, and active status.
+     * @return OrganizationAddress The newly created organization address.
      */
     public function createOrganizationAddress(int $organizationId, array $addressData): OrganizationAddress
     {
@@ -72,7 +81,13 @@ class OrganizationService
     }
 
     /**
-     * Update an organization.
+     * Updates the specified organization with provided data fields.
+     *
+     * Only fields present in the input array are updated. Returns the updated Organization instance.
+     *
+     * @param int $id The ID of the organization to update.
+     * @param array $data Associative array of fields to update.
+     * @return Organization The updated organization instance.
      */
     public function updateOrganization(int $id, array $data): Organization
     {
@@ -116,10 +131,12 @@ class OrganizationService
     }
 
     /**
-     * Delete an organization by ID.
+     * Deletes an organization by its ID, including all associated addresses and memberships.
      *
-     * @param int $id The organization ID
-     * @return Organization|null The deleted organization or null if not found
+     * Returns a copy of the deleted organization, or null if the organization does not exist.
+     *
+     * @param int $id The ID of the organization to delete.
+     * @return Organization|null The deleted organization instance, or null if not found.
      */
     public function deleteOrganization(int $id): ?Organization
     {

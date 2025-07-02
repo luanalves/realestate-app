@@ -22,10 +22,12 @@ class CachedUserRepository implements UserRepositoryInterface
     private const CACHE_PREFIX = 'user_management';
 
     /**
-     * Find user by email with role relationship.
-     * Searches cache first, falls back to database.
+     * Retrieves a user by email, including the related role, using cache for performance.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * Attempts to fetch the user from cache; if not found, queries the database and caches the result.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no user with the given email exists.
+     * @return User The user model with the associated role.
      */
     public function findByEmailWithRole(string $email): User
     {
@@ -38,11 +40,14 @@ class CachedUserRepository implements UserRepositoryInterface
         });
     }
 
-    /**
-     * Find user by ID with role relationship.
-     * Searches cache first, falls back to database.
+    /****
+     * Retrieves a user by ID along with their role, using cache for faster access.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * Attempts to fetch the user and their associated role from the cache. If not found, queries the database and caches the result for future requests.
+     *
+     * @param int $userId The ID of the user to retrieve.
+     * @return User The user model with the associated role.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no user with the given ID exists.
      */
     public function findByIdWithRole(int $userId): User
     {
@@ -56,7 +61,9 @@ class CachedUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Invalidate cache for specific user.
+     * Removes cached entries for a specific user by user ID, clearing both email and ID-based cache keys if the user exists.
+     *
+     * @param int $userId The ID of the user whose cache should be invalidated.
      */
     public function invalidateCache(int $userId): void
     {
@@ -72,8 +79,9 @@ class CachedUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Clear all user caches.
-     * Uses cache tags if available, otherwise logs warning.
+     * Clears all cached user data using cache tags if supported.
+     *
+     * If cache tags are not available or an error occurs, logs a warning with details and a suggestion for manual or pattern-based cache clearing.
      */
     public function clearAllCache(): void
     {
@@ -89,7 +97,10 @@ class CachedUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Generate cache key for user email lookup.
+     * Generates a cache key for user email lookups by combining a prefix, the string "email", and an MD5 hash of the lowercase email address.
+     *
+     * @param string $email The user's email address.
+     * @return string The generated cache key.
      */
     private function getUserEmailCacheKey(string $email): string
     {
@@ -97,7 +108,10 @@ class CachedUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Generate cache key for user ID lookup.
+     * Generates a cache key for user ID lookups by combining the cache prefix with the user ID.
+     *
+     * @param int $userId The user ID for which to generate the cache key.
+     * @return string The generated cache key.
      */
     private function getUserIdCacheKey(int $userId): string
     {

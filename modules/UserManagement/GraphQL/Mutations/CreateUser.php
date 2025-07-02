@@ -26,12 +26,15 @@ class CreateUser
     }
 
     /**
-     * Create a new user.
+     * Handles the GraphQL mutation to create a new user with the provided input data.
      *
-     * @param mixed          $rootValue   The result from the parent resolver
-     * @param array          $args        The arguments that were passed into the field
-     * @param GraphQLContext $context     Arbitrary data that is shared between all fields of a single query
-     * @param ResolveInfo    $resolveInfo Information about the query itself
+     * Authorizes the operation, hashes the password, and creates a new user record with the specified attributes.
+     *
+     * @param mixed $rootValue The result from the parent resolver.
+     * @param array $args The arguments passed to the mutation, including user input data.
+     * @param GraphQLContext $context Shared context for the GraphQL request.
+     * @param ResolveInfo $resolveInfo Information about the GraphQL query.
+     * @return User The newly created user instance.
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): User
     {

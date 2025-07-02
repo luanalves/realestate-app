@@ -17,12 +17,14 @@ use Modules\RealEstate\Models\RealEstateOrganization;
 class DeleteRealEstateOrganizationResolver
 {
     /**
-     * Exclui uma imobiliária (e sua organização base associada)
+     * Deletes a real estate organization and its associated base organization atomically.
+     *
+     * Expects an array with an 'id' key specifying the real estate organization to delete. The operation is performed within a database transaction to ensure atomicity. Returns a copy of the deleted real estate organization.
      *
      * @param null $root
-     * @param array $args
-     * @return RealEstateOrganization
-     * @throws ModelNotFoundException
+     * @param array $args Arguments containing the 'id' of the real estate organization to delete.
+     * @return RealEstateOrganization The deleted real estate organization instance.
+     * @throws ModelNotFoundException If the specified real estate organization is not found.
      */
     public function __invoke($root, array $args): RealEstateOrganization
     {

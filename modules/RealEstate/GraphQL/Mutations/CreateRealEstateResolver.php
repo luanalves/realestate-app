@@ -18,10 +18,13 @@ use Modules\RealEstate\Support\RealEstateConstants;
 class CreateRealEstateResolver
 {
     /**
-     * /**
-     * Creates a new real estate organization.
+     * Handles the creation of a new real estate organization and its associated entity within a database transaction.
      *
-     * @param null $root
+     * Accepts input data for both the organization and real estate entity, creates and persists both models, and returns the resulting `RealEstate` instance with its related organization loaded.
+     *
+     * @param mixed $root Unused root value from the GraphQL resolver signature.
+     * @param array $args Arguments containing an 'input' key with organization and real estate data.
+     * @return RealEstate The newly created real estate entity with its associated organization.
      */
     public function __invoke($root, array $args): RealEstate
     {

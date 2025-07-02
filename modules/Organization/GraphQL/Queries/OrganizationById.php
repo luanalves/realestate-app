@@ -14,6 +14,18 @@ use Modules\Organization\Models\Organization;
 
 class OrganizationById
 {
+    /**
+     * Retrieves an Organization model instance by its ID.
+     *
+     * Validates the provided ID argument and returns the corresponding Organization if found.
+     * Throws an InvalidArgumentException if the ID is missing or invalid, and a RuntimeException if retrieval fails.
+     *
+     * @param mixed $root Unused root value.
+     * @param array $args Arguments array containing the 'id' of the organization.
+     * @return Organization|null The Organization instance if found, or null if not found.
+     * @throws \InvalidArgumentException If the provided ID is missing or invalid.
+     * @throws \RuntimeException If an error occurs during retrieval.
+     */
     public function __invoke($root, array $args): ?Organization
     {
         // Validate ID parameter

@@ -23,6 +23,12 @@ class DeleteUser
     private UserManagementAuthorizationService $authService;
     private UserService $userService;
 
+    /**
+     * Initializes the DeleteUser mutation with authorization and user services.
+     *
+     * @param UserManagementAuthorizationService $authService Service for user management authorization checks.
+     * @param UserService $userService Service for user-related operations such as cache invalidation.
+     */
     public function __construct(
         UserManagementAuthorizationService $authService,
         UserService $userService,
@@ -32,12 +38,16 @@ class DeleteUser
     }
 
     /**
-     * Delete an existing user.
+     * Handles the deletion of a user via a GraphQL mutation, enforcing authorization and preventing self-deletion.
      *
-     * @param mixed          $rootValue   The result from the parent resolver
-     * @param array          $args        The arguments that were passed into the field
-     * @param GraphQLContext $context     Arbitrary data that is shared between all fields of a single query
-     * @param ResolveInfo    $resolveInfo Information about the query itself
+     * Prevents users from deleting their own accounts and ensures only authorized users can perform deletions. After successful deletion, attempts to invalidate the deleted user's cache. Returns an array indicating success or failure, along with a relevant message.
+     *
+     * @param mixed $rootValue The result from the parent resolver.
+     * @param array $args Arguments passed to the mutation, including the user ID to delete.
+     * @param GraphQLContext $context Shared context for the GraphQL request.
+     * @param ResolveInfo $resolveInfo Information about the GraphQL query.
+     * @return array Result of the deletion operation, including success status and message.
+     * @throws AuthenticationException If a user attempts to delete their own account.
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {

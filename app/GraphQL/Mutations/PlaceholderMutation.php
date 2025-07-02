@@ -13,7 +13,9 @@ namespace App\GraphQL\Mutations;
 class PlaceholderMutation
 {
     /**
-     * Placeholder resolver for the base Mutation type.
+     * Acts as a placeholder resolver for the base GraphQL Mutation type.
+     *
+     * Always returns null and performs no operation.
      *
      * @return null
      */

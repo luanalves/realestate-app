@@ -25,10 +25,10 @@ class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
     protected array $types = [];
 
     /**
-     * Registers a new organization type.
+     * Registers or updates an organization type with its associated class name.
      *
-     * @param string $type  Organization type name
-     * @param string $class Class that implements this type
+     * @param string $type The name of the organization type to register.
+     * @param string $class The fully qualified class name associated with the type.
      */
     public function registerType(string $type, string $class): void
     {
@@ -36,11 +36,10 @@ class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
     }
 
     /**
-     * Gets the class associated with an organization type.
+     * Returns the class name associated with the specified organization type.
      *
-     * @param string $type Type name
-     *
-     * @return string|null Associated class or null if not found
+     * @param string $type The organization type name.
+     * @return string|null The class name if the type is registered, or null if not found.
      */
     public function getClass(string $type): ?string
     {
@@ -48,9 +47,9 @@ class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
     }
 
     /**
-     * Gets all registered types.
+     * Returns all registered organization types and their associated class names.
      *
-     * @return array<string, string> Array with type => class
+     * @return array<string, string> An associative array mapping type names to class names.
      */
     public function getAllTypes(): array
     {
@@ -58,9 +57,10 @@ class OrganizationTypeRegistry implements OrganizationTypeRegistryContract
     }
 
     /**
-     * Checks if a type is registered.
+     * Determines whether the specified organization type is registered.
      *
-     * @param string $type Type name
+     * @param string $type The name of the organization type to check.
+     * @return bool True if the type is registered; otherwise, false.
      */
     public function hasType(string $type): bool
     {

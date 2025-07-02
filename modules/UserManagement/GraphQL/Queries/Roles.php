@@ -31,17 +31,22 @@ class Roles
 
     private UserManagementAuthorizationService $authService;
 
+    /**
+     * Initializes the Roles query with the provided authorization service.
+     *
+     * @param UserManagementAuthorizationService $authService Service used to enforce user management authorization.
+     */
     public function __construct(UserManagementAuthorizationService $authService)
     {
         $this->authService = $authService;
     }
 
     /**
-     * Get all roles in the system.
+     * Retrieves all user roles, using cache for performance when available.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Enforces authorization before fetching roles. Attempts to return roles from cache; if caching fails, logs a warning and fetches roles directly from the database.
      *
-     * @throws \Exception
+     * @return \Illuminate\Database\Eloquent\Collection Collection of all user roles.
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
@@ -65,8 +70,9 @@ class Roles
     }
 
     /**
-     * Invalidate the roles cache.
-     * This should be called whenever roles are created, updated, or deleted.
+     * Clears the cached user roles to ensure updated role data is served.
+     *
+     * Should be called after creating, updating, or deleting roles to maintain cache consistency.
      */
     public static function invalidateCache(): void
     {

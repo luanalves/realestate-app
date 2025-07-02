@@ -19,8 +19,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class CreateOrganizationAddress
 {
     /**
-     * @param null                 $_
-     * @param array<string, mixed> $args
+     * Handles the GraphQL mutation to create a new address for an existing organization.
+     *
+     * Validates the provided address input, ensures the organization exists, and creates a new active address record associated with the organization. Throws a GraphQL error if validation fails or the organization is not found.
+     *
+     * @param array<string, mixed> $args The input arguments containing address details and organization ID.
+     * @return OrganizationAddress The newly created organization address.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): OrganizationAddress
     {
@@ -50,11 +54,12 @@ class CreateOrganizationAddress
     }
 
     /**
-     * Validate address input fields.
+     * Validates organization address input fields for required presence, type, and format.
      *
-     * @param array<string, mixed> $args
+     * Ensures all required address fields are present and correctly formatted, including specific checks for address type, ZIP code, state, and country. Optional fields are validated if provided. Throws a GraphQLError with details if validation fails.
      *
-     * @throws GraphQLError
+     * @param array<string, mixed> $args Address input data to validate.
+     * @throws GraphQLError If any validation rule is violated.
      */
     private function validateAddressInput(array $args): void
     {
@@ -111,7 +116,10 @@ class CreateOrganizationAddress
     }
 
     /**
-     * Normalize ZIP code to standard format.
+     * Normalizes a ZIP code by removing non-numeric characters and formatting it as 'XXXXX-XXX' if it contains exactly 8 digits.
+     *
+     * @param string $zipCode The input ZIP code string.
+     * @return string The normalized ZIP code.
      */
     private function normalizeZipCode(string $zipCode): string
     {

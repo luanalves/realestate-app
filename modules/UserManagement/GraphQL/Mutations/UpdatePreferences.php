@@ -20,13 +20,16 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class UpdatePreferences
 {
     /**
-     * Update the authenticated user's preferences.
+     * Handles the GraphQL mutation to update the authenticated user's preferences.
      *
-     * @param  null  $root
-     * @param  array{preferences: array}  $args
-     * @param  GraphQLContext  $context
-     * @param  ResolveInfo  $resolveInfo
-     * @return array{success: bool, message: string, preferences: array|null}
+     * Validates the input and updates the user's preferences if authenticated. Returns a response indicating success or failure, along with a message and the updated preferences if successful.
+     *
+     * @param null $root
+     * @param array{preferences: array} $args The mutation arguments, including the preferences to update.
+     * @param GraphQLContext $context
+     * @param ResolveInfo $resolveInfo
+     * @return array{success: bool, message: string, preferences: array|null} The result of the update operation.
+     * @throws AuthenticationException If the user is not authenticated.
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {

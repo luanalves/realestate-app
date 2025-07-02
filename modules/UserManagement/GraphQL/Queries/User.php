@@ -25,14 +25,17 @@ class User
     }
 
     /**
-     * Get a user by ID.
+     * Resolves a GraphQL query to retrieve a user by their ID, including their role.
      *
-     * @param  mixed  $rootValue
-     * @param  array  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \Modules\UserManagement\Models\User
-     * @throws \Exception
+     * Authorizes the request for user management read access before fetching the user.
+     * Throws an exception if the user with the specified ID does not exist.
+     *
+     * @param mixed $rootValue The root value passed to the resolver.
+     * @param array $args The arguments provided to the query, must include 'id'.
+     * @param \Nuwave\Lighthouse\Support\Contracts\GraphQLContext $context The GraphQL context.
+     * @param \GraphQL\Type\Definition\ResolveInfo $resolveInfo GraphQL resolve information.
+     * @return \Modules\UserManagement\Models\User The user model with related role data.
+     * @throws \Exception If the user is not found.
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {

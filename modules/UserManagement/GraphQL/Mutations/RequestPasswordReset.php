@@ -18,12 +18,14 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class RequestPasswordReset
 {
     /**
-     * Request a password reset link to be sent to the user's email.
+     * Handles a GraphQL mutation to request a password reset link for a user's email address.
      *
-     * @param null                 $root
-     * @param array{email: string} $args
+     * Validates the provided email and, if valid and registered, sends a password reset link to it.
+     * Returns a success status and a localized message indicating the result.
      *
-     * @return array{success: bool, message: string}
+     * @param null $root
+     * @param array{email: string} $args The arguments containing the user's email address.
+     * @return array{success: bool, message: string} The result of the password reset request.
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {

@@ -17,11 +17,12 @@ use Modules\Organization\Models\OrganizationAddress;
 class OrganizationAddressById
 {
     /**
-     * @param  null  $_
-     * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \Modules\Organization\Models\OrganizationAddress|null
+     * Retrieves an OrganizationAddress model by its ID.
+     *
+     * Returns the OrganizationAddress instance matching the provided 'id' argument, or null if not found.
+     *
+     * @param array<string, mixed> $args Arguments containing the 'id' of the address to retrieve.
+     * @return \Modules\Organization\Models\OrganizationAddress|null The matching OrganizationAddress instance, or null if not found.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?OrganizationAddress
     {

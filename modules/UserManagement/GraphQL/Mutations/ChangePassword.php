@@ -24,6 +24,12 @@ class ChangePassword
     private UserService $userService;
     private UserManagementAuthorizationService $authService;
 
+    /**
+     * Initializes the ChangePassword mutation with user and authorization services.
+     *
+     * @param UserService $userService Service for user-related operations.
+     * @param UserManagementAuthorizationService $authService Service for enforcing authentication.
+     */
     public function __construct(
         UserService $userService,
         UserManagementAuthorizationService $authService
@@ -33,13 +39,15 @@ class ChangePassword
     }
 
     /**
-     * Change the authenticated user's password.
+     * Handles the password change mutation for an authenticated user.
      *
-     * @param  null  $root
-     * @param  array{current_password: string, new_password: string, new_password_confirmation: string}  $args
-     * @param  GraphQLContext  $context
-     * @param  ResolveInfo  $resolveInfo
-     * @return array{success: bool, message: string}
+     * Validates the provided current password, ensures the new password meets security requirements, updates the user's password, and invalidates the user cache. Returns a success status and message indicating the result.
+     *
+     * @param null $root
+     * @param array{current_password: string, new_password: string, new_password_confirmation: string} $args The password change input arguments.
+     * @param GraphQLContext $context
+     * @param ResolveInfo $resolveInfo
+     * @return array{success: bool, message: string} Result of the password change operation.
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {

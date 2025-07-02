@@ -18,10 +18,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class AddressesByOrganizationId
 {
     /**
-     * @param null                 $_
-     * @param array<string, mixed> $args
+     * Resolves and returns all addresses associated with a given organization ID.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * If the organization does not exist or an error occurs, returns an empty collection.
+     *
+     * @param array<string, mixed> $args The GraphQL query arguments, must include 'organizationId'.
+     * @return \Illuminate\Database\Eloquent\Collection The collection of organization addresses.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {

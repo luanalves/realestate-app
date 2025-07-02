@@ -25,6 +25,9 @@ class UpdateProfile
     private UserService $userService;
     private UserManagementAuthorizationService $authService;
 
+    /**
+     * Initializes the UpdateProfile mutation with required user and authorization services.
+     */
     public function __construct(
         UserService $userService,
         UserManagementAuthorizationService $authService
@@ -34,12 +37,13 @@ class UpdateProfile
     }
 
     /**
-     * Update the authenticated user's profile.
+     * Handles updating the authenticated user's profile with optional name and email changes.
      *
-     * @param null                                         $root
-     * @param array{name: string|null, email: string|null} $args
+     * Validates input fields, applies updates to the user model if provided, and returns a response indicating success or failure along with the updated user object.
      *
-     * @return array{success: bool, message: string, user: User|null}
+     * @param null $root
+     * @param array{name: string|null, email: string|null} $args The profile fields to update.
+     * @return array{success: bool, message: string, user: User|null} The result of the update operation.
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {

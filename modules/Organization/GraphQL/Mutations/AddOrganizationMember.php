@@ -19,8 +19,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class AddOrganizationMember
 {
     /**
-     * @param null                 $_
-     * @param array<string, mixed> $args
+     * Adds a user as a member to an organization or updates their membership if it already exists.
+     *
+     * If the user is already a member, updates their role, position (if provided), and activates the membership. If not, creates a new active membership with the specified role and optional position.
+     *
+     * @param array<string, mixed> $args GraphQL arguments including 'organizationId', 'userId', 'role', and optionally 'position'.
+     * @return bool True on successful addition or update, false if an error occurs.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool
     {

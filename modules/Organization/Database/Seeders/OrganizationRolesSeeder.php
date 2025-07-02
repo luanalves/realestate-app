@@ -16,7 +16,9 @@ use Modules\Organization\Support\OrganizationConstants;
 class OrganizationRolesSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Outputs a table of available organization roles and their descriptions to the console.
+     *
+     * This seeder does not insert data into the database; it serves as documentation by displaying the roles defined in the OrganizationConstants class.
      */
     public function run(): void
     {

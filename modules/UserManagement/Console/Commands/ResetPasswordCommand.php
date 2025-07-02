@@ -34,7 +34,11 @@ class ResetPasswordCommand extends Command
     protected $description = 'Reset user password by email address';
 
     /**
-     * Execute the console command.
+     * Resets a user's password by email via the console command.
+     *
+     * Prompts for confirmation before updating the password. Uses a provided password or generates a secure one if not specified. Displays user details, handles error conditions such as user not found or password validation failure, and provides security recommendations after a successful reset.
+     *
+     * @return int Exit code: 0 on success, 1 on failure or cancellation.
      */
     public function handle(): int
     {
@@ -111,7 +115,10 @@ class ResetPasswordCommand extends Command
     }
 
     /**
-     * Generate a secure random password.
+     * Generates a secure random password containing at least one lowercase letter, one uppercase letter, one number, and one symbol.
+     *
+     * @param int $length The desired length of the generated password. Defaults to 12.
+     * @return string The generated secure password.
      */
     private function generateSecurePassword(int $length = 12): string
     {
@@ -149,7 +156,12 @@ class ResetPasswordCommand extends Command
     }
 
     /**
-     * Validate password strength.
+     * Checks whether the given password meets minimum strength requirements.
+     *
+     * Validates that the password is at least 8 characters long and contains at least one lowercase letter, one uppercase letter, and one number. Outputs error messages for any failed criteria.
+     *
+     * @param string $password The password to validate.
+     * @return bool True if the password meets all requirements, false otherwise.
      */
     private function validatePassword(string $password): bool
     {
@@ -184,7 +196,10 @@ class ResetPasswordCommand extends Command
     }
 
     /**
-     * Show available users for reference.
+     * Displays up to 10 users with their roles in a table for operator reference.
+     *
+     * If no users exist, outputs a message indicating the absence of users.
+     * If exactly 10 users are shown, notes that only the first 10 are displayed.
      */
     private function showAvailableUsers(): void
     {

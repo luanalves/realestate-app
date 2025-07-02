@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\File;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Executes all seeder classes in the current directory except itself.
+     *
+     * Dynamically discovers and runs all classes in the same namespace and directory that extend Laravel's Seeder, enabling automatic execution of all seeders without manual registration.
+     */
     public function run(): void
     {
         $seederPath = __DIR__;

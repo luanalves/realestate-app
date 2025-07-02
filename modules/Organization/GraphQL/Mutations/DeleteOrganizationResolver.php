@@ -24,7 +24,9 @@ class DeleteOrganizationResolver
     private OrganizationService $organizationService;
 
     /**
-     * Constructor.
+     * Initializes the resolver with the given organization service.
+     *
+     * @param OrganizationService $organizationService Service used to manage organizations.
      */
     public function __construct(OrganizationService $organizationService)
     {
@@ -32,10 +34,11 @@ class DeleteOrganizationResolver
     }
 
     /**
-     * Delete an organization.
+     * Deletes an organization by its ID.
      *
-     * @param null  $root
-     * @param array $args The input arguments
+     * @param null $root Unused root value from GraphQL resolver signature.
+     * @param array $args Arguments containing the 'id' of the organization to delete.
+     * @return Organization|null The deleted Organization object, or null if not found or deletion failed.
      */
     public function __invoke($root, array $args): ?Organization
     {

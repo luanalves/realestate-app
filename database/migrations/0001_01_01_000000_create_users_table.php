@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
-     * Run the migrations.
+     * Creates the `users`, `password_reset_tokens`, and `sessions` tables in the database.
+     *
+     * Defines the schema for user authentication, password reset tokens, and session management.
      */
     public function up(): void
     {

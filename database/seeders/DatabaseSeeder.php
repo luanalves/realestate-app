@@ -8,7 +8,9 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Executes the database seeders for the UserManagement, Organization, and RealEstate modules.
+     *
+     * Populates the application's database by invoking the primary seeders for each module in sequence.
      */
     public function run(): void
     {

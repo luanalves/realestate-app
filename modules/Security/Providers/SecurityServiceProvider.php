@@ -23,7 +23,7 @@ class SecurityServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap services.
+     * Bootstraps the Security module by loading its database migrations and registering its GraphQL schema with the Lighthouse configuration.
      */
     public function boot(): void
     {

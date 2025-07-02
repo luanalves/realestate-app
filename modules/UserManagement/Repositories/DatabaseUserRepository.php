@@ -17,10 +17,13 @@ use Modules\UserManagement\Models\User;
 class DatabaseUserRepository implements UserRepositoryInterface
 {
     /**
-     * Find user by email with role relationship.
-     * Direct database query without cache.
+     * Retrieves a user by email, including the associated role.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * Performs a direct database query and returns the user with the related role data.
+     *
+     * @param string $email The email address of the user to retrieve.
+     * @return User The user model with the role relationship loaded.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no user is found with the given email.
      */
     public function findByEmailWithRole(string $email): User
     {
@@ -30,10 +33,11 @@ class DatabaseUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Find user by ID with role relationship.
-     * Direct database query without cache.
+     * Retrieves a user by ID, including the associated role, using a direct database query.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @param int $userId The unique identifier of the user.
+     * @return User The user model with the related role loaded.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no user with the given ID is found.
      */
     public function findByIdWithRole(int $userId): User
     {
@@ -43,8 +47,11 @@ class DatabaseUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Invalidate cache for specific user.
-     * No-op for database repository as there's no cache.
+     * No-op method for invalidating cache for a specific user.
+     *
+     * This method does nothing because the database repository does not use caching.
+     *
+     * @param int $userId The ID of the user for which cache invalidation was requested.
      */
     public function invalidateCache(int $userId): void
     {
@@ -56,8 +63,7 @@ class DatabaseUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Clear all user caches.
-     * No-op for database repository as there's no cache.
+     * Placeholder method for clearing all user caches; performs no action as caching is not implemented.
      */
     public function clearAllCache(): void
     {

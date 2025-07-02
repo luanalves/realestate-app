@@ -16,9 +16,9 @@ use Modules\Organization\Models\OrganizationMembership;
 trait BelongsToOrganizations
 {
     /**
-     * Get all organization memberships for this user
+     * Returns a HasMany relationship for all organization memberships associated with the user.
      *
-     * @return HasMany
+     * @return HasMany The Eloquent relationship representing all organization memberships for the user.
      */
     public function organizationMemberships(): HasMany
     {
@@ -26,7 +26,9 @@ trait BelongsToOrganizations
     }
     
     /**
-     * Get active organization memberships for this user
+     * Returns a relationship for all active organization memberships associated with the user.
+     *
+     * Only memberships where the `is_active` attribute is true are included.
      *
      * @return HasMany
      */
@@ -36,10 +38,10 @@ trait BelongsToOrganizations
     }
     
     /**
-     * Get organization memberships for this user with a specific role
+     * Returns the organization memberships for this user that match the specified role.
      *
-     * @param string $role
-     * @return HasMany
+     * @param string $role The role to filter organization memberships by.
+     * @return HasMany The filtered organization memberships relationship.
      */
     public function organizationMembershipsWithRole(string $role): HasMany
     {

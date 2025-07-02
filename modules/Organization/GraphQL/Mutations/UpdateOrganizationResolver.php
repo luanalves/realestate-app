@@ -25,7 +25,9 @@ class UpdateOrganizationResolver
     private OrganizationService $organizationService;
 
     /**
-     * Constructor.
+     * Initializes the resolver with the given organization service.
+     *
+     * @param OrganizationService $organizationService Service used to perform organization updates.
      */
     public function __construct(OrganizationService $organizationService)
     {
@@ -33,10 +35,13 @@ class UpdateOrganizationResolver
     }
 
     /**
-     * Update an existing organization.
+     * Updates an existing organization with the provided input data.
      *
-     * @param null $root
-     * @param array $args The input arguments
+     * Executes the update operation within a database transaction to ensure data consistency.
+     *
+     * @param null $root Unused GraphQL root value.
+     * @param array $args Arguments containing the organization ID and input data.
+     * @return Organization The updated organization model instance.
      */
     public function __invoke($root, array $args): Organization
     {

@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
-     * Run the migrations.
+     * Creates the "organizations" table with columns for organization details and relevant indexes.
+     *
+     * Defines columns for name, optional fantasy name, unique optional CNPJ, description, contact information, an active flag, and timestamps. Adds indexes on the "active" and "cnpj" columns to optimize queries.
      */
     public function up(): void
     {
@@ -37,7 +39,7 @@ return new class extends Migration {
     }
 
     /**
-     * Reverse the migrations.
+     * Drops the "organizations" table if it exists, reversing the migration.
      */
     public function down(): void
     {

@@ -16,34 +16,33 @@ namespace Modules\Organization\Contracts;
 interface OrganizationTypeRegistryContract
 {
     /**
-     * Registra um novo tipo de organização
-     *
-     * @param string $type Nome do tipo de organização
-     * @param string $class Classe que implementa este tipo
-     * @return void
-     */
+ * Registers a new organization type with its associated class.
+ *
+ * @param string $type The name of the organization type.
+ * @param string $class The class name that implements this organization type.
+ */
     public function registerType(string $type, string $class): void;
 
     /**
-     * Obtém a classe associada a um tipo de organização
-     *
-     * @param string $type Nome do tipo
-     * @return string|null Classe associada ou null se não encontrada
-     */
+ * Retrieves the class name associated with the specified organization type.
+ *
+ * @param string $type The organization type name.
+ * @return string|null The class name if the type is registered, or null if not found.
+ */
     public function getClass(string $type): ?string;
 
     /**
-     * Obtém todos os tipos registrados
-     *
-     * @return array<string, string> Array com tipo => classe
-     */
+ * Returns all registered organization types and their associated classes.
+ *
+ * @return array<string, string> An associative array mapping type names to class names.
+ */
     public function getAllTypes(): array;
 
     /**
-     * Verifica se um tipo está registrado
-     *
-     * @param string $type Nome do tipo
-     * @return bool
-     */
+ * Determines whether a given organization type is registered.
+ *
+ * @param string $type The name of the organization type to check.
+ * @return bool True if the type is registered, false otherwise.
+ */
     public function hasType(string $type): bool;
 }

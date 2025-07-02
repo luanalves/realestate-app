@@ -19,7 +19,9 @@ use Modules\Organization\Support\OrganizationConstants;
 class OrganizationDemoDataSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Seeds the database with demo organizations, their addresses, and members.
+     *
+     * Creates predefined demo users if they do not exist, then creates demo organizations with associated addresses and assigns users as members with specific roles. Ensures that duplicate users, organizations, addresses, and memberships are not created if they already exist.
      */
     public function run(): void
     {
@@ -145,7 +147,10 @@ class OrganizationDemoDataSeeder extends Seeder
     }
 
     /**
-     * Create a user if it doesn't exist.
+     * Retrieves an existing user by email or creates a new user with the provided data if none exists.
+     *
+     * @param array $userData The user attributes, including at least an 'email' key.
+     * @return User The existing or newly created user instance.
      */
     private function createUserIfNotExists(array $userData): User
     {

@@ -14,21 +14,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
-     * Run the migrations.
+     * Creates the `real_estates` table with a primary key that is also a foreign key to `organizations`, establishing a one-to-one inheritance relationship.
      *
-     * Esta migração cria uma tabela que estende a tabela 'organizations'
-     * usando uma relação 1-1 com chave primária compartilhada.
-     *
-     * A relação de herança é implementada no nível de modelagem de dados,
-     * onde cada RealEstate tem uma Organization correspondente
-     * e a chave primária da RealEstate é também uma chave estrangeira
-     * para a tabela organizations.
-     *
-     * Esta abordagem permite:
-     * 1. Reutilizar campos comuns na tabela 'organizations'
-     * 2. Adicionar campos específicos para imobiliárias na tabela 'real_estates'
-     * 3. Manter integridade referencial com exclusão em cascata
-     * 4. Implementar o padrão de herança de tabela concreta
+     * The table includes real estate-specific fields (`creci`, `state_registration`) and enforces referential integrity with cascading deletes. An index is added on the `creci` column to optimize queries.
      */
     public function up(): void
     {
@@ -48,7 +36,7 @@ return new class extends Migration {
     }
 
     /**
-     * Reverse the migrations.
+     * Drops the `real_estates` table, reversing the migration.
      */
     public function down(): void
     {

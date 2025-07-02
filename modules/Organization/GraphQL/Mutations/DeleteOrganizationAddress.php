@@ -17,8 +17,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class DeleteOrganizationAddress
 {
     /**
-     * @param null                 $_
-     * @param array<string, mixed> $args
+     * Deletes an organization address by its ID and returns the deleted address data.
+     *
+     * If the address does not exist, a GraphQL error is thrown. The returned model contains the data of the deleted address for use in the GraphQL response.
+     *
+     * @param array<string, mixed> $args Arguments containing the 'id' of the address to delete.
+     * @return OrganizationAddress The deleted organization address as a model instance.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): OrganizationAddress
     {

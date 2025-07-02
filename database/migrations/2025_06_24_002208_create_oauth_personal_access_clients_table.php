@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Creates the `oauth_personal_access_clients` table with columns for ID, client ID, and timestamps.
      */
     public function up(): void
     {
@@ -19,7 +19,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Drops the `oauth_personal_access_clients` table if it exists, reversing the migration.
      */
     public function down(): void
     {

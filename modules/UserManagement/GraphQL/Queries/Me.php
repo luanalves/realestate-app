@@ -22,17 +22,23 @@ class Me
 {
     private UserService $userService;
 
+    /**
+     * Initializes the Me query resolver with the provided user service.
+     *
+     * @param UserService $userService Service used to retrieve user data.
+     */
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
     }
 
     /**
-     * Return the currently authenticated user with cache support.
+     * Resolves the currently authenticated user for the GraphQL "me" query, including role information.
      *
-     * @param null $root
+     * Attempts to return cached user data with role details via the UserService. If the cache retrieval fails, falls back to returning the authenticated user with the role relationship loaded.
      *
-     * @throws AuthenticationException
+     * @throws AuthenticationException If no user is authenticated.
+     * @return User The authenticated user with role information.
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): User
     {

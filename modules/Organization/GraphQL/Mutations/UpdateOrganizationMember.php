@@ -19,8 +19,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class UpdateOrganizationMember
 {
     /**
-     * @param null                 $_
-     * @param array<string, mixed> $args
+     * Updates the membership details of a user within an organization.
+     *
+     * Accepts organization and user identifiers along with optional fields (`role`, `position`, `is_active`) to update the corresponding membership record. Returns `true` if the membership exists and is updated (or if no update fields are provided), or `false` if the membership does not exist or an error occurs.
+     *
+     * @param array<string, mixed> $args Arguments including `organizationId`, `userId`, and optional `role`, `position`, `is_active`.
+     * @return bool `True` on successful update or if no update fields are provided; `false` if the membership is not found or an error occurs.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool
     {

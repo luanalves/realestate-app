@@ -50,10 +50,11 @@ class OrganizationMembership extends Model
 
     
     /**
-     * Set the isActive attribute (for GraphQL).
+     * Sets the 'is_active' attribute for the organization membership.
      *
-     * @param bool $value
-     * @return void
+     * This mutator ensures the 'is_active' property is correctly assigned, supporting integration with GraphQL.
+     *
+     * @param bool $value The new active status.
      */
     public function setIsActiveAttribute(bool $value): void
     {
@@ -61,8 +62,8 @@ class OrganizationMembership extends Model
     }
 
     /**
-     * Get the user that belongs to this membership
-     * 
+     * Defines the relationship to the user associated with this organization membership.
+     *
      * @return BelongsTo
      */
     public function user(): BelongsTo
@@ -71,9 +72,9 @@ class OrganizationMembership extends Model
     }
 
     /**
-     * Get the organization this membership belongs to
-     * 
-     * @return BelongsTo
+     * Returns the organization associated with this membership.
+     *
+     * @return BelongsTo The relationship to the Organization model.
      */
     public function organization(): BelongsTo
     {

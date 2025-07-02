@@ -24,6 +24,15 @@ class Login
         $this->userService = $userService;
     }
 
+    /**
+     * Handles user login via GraphQL mutation, authenticating credentials and returning an OAuth2 access token with user data.
+     *
+     * Validates the provided email and password, authenticates the user using OAuth2, and retrieves formatted user information for the response.
+     *
+     * @param mixed $_ Unused parameter, required by the GraphQL resolver signature.
+     * @param array $args The input arguments containing 'email' and 'password' for authentication.
+     * @return array An array containing the OAuth2 access token details and the authenticated user's formatted data.
+     */
     public function __invoke($_, array $args)
     {
         // 1. Validate input

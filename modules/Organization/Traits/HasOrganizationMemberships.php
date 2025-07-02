@@ -16,8 +16,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 trait HasOrganizationMemberships
 {
     /**
-     * Relação com os membros da organização
-     * 
+     * Defines a many-to-many relationship between the organization and its user members via the `organization_members` pivot table.
+     *
+     * The relationship includes additional pivot fields: `role`, `position`, and `is_active`, and manages timestamps on the pivot.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function members(): BelongsToMany
@@ -32,7 +34,7 @@ trait HasOrganizationMemberships
     }
     
     /**
-     * Retorna apenas membros ativos desta organização
+     * Returns the members of the organization who are marked as active.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
@@ -42,21 +44,21 @@ trait HasOrganizationMemberships
     }
     
     /**
-     * Retorna membros com um papel específico
+     * Returns organization members with a specific role.
      *
-     * @param string $role
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @param string $role The role to filter members by.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany The relationship query for members with the given role.
      */
     public function membersWithRole(string $role): BelongsToMany
     {
         return $this->members()->wherePivot('role', $role);
     }
     
-    /**
-     * Verifica se um usuário é membro desta organização
+    /****
+     * Determines whether the given user is a member of the organization.
      *
-     * @param User $user
-     * @return bool
+     * @param User $user The user to check for membership.
+     * @return bool True if the user is a member of the organization; otherwise, false.
      */
     public function hasMember(User $user): bool
     {

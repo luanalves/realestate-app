@@ -23,6 +23,12 @@ class UpdateUser
     private UserManagementAuthorizationService $authService;
     private UserService $userService;
 
+    /**
+     * Initializes the UpdateUser mutation with authorization and user service dependencies.
+     *
+     * @param UserManagementAuthorizationService $authService Service for performing authorization checks.
+     * @param UserService $userService Service for user-related operations such as cache management.
+     */
     public function __construct(
         UserManagementAuthorizationService $authService,
         UserService $userService,
@@ -32,12 +38,15 @@ class UpdateUser
     }
 
     /**
-     * Update an existing user.
+     * Handles the GraphQL mutation to update an existing user's information.
      *
-     * @param mixed          $rootValue   The result from the parent resolver
-     * @param array          $args        The arguments that were passed into the field
-     * @param GraphQLContext $context     Arbitrary data that is shared between all fields of a single query
-     * @param ResolveInfo    $resolveInfo Information about the query itself
+     * Updates user attributes such as name, email, password, and optionally role, with appropriate authorization checks. Only the user themselves or an admin can perform updates, and role changes require admin privileges. After saving changes, the user's cache is invalidated.
+     *
+     * @param mixed $rootValue The result from the parent resolver.
+     * @param array $args The arguments passed to the mutation, including user ID and input fields.
+     * @param GraphQLContext $context Shared context for the GraphQL request.
+     * @param ResolveInfo $resolveInfo Information about the GraphQL query.
+     * @return User The updated user model instance.
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): User
     {

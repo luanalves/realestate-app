@@ -17,12 +17,14 @@ use Modules\RealEstate\Models\RealEstate;
 class UpdateRealEstateResolver
 {
     /**
-     * Atualiza uma imobiliária existente
+     * Updates an existing real estate entity and its associated organization with the provided input data.
      *
-     * @param null $root
-     * @param array $args
-     * @return RealEstate
-     * @throws ModelNotFoundException
+     * Accepts an array of arguments containing the real estate ID and an input array with updated fields. Updates both organization and real estate-specific fields if present, and returns the updated real estate instance.
+     *
+     * @param null $root Unused parameter.
+     * @param array $args Arguments containing 'id' (real estate ID) and 'input' (fields to update).
+     * @return RealEstate The updated real estate entity.
+     * @throws ModelNotFoundException If the real estate entity with the given ID does not exist.
      */
     public function __invoke($root, array $args): RealEstate
     {

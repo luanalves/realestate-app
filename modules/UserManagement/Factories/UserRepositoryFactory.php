@@ -19,9 +19,12 @@ use Modules\UserManagement\Repositories\DatabaseUserRepository;
 class UserRepositoryFactory
 {
     /**
-     * Create appropriate user repository based on cache availability and configuration.
+     * Creates and returns a user repository instance, selecting between cached or database-backed implementations.
      *
-     * @param bool|null $forceCache Override automatic detection
+     * If $forceCache is provided, it forces the use of either the cached or database repository. If not provided, the method automatically selects the cached repository if cache is available, otherwise defaults to the database repository.
+     *
+     * @param bool|null $forceCache If true, always use the cached repository; if false, always use the database repository; if null, auto-detect based on cache availability.
+     * @return UserRepositoryInterface The selected user repository implementation.
      */
     public static function create(?bool $forceCache = null): UserRepositoryInterface
     {
@@ -41,7 +44,9 @@ class UserRepositoryFactory
     }
 
     /**
-     * Create cached repository explicitly.
+     * Creates and returns a new instance of CachedUserRepository.
+     *
+     * @return CachedUserRepository The cached user repository instance.
      */
     public static function createCached(): CachedUserRepository
     {
@@ -49,7 +54,9 @@ class UserRepositoryFactory
     }
 
     /**
-     * Create database repository explicitly.
+     * Creates and returns a new instance of the database-backed user repository.
+     *
+     * @return DatabaseUserRepository The user repository implementation that interacts directly with the database.
      */
     public static function createDatabase(): DatabaseUserRepository
     {
@@ -57,7 +64,11 @@ class UserRepositoryFactory
     }
 
     /**
-     * Check if cache is available and working.
+     * Determines whether the cache system is available and functioning correctly.
+     *
+     * Performs a write-read-delete test on the cache and returns true if the cache responds as expected; otherwise, returns false.
+     *
+     * @return bool True if the cache is available and working; false otherwise.
      */
     private static function isCacheAvailable(): bool
     {
@@ -91,7 +102,9 @@ class UserRepositoryFactory
     }
 
     /**
-     * Get current cache configuration for debugging.
+     * Retrieves current cache configuration and status details for debugging purposes.
+     *
+     * @return array An associative array containing the default cache store, cache availability status, Redis connection configuration, and cache prefix.
      */
     public static function getCacheInfo(): array
     {

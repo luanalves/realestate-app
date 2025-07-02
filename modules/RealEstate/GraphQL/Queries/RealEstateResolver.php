@@ -16,11 +16,15 @@ use Modules\RealEstate\Models\RealEstate;
 class RealEstateResolver
 {
     /**
-     * Obtém uma imobiliária específica pelo ID ou CNPJ.
+     * Resolves and returns a specific real estate entity by its ID or the CNPJ of its associated organization.
      *
-     * @param null $root
+     * If neither `id` nor `cnpj` is provided in the arguments, an exception is thrown.
      *
-     * @throws ModelNotFoundException
+     * @param mixed $root Unused root value from the GraphQL resolver signature.
+     * @param array $args Arguments array containing either 'id' or 'cnpj' as identifiers.
+     * @return RealEstate The matching real estate entity.
+     * @throws \Exception If neither 'id' nor 'cnpj' is provided.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no matching real estate entity is found.
      */
     public function __invoke($root, array $args): RealEstate
     {

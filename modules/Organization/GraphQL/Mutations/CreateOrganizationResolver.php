@@ -25,7 +25,9 @@ class CreateOrganizationResolver
     private OrganizationService $organizationService;
 
     /**
-     * Constructor.
+     * Initializes the resolver with the provided organization service.
+     *
+     * @param OrganizationService $organizationService Service for organization-related operations.
      */
     public function __construct(OrganizationService $organizationService)
     {
@@ -33,10 +35,14 @@ class CreateOrganizationResolver
     }
 
     /**
-     * Create a new generic organization.
+     * Handles the GraphQL mutation to create a new organization with optional address information.
+     *
+     * Accepts input data for the organization, creates the organization record within a database transaction,
+     * and, if address data is provided, associates an address with the new organization.
      *
      * @param null $root
-     * @param array $args The input arguments
+     * @param array $args Arguments containing the 'input' data for the organization.
+     * @return Organization The newly created organization instance.
      */
     public function __invoke($root, array $args): Organization
     {

@@ -59,9 +59,9 @@ class OrganizationAddress extends Model
     ];
 
     /**
-     * Obtém a organização a que este endereço pertence
+     * Defines the relationship to the organization that owns this address.
      *
-     * @return BelongsTo
+     * @return BelongsTo The parent organization associated with this address.
      */
     public function organization(): BelongsTo
     {
@@ -69,7 +69,7 @@ class OrganizationAddress extends Model
     }
 
     /**
-     * Escopo para filtrar apenas endereços ativos
+     * Query scope to filter only active organization addresses.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
@@ -80,7 +80,7 @@ class OrganizationAddress extends Model
     }
 
     /**
-     * Escopo para filtrar apenas endereços de matriz
+     * Query scope to filter addresses of type "headquarters".
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
@@ -91,7 +91,7 @@ class OrganizationAddress extends Model
     }
 
     /**
-     * Escopo para filtrar apenas endereços de filiais
+     * Query scope to filter addresses of type "branch".
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder

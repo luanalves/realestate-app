@@ -17,7 +17,10 @@ use Modules\Organization\Services\OrganizationTypeRegistry;
 class OrganizationServiceProvider extends ServiceProvider
 {
     /**
-     * Register services.
+     * Registers the Organization module's services in the application container.
+     *
+     * Binds the OrganizationTypeRegistryContract interface to its implementation as a singleton.
+     * If the application is running in the console, registers the module's test directory for PHPUnit.
      */
     public function register(): void
     {
@@ -31,7 +34,7 @@ class OrganizationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap services.
+     * Boots the Organization module by loading its database migrations and registering its GraphQL schema.
      */
     public function boot(): void
     {
@@ -40,7 +43,7 @@ class OrganizationServiceProvider extends ServiceProvider
     }
     
     /**
-     * Register the GraphQL schema for this module.
+     * Registers the module's GraphQL schema with the Lighthouse configuration if the schema file exists.
      */
     protected function registerGraphQLSchema(): void
     {
@@ -54,7 +57,9 @@ class OrganizationServiceProvider extends ServiceProvider
     }
     
     /**
-     * Registra os testes do módulo para serem executados pelo PHPUnit
+     * Publishes the module's test directory to the application's base tests directory for PHPUnit execution.
+     *
+     * This enables the module's tests to be run as part of the application's test suite under the 'organization-tests' tag.
      */
     protected function registerTests(): void
     {

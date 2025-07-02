@@ -28,7 +28,7 @@ class RealEstateServiceProvider extends ServiceProvider
     ];
 
     /**
-     * Register services.
+     * Registers all dependent service providers required by this module.
      */
     public function register(): void
     {
@@ -39,7 +39,7 @@ class RealEstateServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap services.
+     * Boots the RealEstate module by registering its organization type, loading migrations, and conditionally registering its GraphQL schema with the Lighthouse configuration.
      */
     public function boot(): void
     {
@@ -68,7 +68,7 @@ class RealEstateServiceProvider extends ServiceProvider
     }
 
     /**
-     * Registra o tipo RealEstate no sistema de organizações
+     * Registers the RealEstate organization type with the organization type registry.
      */
     protected function registerOrganizationType(): void
     {

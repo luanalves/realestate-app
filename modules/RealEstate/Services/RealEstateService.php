@@ -20,7 +20,13 @@ use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 class RealEstateService
 {
     /**
-     * Check if user has permission to access real estate management.
+     * Ensures the user is authenticated for real estate management access.
+     *
+     * Returns the authenticated user object if access is granted.
+     *
+     * @param object|null $user The user to authorize, or null to use the current API user.
+     * @return object The authenticated user.
+     * @throws \Illuminate\Auth\AuthenticationException If no user is authenticated.
      */
     public function authorizeRealEstateAccess(?object $user = null): object
     {
@@ -34,7 +40,12 @@ class RealEstateService
     }
 
     /**
-     * Check if user has permission to modify real estate entities.
+     * Ensures the user has write permissions for real estate entities.
+     *
+     * Verifies that the user is authenticated and has a role of either super admin or real estate admin. Throws an AuthenticationException if the user lacks the required permissions.
+     *
+     * @param object|null $user The user to authorize, or null to use the currently authenticated user.
+     * @return object The authorized user object.
      */
     public function authorizeRealEstateWrite(?object $user = null): object
     {
@@ -52,7 +63,11 @@ class RealEstateService
     }
 
     /**
-     * Check if user can access a specific real estate entity (multi-tenant check).
+     * Ensures the user has access to a specific real estate entity, enforcing multi-tenant restrictions.
+     *
+     * Grants access to super admins for all entities. For other users, access is allowed only if their tenant ID matches the real estate entity's tenant ID. Throws an AuthenticationException if access is denied.
+     *
+     * @param RealEstate $realEstate The real estate entity to check access for.
      */
     public function authorizeRealEstateEntityAccess(RealEstate $realEstate, ?object $user = null): void
     {
@@ -70,7 +85,12 @@ class RealEstateService
     }
 
     /**
-     * Create a new real estate with address.
+     * Creates a new real estate entity, optionally with an associated address.
+     *
+     * If the user is not a super admin, the real estate is assigned the user's tenant ID. Address data, if provided, is extracted and used to create an address linked to the new real estate entity. Returns the created real estate entity with its addresses loaded.
+     *
+     * @param array $data The data for the new real estate entity, optionally including an 'address' key with address details.
+     * @return RealEstate The created real estate entity with addresses loaded.
      */
     public function createRealEstate(array $data, ?object $user = null): RealEstate
     {
@@ -107,7 +127,13 @@ class RealEstateService
     }
 
     /**
-     * Update an existing real estate with address.
+     * Updates an existing real estate entity and its address.
+     *
+     * If address data is provided, updates the associated address or creates one if none exists. Only super admin users can change the tenant ID; for other users, tenant ID changes are ignored. Loads and returns the updated real estate entity with its addresses.
+     *
+     * @param int $id The ID of the real estate entity to update.
+     * @param array $data The data to update, optionally including address information under the 'address' key.
+     * @return RealEstate The updated real estate entity with addresses loaded.
      */
     public function updateRealEstate(int $id, array $data, ?object $user = null): RealEstate
     {
@@ -149,7 +175,10 @@ class RealEstateService
     }
 
     /**
-     * Delete a real estate agency.
+     * Deletes a real estate agency and its associated addresses after verifying user authorization.
+     *
+     * @param int $id The ID of the real estate agency to delete.
+     * @return RealEstate The deleted real estate agency instance.
      */
     public function deleteRealEstate(int $id, ?object $user = null): RealEstate
     {
@@ -181,7 +210,13 @@ class RealEstateService
     }
 
     /**
-     * Create an address for a real estate agency.
+     * Creates a new address for the specified real estate entity.
+     *
+     * Sets default values for address type ('headquarters') and active status (true) if not provided, and normalizes the zip code by removing dashes.
+     *
+     * @param int $realEstateId The ID of the real estate entity to associate with the address.
+     * @param array $addressData The address data to be stored.
+     * @return RealEstateAddress The newly created address.
      */
     private function createRealEstateAddress(int $realEstateId, array $addressData): RealEstateAddress
     {
@@ -197,7 +232,11 @@ class RealEstateService
     }
 
     /**
-     * Update an existing address or create a new one if none exists.
+     * Updates the headquarters address of a real estate entity if it exists, or creates a new address if none is found.
+     *
+     * @param RealEstate $realEstate The real estate entity whose address will be updated or created.
+     * @param array $addressData The address data to update or create.
+     * @return RealEstateAddress The updated or newly created address.
      */
     private function updateRealEstateAddress(RealEstate $realEstate, array $addressData): RealEstateAddress
     {
@@ -215,7 +254,11 @@ class RealEstateService
     }
 
     /**
-     * Create a new address for an existing real estate.
+     * Creates a new address for an existing real estate entity after verifying user authorization and access.
+     *
+     * @param int $realEstateId The ID of the real estate entity to associate the new address with.
+     * @param array $addressData The address details to be created.
+     * @return RealEstateAddress The newly created real estate address.
      */
     public function createRealEstateAddressForExisting(int $realEstateId, array $addressData, ?object $user = null): RealEstateAddress
     {
@@ -240,7 +283,13 @@ class RealEstateService
     }
 
     /**
-     * Update an existing real estate address.
+     * Updates an existing real estate address by its ID.
+     *
+     * Normalizes the zip code if provided and applies the updates to the address after verifying user authorization and access to the related real estate entity.
+     *
+     * @param int $id The ID of the real estate address to update.
+     * @param array $addressData The address fields to update.
+     * @return RealEstateAddress The updated real estate address.
      */
     public function updateRealEstateAddressById(int $id, array $addressData, ?object $user = null): RealEstateAddress
     {
@@ -270,7 +319,10 @@ class RealEstateService
     }
 
     /**
-     * Delete an existing real estate address.
+     * Deletes a real estate address by its ID after verifying user authorization.
+     *
+     * @param int $id The ID of the real estate address to delete.
+     * @return RealEstateAddress The deleted address instance.
      */
     public function deleteRealEstateAddress(int $id, ?object $user = null): RealEstateAddress
     {

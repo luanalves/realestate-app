@@ -19,8 +19,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class RemoveOrganizationMember
 {
     /**
-     * @param null                 $_
-     * @param array<string, mixed> $args
+     * Removes a user from an organization by deleting their membership record.
+     *
+     * Accepts arguments containing `organizationId` and `userId`. Returns `true` if the membership is found and deleted, or `false` if no membership exists or an error occurs.
+     *
+     * @param array<string, mixed> $args Arguments including `organizationId` and `userId`.
+     * @return bool `true` if the user was removed from the organization; `false` otherwise.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool
     {

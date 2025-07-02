@@ -49,7 +49,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Bootstrap the model and its traits.
+     * Registers model event listeners to invalidate the user cache when a user is updated or deleted.
      */
     protected static function booted(): void
     {
@@ -81,9 +81,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the attributes that should be cast.
+     * Returns the attribute casting definitions for the user model.
      *
-     * @return array<string, string>
+     * Specifies how certain attributes should be automatically converted to and from native types.
+     *
+     * @return array<string, string> An associative array mapping attribute names to their cast types.
      */
     protected function casts(): array
     {
@@ -96,7 +98,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the role that owns the user.
+     * Returns the role associated with the user.
+     *
+     * @return BelongsTo The relationship instance linking the user to a role.
      */
     public function role(): BelongsTo
     {
@@ -104,8 +108,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Validate user credentials for Laravel Passport password grant.
-     * This method is called by Laravel Passport BEFORE creating the access token.
+     * Validates the user's credentials for Laravel Passport's password grant.
+     *
+     * Denies authentication and logs a warning if the user is inactive; otherwise, verifies the provided password against the stored hash.
+     *
+     * @param string $password The plaintext password to validate.
+     * @return bool True if the user is active and the password is correct; false otherwise.
      */
     public function validateForPassportPasswordGrant(string $password): bool
     {

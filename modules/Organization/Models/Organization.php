@@ -55,7 +55,9 @@ class Organization extends Model
     ];
 
     /**
-     * Memberships da organização.
+     * Returns all membership records associated with the organization.
+     *
+     * @return HasMany The organization's related OrganizationMembership models.
      */
     public function memberships(): HasMany
     {
@@ -66,7 +68,9 @@ class Organization extends Model
     }
 
     /**
-     * Addresses da organização.
+     * Returns all addresses associated with the organization.
+     *
+     * @return HasMany The related organization addresses.
      */
     public function addresses(): HasMany
     {
@@ -74,9 +78,10 @@ class Organization extends Model
     }
 
     /**
-     * Escopo para filtrar por organizações ativas.
+     * Query scope to filter only active organizations.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder instance.
+     * @return \Illuminate\Database\Eloquent\Builder The modified query builder with active organizations.
      */
     public function scopeActive($query)
     {

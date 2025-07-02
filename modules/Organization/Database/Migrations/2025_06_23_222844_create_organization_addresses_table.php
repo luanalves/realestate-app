@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
-     * Run the migrations.
+     * Creates the `organization_addresses` table with address details, foreign key constraints, default values, and indexes.
+     *
+     * Defines columns for organization association, address type, location details, status, and timestamps. Adds foreign key and indexes to optimize queries.
      */
     public function up(): void
     {
@@ -43,7 +45,7 @@ return new class extends Migration {
     }
 
     /**
-     * Reverse the migrations.
+     * Drops the `organization_addresses` table, reversing the migration.
      */
     public function down(): void
     {

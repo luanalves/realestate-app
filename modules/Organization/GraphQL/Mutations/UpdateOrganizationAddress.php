@@ -17,11 +17,13 @@ use Modules\Organization\Models\OrganizationAddress;
 class UpdateOrganizationAddress
 {
     /**
-     * @param  null  $_
-     * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \Modules\Organization\Models\OrganizationAddress
+     * Updates an existing organization address with the provided fields.
+     *
+     * Accepts an address ID and a set of address-related fields to update. Only fields present in the input are updated. Returns the updated `OrganizationAddress` model instance.
+     *
+     * @param null $_ Unused placeholder parameter.
+     * @param array<string, mixed> $args Input arguments, including the address ID and fields to update.
+     * @return \Modules\Organization\Models\OrganizationAddress The updated organization address instance.
      */
     public function __invoke($_, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): OrganizationAddress
     {

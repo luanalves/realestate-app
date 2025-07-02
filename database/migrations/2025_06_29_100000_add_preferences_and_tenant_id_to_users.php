@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Adds 'preferences' and 'tenant_id' columns to the 'users' table.
+     *
+     * The 'preferences' column is a nullable JSON field added after 'role_id'. The 'tenant_id' column is a nullable unsigned big integer, indexed, and added after 'preferences'.
      */
     public function up(): void
     {
@@ -26,7 +28,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Removes the 'preferences' and 'tenant_id' columns from the 'users' table.
      */
     public function down(): void
     {
