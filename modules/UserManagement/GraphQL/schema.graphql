@@ -16,6 +16,11 @@ type Query {
     Get a user by ID (requires authentication)
     """
     user(id: ID!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\User")
+    
+    """
+    Get all available roles (requires authentication)
+    """
+    roles: [Role!]! @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\Roles")
 }
 
 type Mutation {
