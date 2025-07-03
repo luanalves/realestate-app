@@ -11,7 +11,9 @@ declare(strict_types=1);
 namespace Modules\RealEstate\Services;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\Organization\Models\Organization;
 use Modules\RealEstate\Models\RealEstate;
 use Modules\RealEstate\Models\RealEstateAddress;
 use Modules\UserManagement\Database\Seeders\RolesSeeder;
@@ -71,6 +73,9 @@ class RealEstateService
 
     /**
      * Create a new real estate with address.
+     *
+     * This method handles the creation of both the Organization and RealEstate records
+     * in a single database transaction, ensuring data consistency.
      */
     public function createRealEstate(array $data, ?object $user = null): RealEstate
     {
@@ -86,17 +91,34 @@ class RealEstateService
             $addressData = $data['address'] ?? null;
             unset($data['address']);
 
-            // Create the real estate agency
-            $realEstate = RealEstate::create($data);
+            // Extract RealEstate specific fields
+            $realEstateData = [
+                'creci' => $data['creci'] ?? null,
+                'state_registration' => $data['stateRegistration'] ?? null,
+            ];
 
-            // Create address if provided
-            if ($addressData) {
-                $this->createRealEstateAddress($realEstate->id, $addressData);
-            }
-            // Load addresses relationship for return value
-            $realEstate->load('addresses');
+            // Remove RealEstate specific fields from Organization data
+            unset($data['creci'], $data['stateRegistration']);
 
-            return $realEstate;
+            // Create both Organization and RealEstate in a transaction
+            return DB::transaction(function () use ($data, $addressData, $realEstateData) {
+                // First create the organization
+                $organization = Organization::create($data);
+
+                // Then create the real estate com a referência para organization_id
+                $realEstateData['organization_id'] = $organization->id;
+                $realEstate = RealEstate::create($realEstateData);
+
+                // Create address if provided
+                if ($addressData) {
+                    $this->createRealEstateAddress($realEstate->id, $addressData);
+                }
+
+                // Load the organization data and addresses for the return value
+                $realEstate->load(['organization', 'addresses']);
+
+                return $realEstate;
+            });
         } catch (\Exception $e) {
             Log::error('Error creating real estate agency', [
                 'error' => $e->getMessage(),
@@ -108,11 +130,14 @@ class RealEstateService
 
     /**
      * Update an existing real estate with address.
+     *
+     * This method updates both the Organization and RealEstate records
+     * in a single database transaction, ensuring data consistency.
      */
     public function updateRealEstate(int $id, array $data, ?object $user = null): RealEstate
     {
         $user = $this->authorizeRealEstateWrite($user);
-        $realEstate = RealEstate::findOrFail($id);
+        $realEstate = RealEstate::with('organization')->findOrFail($id);
 
         // Check if user can access this real estate
         $this->authorizeRealEstateEntityAccess($realEstate, $user);
@@ -127,17 +152,36 @@ class RealEstateService
                 unset($data['tenant_id']);
             }
 
-            // Update real estate attributes
-            $realEstate->update($data);
+            // Separate Organization data from RealEstate data
+            $realEstateData = [
+                'creci' => $data['creci'] ?? null,
+                'state_registration' => $data['stateRegistration'] ?? null,
+            ];
 
-            // Update address if provided
-            if ($addressData) {
-                $this->updateRealEstateAddress($realEstate, $addressData);
-            }
+            // Remove RealEstate specific fields from Organization data
+            unset($data['creci'], $data['stateRegistration']);
 
-            $realEstate->load('addresses');
+            // Update both Organization and RealEstate in a transaction
+            return DB::transaction(function () use ($realEstate, $data, $addressData, $realEstateData) {
+                // Update the organization data
+                if (!empty($data)) {
+                    $realEstate->organization->update($data);
+                }
 
-            return $realEstate;
+                // Update the real estate data
+                if (!empty($realEstateData)) {
+                    $realEstate->update($realEstateData);
+                }
+
+                // Update address if provided
+                if ($addressData) {
+                    $this->updateRealEstateAddress($realEstate, $addressData);
+                }
+
+                $realEstate->load(['organization', 'addresses']);
+
+                return $realEstate;
+            });
         } catch (\Exception $e) {
             Log::error('Error updating real estate agency', [
                 'id' => $realEstate->id,
@@ -150,11 +194,16 @@ class RealEstateService
 
     /**
      * Delete a real estate agency.
+     *
+     * This method deletes both the RealEstate and Organization records
+     * in a single database transaction, relying on foreign key cascade for consistency.
+     * The Organization deletion will automatically cascade to the RealEstate record
+     * due to the foreign key constraint.
      */
     public function deleteRealEstate(int $id, ?object $user = null): RealEstate
     {
         $user = $this->authorizeRealEstateWrite($user);
-        $realEstate = RealEstate::with('addresses')->findOrFail($id);
+        $realEstate = RealEstate::with(['organization', 'addresses'])->findOrFail($id);
 
         // Check if user can access this real estate
         $this->authorizeRealEstateEntityAccess($realEstate, $user);
@@ -163,11 +212,22 @@ class RealEstateService
         $deletedRealEstate = clone $realEstate;
 
         try {
-            // Delete the addresses first (should cascade but being explicit)
-            $realEstate->addresses()->delete();
+            // Delete in a transaction
+            DB::transaction(function () use ($realEstate) {
+                // Delete the addresses first
+                if ($realEstate->addresses) {
+                    $realEstate->addresses()->delete();
+                }
 
-            // Delete the real estate agency
-            $realEstate->delete();
+                // Get the organization ID before deleting
+                $organizationId = $realEstate->organization_id;
+                
+                // Primeiro exclua o registro RealEstate
+                $realEstate->delete();
+
+                // Depois exclua a organização (se necessário)
+                Organization::destroy($organizationId);
+            });
 
             return $deletedRealEstate;
         } catch (\Exception $e) {
@@ -296,5 +356,19 @@ class RealEstateService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Get a real estate agency by ID.
+     */
+    public function getRealEstateById(int $id, ?object $user = null): RealEstate
+    {
+        $user = $this->authorizeRealEstateAccess($user);
+        $realEstate = RealEstate::with(['organization', 'addresses'])->findOrFail($id);
+
+        // Check if user can access this real estate
+        $this->authorizeRealEstateEntityAccess($realEstate, $user);
+
+        return $realEstate;
     }
 }

@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Modules\RealEstate\Models\RealEstate;
 use Modules\RealEstate\Services\RealEstateService;
 
-class UpdateRealEstateResolver
+class DeleteRealEstateResolver
 {
     /**
      * @var RealEstateService
@@ -22,7 +22,9 @@ class UpdateRealEstateResolver
     protected $realEstateService;
 
     /**
-     * UpdateRealEstateResolver constructor.
+     * DeleteRealEstateResolver constructor.
+     * 
+     * @param RealEstateService $realEstateService
      */
     public function __construct(RealEstateService $realEstateService)
     {
@@ -30,21 +32,15 @@ class UpdateRealEstateResolver
     }
 
     /**
-     * Atualiza uma imobiliária existente.
+     * Exclui uma imobiliária existente
      *
      * @param null $root
-     *
+     * @param array $args
+     * @return RealEstate
      * @throws ModelNotFoundException
      */
     public function __invoke($root, array $args): RealEstate
     {
-        // Extract id from args
-        $id = (int) $args['id'];
-
-        // Remove id from args to get only input data
-        unset($args['id']);
-
-        // Pass the remaining args as input data (because of @spread directive)
-        return $this->realEstateService->updateRealEstate($id, $args);
+        return $this->realEstateService->deleteRealEstate((int) $args['id']);
     }
 }

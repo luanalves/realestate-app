@@ -48,6 +48,12 @@ type RealEstate implements Organization {
     "Endereço principal da organização"
     mainAddress: OrganizationAddress
     
+    "Data de criação"
+    created_at: DateTime!
+    
+    "Data da última atualização"
+    updated_at: DateTime!
+    
     "Endereços da organização"
     addresses: [OrganizationAddress!]!
     

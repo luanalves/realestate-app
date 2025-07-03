@@ -32,21 +32,7 @@ class RealEstate extends Model
      *
      * @var bool
      */
-    public $timestamps = false;
-
-    /**
-     * Define a chave primária (foreign key referenciando organizations).
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
-    /**
-     * A chave primária não é auto-incremento.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
+    public $timestamps = true;
 
     /**
      * Os atributos que são atribuíveis em massa.
@@ -54,7 +40,7 @@ class RealEstate extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'id', // Referência à ID da organização pai
+        'organization_id', // Referência à ID da organização relacionada
         'creci',
         'state_registration',
     ];
@@ -64,7 +50,7 @@ class RealEstate extends Model
      */
     public function organization(): BelongsTo
     {
-        return $this->belongsTo(Organization::class, 'id');
+        return $this->belongsTo(Organization::class, 'organization_id');
     }
 
     /**

@@ -16,31 +16,30 @@ return new class extends Migration {
     /**
      * Run the migrations.
      *
-     * Esta migração cria uma tabela que estende a tabela 'organizations'
-     * usando uma relação 1-1 com chave primária compartilhada.
-     *
-     * A relação de herança é implementada no nível de modelagem de dados,
-     * onde cada RealEstate tem uma Organization correspondente
-     * e a chave primária da RealEstate é também uma chave estrangeira
-     * para a tabela organizations.
-     *
-     * Esta abordagem permite:
-     * 1. Reutilizar campos comuns na tabela 'organizations'
-     * 2. Adicionar campos específicos para imobiliárias na tabela 'real_estates'
-     * 3. Manter integridade referencial com exclusão em cascata
-     * 4. Implementar o padrão de herança de tabela concreta
+     * Esta migração cria a tabela real_estates seguindo boas práticas:
+     * 1. Usando seu próprio ID como chave primária
+     * 2. Adicionando uma coluna organization_id como chave estrangeira
+     * 3. Incluindo timestamps para controle de data de criação e atualização
      */
     public function up(): void
     {
         Schema::create('real_estates', function (Blueprint $table) {
-            // Chave primária que é também uma foreign key para organizations
-            // Implementando herança de tabela concreta
-            $table->unsignedBigInteger('id')->primary();
-            $table->foreign('id')->references('id')->on('organizations')->onDelete('cascade');
+            // Usar um id próprio como chave primária
+            $table->id();
+
+            // Relacionamento com a tabela organizations via FK
+            $table->unsignedBigInteger('organization_id')->unique();
+            $table->foreign('organization_id')
+                  ->references('id')
+                  ->on('organizations')
+                  ->onDelete('cascade');
 
             // Campos específicos de imobiliárias
             $table->string('creci')->nullable();
             $table->string('state_registration')->nullable();
+
+            // Adicionar timestamps
+            $table->timestamps();
 
             // Índices para campos frequentemente consultados
             $table->index('creci');

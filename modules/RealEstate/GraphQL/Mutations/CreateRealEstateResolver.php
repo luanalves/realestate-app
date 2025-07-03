@@ -13,46 +13,35 @@ namespace Modules\RealEstate\GraphQL\Mutations;
 use Illuminate\Support\Facades\DB;
 use Modules\Organization\Models\Organization;
 use Modules\RealEstate\Models\RealEstate;
+use Modules\RealEstate\Services\RealEstateService;
 use Modules\RealEstate\Support\RealEstateConstants;
 
 class CreateRealEstateResolver
 {
     /**
-     * /**
+     * @var RealEstateService
+     */
+    protected $realEstateService;
+
+    /**
+     * CreateRealEstateResolver constructor.
+     * 
+     * @param RealEstateService $realEstateService
+     */
+    public function __construct(RealEstateService $realEstateService)
+    {
+        $this->realEstateService = $realEstateService;
+    }
+
+    /**
      * Creates a new real estate organization.
      *
      * @param null $root
+     * @param array $args
+     * @return RealEstate
      */
     public function __invoke($root, array $args): RealEstate
     {
-        $input = $args['input'];
-
-        return DB::transaction(function () use ($input) {
-            // 1. Create the base organization first
-            $organization = new Organization();
-            $organization->name = $input['name'];
-            $organization->fantasy_name = $input['fantasyName'] ?? null;
-            $organization->cnpj = $input['cnpj'];
-            $organization->description = $input['description'] ?? null;
-            $organization->email = $input['email'];
-            $organization->phone = $input['phone'] ?? null;
-            $organization->website = $input['website'] ?? null;
-            $organization->active = $input['active'] ?? true;
-            $organization->organization_type = RealEstateConstants::ORGANIZATION_TYPE;
-            $organization->save();
-
-            // 2. Create the real estate entity using the base organization ID
-            $realEstate = new RealEstate();
-            $realEstate->id = $organization->id;
-            $realEstate->creci = $input['creci'] ?? null;
-            $realEstate->state_registration = $input['stateRegistration'] ?? null;
-            $realEstate->save();
-
-            // 3. Load the relationship to ensure we have all the data
-            $realEstate->load('organization');
-            $realEstate->load('organization');
-
-            return $realEstate;
-        });
+        return $this->realEstateService->createRealEstate($args['input']);
     }
 }

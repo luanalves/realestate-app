@@ -12,31 +12,35 @@ namespace Modules\RealEstate\GraphQL\Queries;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Modules\RealEstate\Models\RealEstate;
+use Modules\RealEstate\Services\RealEstateService;
 
 class RealEstateResolver
 {
     /**
-     * Obtém uma imobiliária específica pelo ID ou CNPJ.
+     * @var RealEstateService
+     */
+    protected $realEstateService;
+
+    /**
+     * RealEstateResolver constructor.
+     * 
+     * @param RealEstateService $realEstateService
+     */
+    public function __construct(RealEstateService $realEstateService)
+    {
+        $this->realEstateService = $realEstateService;
+    }
+
+    /**
+     * Obtém uma imobiliária específica pelo ID.
      *
      * @param null $root
-     *
+     * @param array $args
+     * @return RealEstate
      * @throws ModelNotFoundException
      */
     public function __invoke($root, array $args): RealEstate
     {
-        $query = RealEstate::query()->with('organization');
-
-        if (isset($args['id'])) {
-            $query->where('id', $args['id']);
-        } elseif (isset($args['cnpj'])) {
-            // CNPJ agora está na tabela organizations
-            $query->whereHas('organization', function ($q) use ($args) {
-                $q->where('cnpj', $args['cnpj']);
-            });
-        } else {
-            throw new \Exception('Você precisa fornecer um ID ou CNPJ para buscar uma imobiliária');
-        }
-
-        return $query->firstOrFail();
+        return $this->realEstateService->getRealEstateById((int) $args['id']);
     }
 }
