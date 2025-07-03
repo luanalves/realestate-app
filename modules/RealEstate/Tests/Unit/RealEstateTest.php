@@ -20,11 +20,13 @@ class RealEstateTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Testa a criação e relação entre Organization e RealEstate.
+    /**
+     * Tests the creation and relationship between Organization and RealEstate.
+     */
      */
     public function testCreateRealEstate(): void
     {
-        // 1. Criar usando o resolver para simular o processo real
+        // 1. Create using resolver para simular o processo real
         $resolver = new \Modules\RealEstate\GraphQL\Mutations\CreateRealEstateResolver();
 
         $input = [
@@ -84,11 +86,10 @@ class RealEstateTest extends TestCase
 
         // 3. Verificar que ambos foram criados
         $this->assertDatabaseHas('organizations', ['id' => $realEstate->id]);
-        $this->assertDatabaseHas('real_estates', ['id' => $realEstate->id]);        // 4. Excluir a organização base através do relacionamento
-        $realEstate->organization->delete();
-        
-        // 5. Verificar que ambos foram excluídos (cascade delete)
+        $this->assertDatabaseHas('real_estates', ['id' => $realEstate->id]); 
+        // 5. Verify that both were deleted (cascade delete)
         $this->assertDatabaseMissing('organizations', ['id' => $realEstate->id]);
+        $this->assertDatabaseMissing('real_estates', ['id' => $realEstate->id]);
         $this->assertDatabaseMissing('real_estates', ['id' => $realEstate->id]);
     }
 }

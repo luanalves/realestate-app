@@ -33,8 +33,11 @@ class CreateRealEstateResolver
         $this->realEstateService = $realEstateService;
     }
 
-    /**
-     * Creates a new real estate organization.
+     /**
+      * Creates a new real estate organization.
+      *
+      * @param null $root
+      */
      *
      * @param null $root
      * @param array $args

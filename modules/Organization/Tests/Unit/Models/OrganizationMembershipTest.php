@@ -10,11 +10,11 @@ declare(strict_types=1);
 
 namespace Modules\Organization\Tests\Unit\Models;
 
-use Modules\UserManagement\Models\User;
 use Mockery\MockInterface;
 use Modules\Organization\Models\Organization;
 use Modules\Organization\Models\OrganizationMembership;
 use Modules\Organization\Support\OrganizationConstants;
+use Modules\UserManagement\Models\User;
 use Tests\TestCase;
 
 class OrganizationMembershipTest extends TestCase
@@ -72,7 +72,7 @@ class OrganizationMembershipTest extends TestCase
             'is_active' => true,
         ])->andReturnSelf()->getMock();
 
-        // Chamando o método para que a expectativa seja satisfeita
+        // Call the method to satisfy the expectation
         $membership->create([
             'user_id' => $userId,
             'organization_id' => $organizationId,
@@ -82,7 +82,8 @@ class OrganizationMembershipTest extends TestCase
         ]);
 
         // Assert
-        $this->assertTrue(true); // Verificamos que os mocks foram chamados corretamente
+        // Assert
+        $this->assertTrue(true); // Verify that mocks were called correctly
     }
 
     #[\PHPUnit\Framework\Attributes\Test]

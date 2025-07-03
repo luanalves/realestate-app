@@ -9,10 +9,6 @@ O projeto segue princípios de arquitetura limpa, DDD e modularização baseada 
 
 ### 🎯 Arquitetura Headless & Stateless
 
-- 🚫 **Sem interface web server-side** - API exclusivamente para consumo por clientes externos
-- 🔐 **Autenticação stateless** - JWT tokens via Laravel Passport (sem sessões no servidor)
-- 📱 **Frontend agnóstico** - Suporte nativo a SPA, mobile apps, desktop, serverless
-- ⚡ **Escalabilidade horizontal** - Sem estado compartilhado entre instâncias
 
 ### 📚 Documentação Técnica
 
@@ -26,14 +22,14 @@ O projeto segue princípios de arquitetura limpa, DDD e modularização baseada 
 - 🚫 **Sem interface web server-side** - API exclusivamente para consumo por clientes externos
 - 🔐 **Autenticação stateless** - JWT tokens via Laravel Passport (sem sessões no servidor)
 - 📱 **Frontend agnóstico** - Suporte nativo a SPA, mobile apps, desktop, serverless
-- ⚡ **Escalabilidade horizontal** - Sem estado compartilhado entre instâncias
+- **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`
 
 ### 🛠️ Stack Tecnológica
 - �🔧 **Laravel 12** como framework principal
 - 🧩 **Arquitetura modular por domínio** (UserManagement, RealEstate, Leads, etc)
 - 📡 **GraphQL com Lighthouse** para APIs flexíveis
 - 🗄️ **PostgreSQL, Redis, MongoDB** como suporte a diferentes tipos de persistência
-- ✉️ **Mensageria (Kafka ou RabbitMQ)** em planejamento futuro
+- 🔧 **Laravel 12** como framework principal
 
 ### 📁 Estrutura Modular
 Cada módulo possui seus próprios:
