@@ -106,6 +106,56 @@ ModuleName/
    - **CLI_Commands.md**: Documentação de comandos de terminal com exemplos práticos
 7. **Testes Abrangentes**: Cada padrão deve ter testes unitários específicos
 
+### Padrão de Documentação GraphQL API
+
+Todos os módulos devem seguir o padrão padronizado para documentação da API GraphQL:
+
+#### Template e Estrutura
+
+- **Template**: Use o template definido em [`doc/patterns/graphql-api-documentation-template.md`](../patterns/graphql-api-documentation-template.md)
+- **Localização**: `modules/{ModuleName}/doc/GraphQL_API.md`
+- **Padrão de Variáveis**: Sempre use valores literais em blocos **Variables** (não placeholders)
+- **Exemplos cURL**: Incluir exemplos completos e funcionais para teste imediato
+
+#### Estrutura Obrigatória
+
+1. **Table of Contents**: Navegação clara de todas as operações
+2. **Introduction**: Propósito e visão geral do módulo
+3. **Authentication**: Requisitos de autenticação e permissões
+4. **Queries**: Documentação completa de todas as consultas GraphQL
+5. **Mutations**: Documentação completa de todas as mutações GraphQL
+6. **Error Handling**: Exemplos de tratamento de erros padrão
+7. **Examples**: Casos de uso completos e workflows
+
+#### Elementos Obrigatórios por Operação
+
+Para cada query e mutation, incluir:
+
+- **Descrição**: Propósito e funcionalidade
+- **Authentication Required**: Especificar se requer autenticação e quais roles
+- **Query/Mutation**: Schema GraphQL completo
+- **Variables**: Bloco JSON com valores literais de exemplo
+- **cURL Example**: Exemplo funcional para teste imediato
+- **Response**: Exemplo de resposta de sucesso (quando aplicável)
+- **Technical Implementation**: Notas técnicas sobre implementação (opcional)
+
+#### Padrões de Valores
+
+- **Base URL**: `http://realestate.localhost/graphql`
+- **Token**: `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...`
+- **IDs**: Usar valores simples como `"1"`, `"2"`
+- **Paginação**: `{"first": 10, "page": 1}`
+- **Dados de exemplo**: Usar valores realistas e compreensíveis
+
+#### Exemplo de Implementação
+
+Veja a implementação completa no módulo RealEstate:
+```
+modules/RealEstate/doc/GraphQL_API.md
+```
+
+Este arquivo serve como referência de aplicação do template padrão.
+
 ### Exemplo: Módulo UserManagement
 
 O módulo `UserManagement` serve como referência de implementação, incluindo:
@@ -115,8 +165,24 @@ O módulo `UserManagement` serve como referência de implementação, incluindo:
 - **Commands**: `UserCacheCommand`, `TokenAnalysisCommand`, `ResetPasswordCommand`
 - **Documentação Completa**: 
   - `doc/README.md`: Visão geral e estrutura do módulo
-  - `doc/GraphQL_API.md`: API completa com exemplos de uso
+  - `doc/GraphQL_API.md`: API completa seguindo o template padrão com variáveis literais
   - `doc/CLI_Commands.md`: Comandos de terminal com casos de uso
 - **Testes Completos**: 62 testes unitários cobrindo todos os padrões
+
+### Criação de Novo Módulo - Checklist de Documentação
+
+Ao criar um novo módulo, siga este checklist para documentação GraphQL:
+
+1. **📋 Copiar Template**: Use [`doc/patterns/graphql-api-documentation-template.md`](../patterns/graphql-api-documentation-template.md)
+2. **🔄 Substituir Placeholders**: Substitua `{ModuleName}`, `{Entity}`, `{Entities}`, etc.
+3. **📝 Customizar Conteúdo**: Adicione campos específicos, relacionamentos e regras de negócio
+4. **✅ Verificar Padrões**: Garanta que usa valores literais nas Variables (não placeholders)
+5. **🧪 Testar Exemplos**: Confirme que os exemplos cURL funcionam corretamente
+6. **📚 Referenciar**: Use RealEstate como exemplo de implementação completa
+
+### Templates Disponíveis
+
+- **GraphQL API**: [`doc/patterns/graphql-api-documentation-template.md`](../patterns/graphql-api-documentation-template.md)
+- **Outros patterns**: Consulte `doc/patterns/` para padrões adicionais
 
 Essa abordagem reforça a visão de que **cada módulo deve ser tratado como um subproduto completo e autocontido**, responsável por sua própria lógica, dados, comportamento, documentação e padrões arquiteturais específicos.

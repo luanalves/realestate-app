@@ -247,7 +247,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\ModuleName;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
 use Mockery;
@@ -458,7 +458,7 @@ public function testAuthenticationRequiredForQuery(): void
 ### update password
 ```php
 app php artisan tinker
-$user = App\Models\User::where('email', 'contato@thedevkitchen.com.br')->first();
+$user = Modules\UserManagement\Models\User::where('email', 'contato@thedevkitchen.com.br')->first();
 $user->password = Hash::make('senha123');
 $user->save();
 ```
