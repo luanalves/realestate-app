@@ -46,6 +46,9 @@ class RealEstateServiceProvider extends ServiceProvider
         // Registrar o tipo RealEstate no sistema de organizações
         $this->registerOrganizationType();
         
+        // Register event listeners
+        $this->registerEventListeners();
+        
         // Load migrations
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
@@ -74,5 +77,16 @@ class RealEstateServiceProvider extends ServiceProvider
     {
         $registry = $this->app->make(OrganizationTypeRegistryContract::class);
         $registry->registerType(RealEstateConstants::ORGANIZATION_TYPE, RealEstate::class);
+    }
+
+    /**
+     * Register event listeners
+     */
+    protected function registerEventListeners(): void
+    {
+        $this->app['events']->listen(
+            \Modules\Organization\Events\OrganizationDataRequested::class,
+            \Modules\RealEstate\Listeners\InjectRealEstateDataListener::class
+        );
     }
 }

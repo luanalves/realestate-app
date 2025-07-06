@@ -25,7 +25,7 @@ type Organization {
     
     "Whether the organization is active"
     active: Boolean!
-    
+      
     "Organization memberships"
     memberships: [OrganizationMembership!]! @hasMany
     
@@ -40,6 +40,9 @@ type Organization {
     
     "Organization addresses"
     addresses: [OrganizationAddress!]!
+    
+    "Extension data from other modules"
+    extensionData: JSON @field(resolver: "Modules\\Organization\\GraphQL\\Resolvers\\OrganizationExtensionDataResolver")
     
     "Creation date"
     created_at: DateTime!
