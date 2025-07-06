@@ -16,6 +16,7 @@ This module implements a **specialized organization type** that:
 - CRECI (Brazilian real estate license) validation
 - State registration tracking
 - Integration with generic organization functionality
+- **Organization Extension System**: Inject real estate data into organization queries
 - GraphQL API for agency operations
 - Multi-tenant support with proper isolation
 
@@ -35,6 +36,8 @@ RealEstate/
 │   │   └── DeleteRealEstateOrganizationResolver.php
 │   └── Queries/
 │       └── RealEstateResolver.php
+├── Listeners/
+│   └── InjectRealEstateDataListener.php        # Organization extension listener
 ├── Models/
 │   └── RealEstate.php                           # Specialized real estate model
 ├── Providers/
@@ -258,6 +261,47 @@ mutation {
     active
   }
 }
+
+## Organization Integration
+
+The RealEstate module integrates with the Organization module's extension system, allowing real estate data to be accessed through organization queries.
+
+### Extension System
+
+The module implements a listener (`InjectRealEstateDataListener`) that automatically injects real estate-specific data when an organization is queried via GraphQL.
+
+### Getting Organization + Real Estate Data
+
+```graphql
+query GetOrganizationWithRealEstate($id: ID!) {
+  organization(id: $id) {
+    id
+    name
+    description
+    addresses {
+      id
+      street
+      city
+    }
+    extensionData  # Contains real estate data
+  }
+}
+```
+
+### When to Use Each Approach
+
+**Use Organization Extension:**
+- Need complete organization + real estate data
+- Want to access organization addresses
+- Building user interfaces showing organizational information
+
+**Use Direct RealEstate Queries:**
+- Need only real estate specific data
+- Building reports focused on real estate data
+- Performing bulk operations on real estate entities
+
+For detailed information, see [Organization Integration Documentation](doc/Organization_Integration.md).
+
 ## Constants
 
 Available constants from `RealEstateConstants`:
