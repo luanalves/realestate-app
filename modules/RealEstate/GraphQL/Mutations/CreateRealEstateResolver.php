@@ -10,11 +10,9 @@ declare(strict_types=1);
 
 namespace Modules\RealEstate\GraphQL\Mutations;
 
-use Illuminate\Support\Facades\DB;
 use Modules\Organization\Models\Organization;
 use Modules\RealEstate\Models\RealEstate;
 use Modules\RealEstate\Services\RealEstateService;
-use Modules\RealEstate\Support\RealEstateConstants;
 
 class CreateRealEstateResolver
 {
@@ -25,23 +23,16 @@ class CreateRealEstateResolver
 
     /**
      * CreateRealEstateResolver constructor.
-     * 
-     * @param RealEstateService $realEstateService
      */
     public function __construct(RealEstateService $realEstateService)
     {
         $this->realEstateService = $realEstateService;
     }
 
-     /**
-      * Creates a new real estate organization.
-      *
-      * @param null $root
-      */
+    /**
+     * Creates a new real estate organization.
      *
      * @param null $root
-     * @param array $args
-     * @return RealEstate
      */
     public function __invoke($root, array $args): RealEstate
     {

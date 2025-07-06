@@ -1,165 +1,123 @@
-"""
-Schema GraphQL para o módulo RealEstate
-"""
-
-"""
-RealEstate representa uma imobiliária no sistema
-"""
-type RealEstate implements Organization {
-    "ID única da organização"
+type RealEstate {
+    "ID única da imobiliária"
     id: ID!
     
-    "Nome da organização"
-    name: String!
+    "ID da organização base"
+    organization_id: ID!
     
-    "Nome fantasia da imobiliária"
-    fantasyName: String
+    "Organização base associada"
+    organization: Organization! @belongsTo
     
-    "CNPJ da imobiliária"
+    "Nome da imobiliária (delegado da organização)"
+    name: String
+    
+    "Nome fantasia da imobiliária (delegado da organização)"
+    fantasy_name: String
+    
+    "CNPJ da imobiliária (delegado da organização)"
     cnpj: String
     
-    "Descrição da organização"
+    "Descrição da imobiliária (delegado da organização)"
     description: String
     
-    "Email de contato principal"
+    "Email de contato (delegado da organização)"
     email: String
     
-    "Telefone de contato principal"
+    "Telefone de contato (delegado da organização)"
     phone: String
     
-    "Website da organização"
+    "Website da imobiliária (delegado da organização)"
     website: String
+    
+    "Status ativo/inativo (delegado da organização)"
+    active: Boolean
     
     "Número do CRECI da imobiliária"
     creci: String
     
     "Inscrição estadual"
-    stateRegistration: String
-    
-    "Indica se a organização está ativa"
-    active: Boolean!
-    
-    "Membros da organização"
-    members: [OrganizationMembership!]! @morphMany
-    
-    "Membros ativos da organização"
-    activeMembers: [OrganizationMembership!]! @morphMany(relation: "activeMembers")
-    
-    "Endereço principal da organização"
-    mainAddress: OrganizationAddress
+    state_registration: String
     
     "Data de criação"
     created_at: DateTime!
     
     "Data da última atualização"
     updated_at: DateTime!
-    
-    "Endereços da organização"
-    addresses: [OrganizationAddress!]!
-    
-    "Data de criação"
-    createdAt: DateTime!
-    
-    "Data da última atualização"
-    updatedAt: DateTime!
 }
 
 """
-Input para criação de uma imobiliária
+Input para criação de uma nova imobiliária
 """
 input CreateRealEstateInput {
-    "Nome da organização"
+    "Nome da imobiliária"
     name: String! @rules(apply: ["required", "string", "max:255"])
     
     "Nome fantasia da imobiliária"
-    fantasyName: String @rules(apply: ["nullable", "string", "max:255"])
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
     
     "CNPJ da imobiliária"
-    cnpj: String! @rules(apply: ["required", "string", "regex:/^[0-9]{14}$/", "unique:organizations,cnpj"])
+    cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:organizations,cnpj"])
     
-    "Descrição da organização"
+    "Descrição da imobiliária"
     description: String @rules(apply: ["nullable", "string", "max:1000"])
     
-    "Email de contato principal"
+    "Email de contato"
     email: String! @rules(apply: ["required", "email", "unique:organizations,email"])
     
-    "Telefone de contato principal"
+    "Telefone de contato"
     phone: String @rules(apply: ["nullable", "string", "max:20"])
     
-    "Website da organização"
+    "Website da imobiliária"
     website: String @rules(apply: ["nullable", "url", "max:255"])
     
-    "Número do CRECI da imobiliária"
+    "Número do CRECI"
     creci: String @rules(apply: ["nullable", "string", "max:50"])
     
     "Inscrição estadual"
-    stateRegistration: String @rules(apply: ["nullable", "string", "max:50"])
+    state_registration: String @rules(apply: ["nullable", "string", "max:50"])
     
-    "Indica se a organização está ativa"
+    "Status ativo/inativo"
     active: Boolean = true
     
-    "Endereço principal da organização"
+    "Endereço principal da imobiliária"
     address: OrganizationAddressInput
 }
 
 """
-Input para atualização de uma imobiliária
+Input para atualização de uma imobiliária existente
 """
 input UpdateRealEstateInput {
-    "Nome da organização"
-    name: String @rules(apply: ["nullable", "string", "max:255"])
+    "Nome da imobiliária"
+    name: String @rules(apply: ["string", "max:255"])
     
     "Nome fantasia da imobiliária"
-    fantasyName: String @rules(apply: ["nullable", "string", "max:255"])
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
     
-    "Descrição da organização"
+    "Descrição da imobiliária"
     description: String @rules(apply: ["nullable", "string", "max:1000"])
     
-    "Email de contato principal"
-    email: String @rules(apply: ["nullable", "email"])
+    "Email de contato"
+    email: String @rules(apply: ["email"])
     
-    "Telefone de contato principal"
+    "Telefone de contato"
     phone: String @rules(apply: ["nullable", "string", "max:20"])
     
-    "Website da organização"
+    "Website da imobiliária"
     website: String @rules(apply: ["nullable", "url", "max:255"])
     
-    "Número do CRECI da imobiliária"
+    "Número do CRECI"
     creci: String @rules(apply: ["nullable", "string", "max:50"])
     
     "Inscrição estadual"
-    stateRegistration: String @rules(apply: ["nullable", "string", "max:50"])
+    state_registration: String @rules(apply: ["nullable", "string", "max:50"])
     
-    "Representante legal"
-    legalRepresentative: String @rules(apply: ["nullable", "string", "max:255"])
-    
-    "Indica se a organização está ativa"
+    "Status ativo/inativo"
     active: Boolean
 }
 
-"""
-Tipo para representar um resultado paginado de imobiliárias
-"""
-type RealEstatePaginator {
-    "Dados das imobiliárias nesta página"
-    data: [RealEstate!]!
-    
-    "Informações sobre a paginação"
-    paginatorInfo: PaginatorInfo!
-}
 
-extend type Query {
-    "List all real estates"
-    realEstates(
-        first: Int = 10
-        page: Int = 1
-        orderBy: [OrderByClause!]
-    ): [RealEstate!]! @paginate(model: "Modules\\RealEstate\\Models\\RealEstate", scopes: ["active"])
 
-    "Get a specific real estate by ID"
-    realEstate(id: ID!): RealEstate 
-        @field(resolver: "Modules\\RealEstate\\GraphQL\\Queries\\RealEstateResolver")
-}
+
 
 extend type Mutation {
     "Criar uma nova imobiliária"
@@ -169,10 +127,7 @@ extend type Mutation {
     
     "Atualizar uma imobiliária existente"
     updateRealEstate(
-        id: ID!,
-        input: UpdateRealEstateInput! @spread
+        id: ID!
+        input: UpdateRealEstateInput!
     ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstateResolver")
-    
-    "Remover uma imobiliária"
-    deleteRealEstate(id: ID!): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\DeleteRealEstateResolver")
 }
