@@ -163,14 +163,14 @@ type Mutation {
     ): PreferencesUpdateResponse!
         @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdatePreferences")
         
-    """
-    Set user active status (admin only)
-    """
-    setUserActiveStatus(
-        user_id: ID!,
-        is_active: Boolean!
-    ): UserActiveStatusResponse!
-        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\SetUserActiveStatus")
+    # """
+    # Set user active status (admin only)
+    # """
+    # setUserActiveStatus(
+    #     user_id: ID!,
+    #     is_active: Boolean!
+    # ): UserActiveStatusResponse!
+    #     @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\SetUserActiveStatus")
 
 }
 
@@ -280,14 +280,14 @@ type PreferencesUpdateResponse {
     message: String!
 }
 
-"""
-User active status update response
-"""
-type UserActiveStatusResponse {
-    success: Boolean!
-    message: String!
-    user: User
-}
+# """
+# User active status update response
+# """
+# type UserActiveStatusResponse {
+#     success: Boolean!
+#     message: String!
+#     user: User
+# }
 
 # Security Module Types
 """
