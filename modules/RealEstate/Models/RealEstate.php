@@ -46,6 +46,16 @@ class RealEstate extends Model
     ];
 
     /**
+     * Os atributos que devem ser convertidos para tipos nativos.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
      * Relação com a organização base.
      */
     public function organization(): BelongsTo
@@ -75,86 +85,43 @@ class RealEstate extends Model
     }
 
     /**
-     * Acessa o nome da organização.
+     * Delegate organization attributes to the organization model.
+     * This allows accessing organization fields directly on the RealEstate model.
      */
-    public function getNameAttribute(): ?string
+    public function __get($key)
     {
-        return $this->organization?->name;
+        // First check if the attribute exists on this model
+        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
+            return parent::__get($key);
+        }
+
+        // If the organization is loaded and has the attribute, delegate to it
+        if ($this->relationLoaded('organization') && 
+            $this->organization && 
+            $this->organization->hasAttribute($key)) {
+            return $this->organization->getAttribute($key);
+        }
+
+        // For the most common organization attributes, try to load the organization
+        $organizationAttributes = ['name', 'fantasy_name', 'cnpj', 'description', 'email', 'phone', 'website', 'active'];
+        if (in_array($key, $organizationAttributes) && !$this->relationLoaded('organization')) {
+            $this->load('organization');
+            if ($this->organization && $this->organization->hasAttribute($key)) {
+                return $this->organization->getAttribute($key);
+            }
+        }
+
+        return parent::__get($key);
     }
 
     /**
-     * Acessa a descrição da organização.
+     * Check if an attribute exists on this model or the organization.
      */
-    public function getDescriptionAttribute(): ?string
+    public function hasAttribute($key): bool
     {
-        return $this->organization?->description;
-    }
-
-    /**
-     * Acessa o email da organização.
-     */
-    public function getEmailAttribute(): ?string
-    {
-        return $this->organization?->email;
-    }
-
-    /**
-     * Acessa o nome fantasia da organização.
-     */
-    public function getFantasyNameAttribute(): ?string
-    {
-        return $this->organization?->fantasy_name;
-    }
-
-    /**
-     * Acessa o CNPJ da organização.
-     */
-    public function getCnpjAttribute(): ?string
-    {
-        return $this->organization?->cnpj;
-    }
-
-    /**
-     * Acessa o telefone da organização.
-     */
-    public function getPhoneAttribute(): ?string
-    {
-        return $this->organization?->phone;
-    }
-
-    /**
-     * Acessa o website da organização.
-     */
-    public function getWebsiteAttribute(): ?string
-    {
-        return $this->organization?->website;
-    }
-
-    /**
-     * Acessa o status ativo da organização.
-     */
-    public function getActiveAttribute(): bool
-    {
-        return $this->organization?->active ?? false;
-    }
-
-    /**
-     * Acessa a data de criação da organização.
-     *
-     * @return \Illuminate\Support\Carbon|null
-     */
-    public function getCreatedAtAttribute()
-    {
-        return $this->organization?->created_at;
-    }
-
-    /**
-     * Acessa a data de atualização da organização.
-     *
-     * @return \Illuminate\Support\Carbon|null
-     */
-    public function getUpdatedAtAttribute()
-    {
-        return $this->organization?->updated_at;
+        return array_key_exists($key, $this->attributes) || 
+               ($this->relationLoaded('organization') && 
+                $this->organization && 
+                $this->organization->hasAttribute($key));
     }
 }

@@ -221,7 +221,7 @@ class RealEstateService
 
                 // Get the organization ID before deleting
                 $organizationId = $realEstate->organization_id;
-                
+
                 // Primeiro exclua o registro RealEstate
                 $realEstate->delete();
 
@@ -364,7 +364,7 @@ class RealEstateService
     public function getRealEstateById(int $id, ?object $user = null): RealEstate
     {
         $user = $this->authorizeRealEstateAccess($user);
-        $realEstate = RealEstate::with(['organization', 'addresses'])->findOrFail($id);
+        $realEstate = RealEstate::with(['organization.addresses'])->findOrFail($id);
 
         // Check if user can access this real estate
         $this->authorizeRealEstateEntityAccess($realEstate, $user);
