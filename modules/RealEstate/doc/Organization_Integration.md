@@ -160,7 +160,7 @@ curl -X POST \
       "website": "https://abcimoveis.com.br",
       "active": true,
       "addresses": [],
-      "extensionData": "{\"realEstate\":{\"id\":2,\"creci\":\"J-54321\",\"state_registration\":\"987.654.321.000\",\"created_at\":\"2025-07-04T23:09:15.000000Z\",\"updated_at\":\"2025-07-04T23:09:15.000000Z\"}}"
+      "extensionData": "{\"realEstate\":{\"id\":2,\"creci\":\"CRECI/SP 12345-J\",\"state_registration\":\"987.654.321.000\",\"created_at\":\"2025-07-04T23:09:15.000000Z\",\"updated_at\":\"2025-07-04T23:09:15.000000Z\"}}"
     }
   }
 }
@@ -197,7 +197,7 @@ O campo `extensionData` retorna uma string JSON que, quando parseada, contém:
 {
   "realEstate": {
     "id": 2,
-    "creci": "J-54321",
+    "creci": "CRECI/SP 12345-J",
     "state_registration": "987.654.321.000",
     "created_at": "2025-07-04T23:09:15.000000Z",
     "updated_at": "2025-07-04T23:09:15.000000Z"
