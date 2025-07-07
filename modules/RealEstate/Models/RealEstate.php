@@ -56,6 +56,15 @@ class RealEstate extends Model
     ];
 
     /**
+     * Os relacionamentos que devem ser carregados automaticamente.
+     *
+     * @var array<string>
+     */
+    protected $with = [
+        'organization',
+    ];
+
+    /**
      * Relação com a organização base.
      */
     public function organization(): BelongsTo
@@ -95,19 +104,17 @@ class RealEstate extends Model
             return parent::__get($key);
         }
 
-        // If the organization is loaded and has the attribute, delegate to it
-        if ($this->relationLoaded('organization') && 
-            $this->organization && 
-            $this->organization->hasAttribute($key)) {
-            return $this->organization->getAttribute($key);
-        }
-
-        // For the most common organization attributes, try to load the organization
+        // For organization attributes, try to load and delegate
         $organizationAttributes = ['name', 'fantasy_name', 'cnpj', 'description', 'email', 'phone', 'website', 'active'];
-        if (in_array($key, $organizationAttributes) && !$this->relationLoaded('organization')) {
-            $this->load('organization');
-            if ($this->organization && $this->organization->hasAttribute($key)) {
-                return $this->organization->getAttribute($key);
+        if (in_array($key, $organizationAttributes)) {
+            // Ensure organization is loaded
+            if (!$this->relationLoaded('organization')) {
+                $this->load('organization');
+            }
+
+            // If organization exists and has the attribute, delegate to it
+            if ($this->organization) {
+                return $this->organization->{$key};
             }
         }
 
@@ -119,9 +126,9 @@ class RealEstate extends Model
      */
     public function hasAttribute($key): bool
     {
-        return array_key_exists($key, $this->attributes) || 
-               ($this->relationLoaded('organization') && 
-                $this->organization && 
-                $this->organization->hasAttribute($key));
+        return array_key_exists($key, $this->attributes)
+               || ($this->relationLoaded('organization')
+                && $this->organization
+                && $this->organization->hasAttribute($key));
     }
 }

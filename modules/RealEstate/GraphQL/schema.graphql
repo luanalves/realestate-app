@@ -46,44 +46,6 @@ type RealEstate {
 }
 
 """
-Input para criação de uma nova imobiliária
-"""
-input CreateRealEstateInput {
-    "Nome da imobiliária"
-    name: String! @rules(apply: ["required", "string", "max:255"])
-    
-    "Nome fantasia da imobiliária"
-    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
-    
-    "CNPJ da imobiliária"
-    cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:organizations,cnpj"])
-    
-    "Descrição da imobiliária"
-    description: String @rules(apply: ["nullable", "string", "max:1000"])
-    
-    "Email de contato"
-    email: String! @rules(apply: ["required", "email", "unique:organizations,email"])
-    
-    "Telefone de contato"
-    phone: String @rules(apply: ["nullable", "string", "max:20"])
-    
-    "Website da imobiliária"
-    website: String @rules(apply: ["nullable", "url", "max:255"])
-    
-    "Número do CRECI"
-    creci: String @rules(apply: ["nullable", "string", "max:50"])
-    
-    "Inscrição estadual"
-    state_registration: String @rules(apply: ["nullable", "string", "max:50"])
-    
-    "Status ativo/inativo"
-    active: Boolean = true
-    
-    "Endereço principal da imobiliária"
-    address: OrganizationAddressInput
-}
-
-"""
 Input para atualização de uma imobiliária existente
 """
 input UpdateRealEstateInput {
@@ -120,11 +82,6 @@ input UpdateRealEstateInput {
 
 
 extend type Mutation {
-    "Criar uma nova imobiliária"
-    createRealEstate(
-        input: CreateRealEstateInput!
-    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\CreateRealEstateResolver")
-    
     "Atualizar uma imobiliária existente"
     updateRealEstate(
         id: ID!
