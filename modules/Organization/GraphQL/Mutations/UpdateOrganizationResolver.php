@@ -10,7 +10,10 @@ declare(strict_types=1);
 
 namespace Modules\Organization\GraphQL\Mutations;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Modules\Organization\Events\OrganizationUpdated;
 use Modules\Organization\Models\Organization;
 use Modules\Organization\Services\OrganizationService;
 
@@ -35,7 +38,7 @@ class UpdateOrganizationResolver
     /**
      * Update an existing organization.
      *
-     * @param null $root
+     * @param null  $root
      * @param array $args The input arguments
      */
     public function __invoke($root, array $args): Organization
@@ -43,9 +46,33 @@ class UpdateOrganizationResolver
         $id = $args['id'];
         $input = $args['input'];
 
+        // Extract extension data if present
+        $extensionData = $input['extensionData'] ?? [];
+        unset($input['extensionData']); // Remove from organization data
+
         // Execute in a transaction to ensure data consistency
-        return DB::transaction(function () use ($id, $input) {
-            return $this->organizationService->updateOrganization((int) $id, $input);
+        return DB::transaction(function () use ($id, $input, $extensionData) {
+            try {
+                // Update the organization
+                $organization = $this->organizationService->updateOrganization((int) $id, $input);
+
+                // Dispatch event for module extensions if extensionData was provided
+                if (!empty($extensionData)) {
+                    $userId = Auth::id() ?? 0;
+                    Event::dispatch(new OrganizationUpdated($organization, $extensionData, $userId));
+                }
+
+                return $organization;
+            } catch (\Exception $e) {
+                // Log the error and re-throw to trigger rollback
+                \Log::error('Failed to update organization', [
+                    'organization_id' => $id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                throw $e;
+            }
         });
     }
 }

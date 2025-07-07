@@ -229,6 +229,14 @@ extend type Query {
         role: String
     ): [OrganizationMembership!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\MembersByOrganizationId")
 }
+
+# Output da criação
+type CreateOrganizationPayload {
+    organization: Organization!
+    success: Boolean!
+    message: String
+}
+
 """
 Input for creating a new generic organization
 """
@@ -240,13 +248,13 @@ input CreateOrganizationInput {
     fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
     
     "Organization CNPJ"
-    cnpj: String! @rules(apply: ["required", "string", "size:14", "unique:organizations,cnpj"])
+    cnpj: String @rules(apply: ["nullable", "string", "size:14", "unique:organizations,cnpj"])
     
     "Organization description"
     description: String @rules(apply: ["nullable", "string", "max:1000"])
     
     "Primary contact email"
-    email: String! @rules(apply: ["required", "email", "unique:organizations,email"])
+    email: String @rules(apply: ["nullable", "email", "unique:organizations,email"])
     
     "Primary contact phone"
     phone: String @rules(apply: ["nullable", "string", "max:20"])
@@ -259,6 +267,9 @@ input CreateOrganizationInput {
     
     "Main address for the organization"
     address: OrganizationAddressInput
+    
+    "Extension data for module-specific information"
+    extensionData: JSON
 }
 
 """
@@ -288,13 +299,16 @@ input UpdateOrganizationInput {
     
     "Whether the organization is active"
     active: Boolean
+    
+    "Extension data for module-specific fields"
+    extensionData: JSON
 }
 
 extend type Mutation {
-    "Create a new generic organization"
+    "Create a new organization with extension support"
     createOrganization(
         input: CreateOrganizationInput!
-    ): Organization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateOrganizationResolver")
+    ): CreateOrganizationPayload! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateOrganizationResolver")
     
     "Update an existing organization"
     updateOrganization(
