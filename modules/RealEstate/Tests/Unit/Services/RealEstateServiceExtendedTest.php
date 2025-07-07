@@ -45,13 +45,10 @@ class RealEstateServiceExtendedTest extends TestCase
         $this->assertTrue(method_exists($this->service, 'authorizeRealEstateAccess'));
         $this->assertTrue(method_exists($this->service, 'authorizeRealEstateWrite'));
         $this->assertTrue(method_exists($this->service, 'authorizeRealEstateEntityAccess'));
-        $this->assertTrue(method_exists($this->service, 'createRealEstate'));
         $this->assertTrue(method_exists($this->service, 'updateRealEstate'));
         $this->assertTrue(method_exists($this->service, 'deleteRealEstate'));
         $this->assertTrue(method_exists($this->service, 'getRealEstateById'));
-        $this->assertTrue(method_exists($this->service, 'createRealEstateAddressForExisting'));
-        $this->assertTrue(method_exists($this->service, 'updateRealEstateAddressById'));
-        $this->assertTrue(method_exists($this->service, 'deleteRealEstateAddress'));
+        // Note: createRealEstate method was removed as creation is delegated to Organization module
     }
 
     /**
@@ -61,43 +58,46 @@ class RealEstateServiceExtendedTest extends TestCase
     {
         $reflection = new \ReflectionClass($this->service);
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-        
+
         $expectedMethods = [
             'authorizeRealEstateAccess',
             'authorizeRealEstateWrite',
             'authorizeRealEstateEntityAccess',
-            'createRealEstate',
             'updateRealEstate',
             'deleteRealEstate',
             'getRealEstateById',
-            'createRealEstateAddressForExisting',
-            'updateRealEstateAddressById',
-            'deleteRealEstateAddress'
+            // Note: createRealEstate method removed as creation is delegated to Organization module
         ];
-        
-        $actualMethods = array_map(function($method) {
+
+        $actualMethods = array_map(function ($method) {
             return $method->getName();
         }, $methods);
-        
+
         foreach ($expectedMethods as $expectedMethod) {
             $this->assertContains($expectedMethod, $actualMethods, "Method $expectedMethod not found");
         }
     }
 
     /**
-     * Test service has private methods for address handling.
+     * Test service structure after address delegation to Organization module.
      */
-    public function testServiceHasPrivateMethodsForAddressHandling(): void
+    public function testServiceStructureAfterAddressDelegation(): void
     {
         $reflection = new \ReflectionClass($this->service);
-        
-        $this->assertTrue($reflection->hasMethod('createRealEstateAddress'));
-        $this->assertTrue($reflection->hasMethod('updateRealEstateAddress'));
-        
-        $createMethod = $reflection->getMethod('createRealEstateAddress');
-        $updateMethod = $reflection->getMethod('updateRealEstateAddress');
-        
-        $this->assertTrue($createMethod->isPrivate());
-        $this->assertTrue($updateMethod->isPrivate());
+
+        // These methods should not exist anymore
+        $this->assertFalse($reflection->hasMethod('createRealEstateAddress'));
+        $this->assertFalse($reflection->hasMethod('updateRealEstateAddress'));
+        $this->assertFalse($reflection->hasMethod('createRealEstateAddressForExisting'));
+        $this->assertFalse($reflection->hasMethod('updateRealEstateAddressById'));
+        $this->assertFalse($reflection->hasMethod('deleteRealEstateAddress'));
+
+        // Core methods should still exist
+        $this->assertTrue($reflection->hasMethod('updateRealEstate'));
+        $this->assertTrue($reflection->hasMethod('deleteRealEstate'));
+        $this->assertTrue($reflection->hasMethod('getRealEstateById'));
+
+        // This method should not exist anymore
+        $this->assertFalse($reflection->hasMethod('createRealEstate'));
     }
 }
