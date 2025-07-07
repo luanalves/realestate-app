@@ -11,31 +11,19 @@ declare(strict_types=1);
 namespace Modules\RealEstate\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Modules\Organization\Contracts\OrganizationTypeRegistryContract;
-use Modules\Organization\Providers\OrganizationServiceProvider;
-use Modules\RealEstate\Models\RealEstate;
-use Modules\RealEstate\Support\RealEstateConstants;
 
 class RealEstateServiceProvider extends ServiceProvider
 {
-    /**
-     * Todas as dependências de serviço do pacote.
-     *
-     * @var array
-     */
-    protected $dependencies = [
-        OrganizationServiceProvider::class,
-    ];
-
     /**
      * Register services.
      */
     public function register(): void
     {
-        // Registre todas as dependências primeiro
-        foreach ($this->dependencies as $dependency) {
-            $this->app->register($dependency);
-        }
+        // Register the update service
+        $this->app->bind(
+            \Modules\RealEstate\Services\RealEstateUpdateService::class,
+            \Modules\RealEstate\Services\RealEstateUpdateService::class
+        );
     }
 
     /**
@@ -43,16 +31,21 @@ class RealEstateServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Registrar o tipo RealEstate no sistema de organizações
-        $this->registerOrganizationType();
-        
         // Register event listeners
         $this->registerEventListeners();
-        
+
         // Load migrations
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
         // Register GraphQL schema
+        $this->registerGraphQLSchema();
+    }
+
+    /**
+     * Register GraphQL schema.
+     */
+    protected function registerGraphQLSchema(): void
+    {
         $schemaPath = __DIR__.'/../GraphQL/schema.graphql';
         if (file_exists($schemaPath)) {
             $currentSchemas = config('lighthouse.schema.register', []);
@@ -61,32 +54,30 @@ class RealEstateServiceProvider extends ServiceProvider
                 $currentSchemas,
                 [$schemaPath]
             )]);
-
-            // Log registration for debugging
-            \Log::debug('RealEstate schema registered', [
-                'schema_path' => $schemaPath,
-                'registered_schemas' => config('lighthouse.schema.register'),
-            ]);
         }
     }
 
     /**
-     * Registra o tipo RealEstate no sistema de organizações
-     */
-    protected function registerOrganizationType(): void
-    {
-        $registry = $this->app->make(OrganizationTypeRegistryContract::class);
-        $registry->registerType(RealEstateConstants::ORGANIZATION_TYPE, RealEstate::class);
-    }
-
-    /**
-     * Register event listeners
+     * Register event listeners.
      */
     protected function registerEventListeners(): void
     {
+        // Listener para injetar dados de RealEstate nas consultas da Organization
         $this->app['events']->listen(
             \Modules\Organization\Events\OrganizationDataRequested::class,
             \Modules\RealEstate\Listeners\InjectRealEstateDataListener::class
+        );
+
+        // Listener para criar registros RealEstate quando Organization é criada com extensionData
+        $this->app['events']->listen(
+            \Modules\Organization\Events\OrganizationCreated::class,
+            \Modules\RealEstate\Listeners\CreateRealEstateOnOrganizationCreatedListener::class
+        );
+
+        // Listener para atualizar registros RealEstate quando Organization é atualizada com extensionData
+        $this->app['events']->listen(
+            \Modules\Organization\Events\OrganizationUpdated::class,
+            \Modules\RealEstate\Listeners\UpdateRealEstateOnOrganizationUpdatedListener::class
         );
     }
 }
