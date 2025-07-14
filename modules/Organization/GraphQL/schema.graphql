@@ -1,0 +1,361 @@
+type Organization {
+    "Organization unique ID"
+    id: ID!
+    
+    "Organization name"
+    name: String!
+    
+    "Organization fantasy name"
+    fantasy_name: String
+    
+    "Organization CNPJ"
+    cnpj: String
+    
+    "Organization description"
+    description: String
+    
+    "Primary contact email"
+    email: String
+    
+    "Primary contact phone"
+    phone: String
+    
+    "Organization website"
+    website: String
+    
+    "Whether the organization is active"
+    active: Boolean!
+      
+    "Organization memberships"
+    memberships: [OrganizationMembership!]! @hasMany
+    
+    "Organization members (users)"
+    members: [User!]! @belongsToMany
+    
+    "Active organization members"
+    activeMembers: [User!]! @belongsToMany(relation: "activeMembers")
+    
+    "Organization main address"
+    mainAddress: OrganizationAddress
+    
+    "Organization addresses"
+    addresses: [OrganizationAddress!]!
+    
+    "Extension data from other modules"
+    extensionData: JSON @field(resolver: "Modules\\Organization\\GraphQL\\Resolvers\\OrganizationExtensionDataResolver")
+    
+    "Creation date"
+    created_at: DateTime!
+    
+    "Last update date"
+    updated_at: DateTime!
+}
+
+"""
+OrganizationMembership - Represents the relationship between a user and organization
+"""
+type OrganizationMembership {
+    "Membership unique ID"
+    id: ID!
+    
+    "User associated with the organization"
+    user: User! @belongsTo
+    
+    "Organization associated with this membership"
+    organization: Organization! @belongsTo
+    
+    "User role in the organization (admin, manager, member, etc)"
+    role: String
+    
+    "User position/job title in the organization"
+    position: String
+    
+    "Whether the user is active in the organization"
+    is_active: Boolean!
+    
+    "Creation date"
+    created_at: DateTime!
+    
+    "Last update date"
+    updated_at: DateTime!
+}
+
+
+"""
+OrganizationAddress - Organization address
+"""
+type OrganizationAddress {
+    "Address unique ID"
+    id: ID!
+    
+    "Address type (headquarters, branch)"
+    type: String!
+    
+    "Street"
+    street: String!
+    
+    "Number"
+    number: String
+    
+    "Complement"
+    complement: String
+    
+    "Neighborhood"
+    neighborhood: String!
+    
+    "City"
+    city: String!
+    
+    "State"
+    state: String!
+    
+    "ZIP code"
+    zip_code: String!
+    
+    "Country"
+    country: String!
+    
+    "Whether the address is active"
+    active: Boolean!
+    
+    "The organization ID this address belongs to"
+    organization_id: ID!
+    
+    "Creation date"
+    created_at: DateTime!
+    
+    "Last update date"
+    updated_at: DateTime!
+
+    "The organization this address belongs to"
+    organization: Organization @belongsTo
+}
+
+"""
+Input for creating organization address
+"""
+input OrganizationAddressInput {
+    "Address type (headquarters, branch)"
+    type: String! = "branch"
+    
+    "Street"
+    street: String!
+    
+    "Number"
+    number: String
+    
+    "Complement"
+    complement: String
+    
+    "Neighborhood"
+    neighborhood: String!
+    
+    "City"
+    city: String!
+    
+    "State"
+    state: String!
+    
+    "ZIP code"
+    zip_code: String!
+    
+    "Country"
+    country: String! = "BR"
+}
+
+"""
+Input for updating organization address
+"""
+input UpdateOrganizationAddressInput {
+    "Address type (headquarters, branch)"
+    type: String
+    
+    "Street"
+    street: String
+    
+    "Number"
+    number: String
+    
+    "Complement"
+    complement: String
+    
+    "Neighborhood"
+    neighborhood: String
+    
+    "City"
+    city: String
+    
+    "State"
+    state: String
+    
+    "ZIP code"
+    zip_code: String
+    
+    "Country"
+    country: String
+    
+    "Whether the address is active"
+    active: Boolean
+}
+
+extend type User {
+    "User organization memberships"
+    organization_memberships: [OrganizationMembership!]! @hasMany(relation: "organizationMemberships")
+}
+
+extend type Query {
+    "Get an organization by ID"
+    organization(id: ID!): Organization @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\OrganizationById")
+    
+    "Get all organizations"
+    organizations(
+        first: Int = 10
+        page: Int
+    ): [Organization!]! @paginate(model: "Modules\\Organization\\Models\\Organization")
+    
+    "Get an organization address by ID"
+    organizationAddressById(id: ID!): OrganizationAddress @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\OrganizationAddressById")
+    
+    "Get all addresses of an organization"
+    addressesByOrganizationId(
+        organizationId: ID!
+        organizationType: String
+    ): [OrganizationAddress!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\AddressesByOrganizationId")
+    
+    "Get all members of an organization"
+    membersByOrganizationId(
+        organizationId: ID!
+        active: Boolean
+        role: String
+    ): [OrganizationMembership!]! @field(resolver: "Modules\\Organization\\GraphQL\\Queries\\MembersByOrganizationId")
+}
+
+# Output da criação
+type CreateOrganizationPayload {
+    organization: Organization!
+    success: Boolean!
+    message: String
+}
+
+"""
+Input for creating a new generic organization
+"""
+input CreateOrganizationInput {
+    "Organization name"
+    name: String! @rules(apply: ["required", "string", "max:255"])
+    
+    "Organization fantasy name"
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Organization CNPJ"
+    cnpj: String @rules(apply: ["nullable", "string", "size:14", "unique:organizations,cnpj"])
+    
+    "Organization description"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+    
+    "Primary contact email"
+    email: String @rules(apply: ["nullable", "email", "unique:organizations,email"])
+    
+    "Primary contact phone"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+    
+    "Organization website"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+    
+    "Whether the organization is active"
+    active: Boolean = true
+    
+    "Main address for the organization"
+    address: OrganizationAddressInput
+    
+    "Extension data for module-specific information"
+    extensionData: JSON
+}
+
+"""
+Input for updating an organization
+"""
+input UpdateOrganizationInput {
+    "Organization name"
+    name: String @rules(apply: ["string", "max:255"])
+    
+    "Organization fantasy name"
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Organization CNPJ"
+    cnpj: String @rules(apply: ["string", "size:14", "unique:organizations,cnpj"])
+    
+    "Organization description"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+    
+    "Primary contact email"
+    email: String @rules(apply: ["email", "unique:organizations,email"])
+    
+    "Primary contact phone"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+    
+    "Organization website"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+    
+    "Whether the organization is active"
+    active: Boolean
+    
+    "Extension data for module-specific fields"
+    extensionData: JSON
+}
+
+extend type Mutation {
+    "Create a new organization with extension support"
+    createOrganization(
+        input: CreateOrganizationInput!
+    ): CreateOrganizationPayload! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateOrganizationResolver")
+    
+    "Update an existing organization"
+    updateOrganization(
+        id: ID!
+        input: UpdateOrganizationInput!
+    ): Organization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationResolver")
+    
+    "Delete an organization"
+    deleteOrganization(
+        id: ID!
+    ): Organization! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\DeleteOrganizationResolver")
+
+    "Add a member to organization"
+    addOrganizationMember(
+        organizationId: ID!
+        userId: ID!
+        role: String!
+        position: String
+    ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\AddOrganizationMember")
+    
+    "Remove a member from organization"
+    removeOrganizationMember(
+        organizationId: ID!
+        userId: ID!
+    ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\RemoveOrganizationMember")
+    
+    "Update organization member information"
+    updateOrganizationMember(
+        organizationId: ID!
+        userId: ID!
+        role: String
+        position: String
+        is_active: Boolean
+    ): Boolean! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationMember")
+    
+    "Create a new address for an existing organization"
+    createOrganizationAddress(
+        organizationId: ID! @rules(apply: ["required"]),
+        input: OrganizationAddressInput! @spread
+    ): OrganizationAddress! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\CreateOrganizationAddress")
+    
+    "Update an existing organization address"
+    updateOrganizationAddress(
+        id: ID!,
+        input: UpdateOrganizationAddressInput! @spread
+    ): OrganizationAddress! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\UpdateOrganizationAddress")
+    
+    "Remove an organization address"
+    deleteOrganizationAddress(id: ID!): OrganizationAddress! @field(resolver: "Modules\\Organization\\GraphQL\\Mutations\\DeleteOrganizationAddress")
+}

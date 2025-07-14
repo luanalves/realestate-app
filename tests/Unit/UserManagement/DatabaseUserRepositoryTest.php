@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\UserManagement;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Mockery;
 use Modules\UserManagement\Repositories\DatabaseUserRepository;

@@ -11,6 +11,20 @@ return [
     |
     */
     'schema_path' => base_path('graphql/schema.graphql'),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Schema Registration
+    |--------------------------------------------------------------------------
+    |
+    | This array holds the paths to additional GraphQL schema files which are
+    | automatically registered if present. Module schemas are registered
+    | by their respective ServiceProviders.
+    |
+    */
+    'schema' => [
+        'register' => [],
+    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -1,25 +1,46 @@
 # RealEstate App
 
 Sistema de gestão imobiliária desenvolvido com foco em performance, escalabilidade e modularidade.
-O projeto segue princípios de arquitetura limpa, DDD e modularização baseada em domínio.
+O projeto segue princípios de arquitetura limpa, DDD e modularização baseada em domínio em uma **arquitetura headless e stateless**.
 
 ---
 
 ## 🧱 Características da Arquitetura
 
-- 🔧 **Laravel 12** como framework principal
+### 🎯 Arquitetura Headless & Stateless
+
+
+### 📚 Documentação Técnica
+
+- **👤 UserManagement Module**: Complete documentation at [`modules/UserManagement/doc/README.md`](modules/UserManagement/doc/README.md)
+  - **🔍 GraphQL API**: [`modules/UserManagement/doc/GraphQL_API.md`](modules/UserManagement/doc/GraphQL_API.md)
+  - **⚡ CLI Commands**: [`modules/UserManagement/doc/CLI_Commands.md`](modules/UserManagement/doc/CLI_Commands.md)
+- **🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
+- **🏗️ ADRs**: Architectural decisions at [`doc/architectural-decision-records/`](doc/architectural-decision-records/)
+- **📖 Guides**: Development patterns and conventions at [`doc/`](doc/)
+- **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`ss & Stateless
+- 🚫 **Sem interface web server-side** - API exclusivamente para consumo por clientes externos
+- 🔐 **Autenticação stateless** - JWT tokens via Laravel Passport (sem sessões no servidor)
+- 📱 **Frontend agnóstico** - Suporte nativo a SPA, mobile apps, desktop, serverless
+- **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`
+
+### 🛠️ Stack Tecnológica
+- �🔧 **Laravel 12** como framework principal
 - 🧩 **Arquitetura modular por domínio** (UserManagement, RealEstate, Leads, etc)
 - 📡 **GraphQL com Lighthouse** para APIs flexíveis
 - 🗄️ **PostgreSQL, Redis, MongoDB** como suporte a diferentes tipos de persistência
-- ✉️ **Mensageria (Kafka ou RabbitMQ)** em planejamento futuro
-- 📁 Cada módulo possui seus próprios:
+- 🔧 **Laravel 12** como framework principal
+
+### 📁 Estrutura Modular
+Cada módulo possui seus próprios:
   - Controllers
   - Models
   - Providers
   - Migrations
   - Seeders
   - GraphQL Schemas
-- 📏 **Padrões PSR implementados**:
+
+### 📏 Padrões PSR Implementados
   - PSR-1: Basic Coding Standard
   - PSR-4: Autoloader
   - PSR-7: HTTP Message Interface
@@ -29,7 +50,7 @@ O projeto segue princípios de arquitetura limpa, DDD e modularização baseada 
 
 ---
 
-Aplicação backend construída com Laravel 12 utilizando arquitetura modular, GraphQL e suporte a múltiplos bancos (PostgreSQL, MongoDB e Redis).
+**Aplicação backend headless e stateless** construída com Laravel 12 utilizando arquitetura modular, GraphQL e suporte a múltiplos bancos (PostgreSQL, MongoDB e Redis).
 
 ---
 
@@ -207,9 +228,13 @@ Todos os dados daquele módulo sejam populados corretamente.
 - [ ] Seguir padrões de naming e documentação
 
 ### 📚 Documentação
+- [ ] Criar diretório `modules/NomeModulo/doc/`
+- [ ] Criar `doc/README.md` com visão geral e propósito do módulo
+- [ ] Criar `doc/GraphQL_API.md` com documentação completa da API
+- [ ] Criar `doc/CLI_Commands.md` se o módulo tiver comandos de terminal
 - [ ] Criar Controller/Resolver e Request (FormRequest) para validações
 - [ ] Criar Seeders se houver dados base (ex: perfis, categorias, etc)
-- [ ] Atualizar README.md com a descrição do novo módulo
+- [ ] Atualizar README.md principal com a descrição do novo módulo
 - [ ] Documentar padrões específicos implementados no módulo
 
 ### 📖 Exemplo de Referência
@@ -217,7 +242,8 @@ Consulte o módulo `UserManagement` como exemplo completo de implementação inc
 - ✅ Factory Pattern com `UserRepositoryFactory`
 - ✅ Strategy Pattern com repositórios de cache
 - ✅ Service Layer com `UserService`  
-- ✅ Commands com `UserCacheCommand`
+- ✅ Commands com `UserCacheCommand`, `TokenAnalysisCommand`, `ResetPasswordCommand`
+- ✅ Documentação completa em `modules/UserManagement/doc/`
 - ✅ 62 testes unitários (173 assertions)
 
 ---
@@ -295,8 +321,14 @@ Para guia completo, consulte: [`doc/conventional-commits-guide.md`](doc/conventi
 
 ### 📚 Documentação Técnica
 
-- **ADRs**: Decisões arquiteturais em `doc/architectural-decision-records/`
-- **Guias**: Padrões e convenções em `doc/`
-- **GraphQL**: Schemas por módulo em `modules/*/GraphQL/`
+- **👤 UserManagement Module**: Complete documentation at [`modules/UserManagement/doc/README.md`](modules/UserManagement/doc/README.md)
+  - **🔍 GraphQL API**: [`modules/UserManagement/doc/GraphQL_API.md`](modules/UserManagement/doc/GraphQL_API.md)
+  - **⚡ CLI Commands**: [`modules/UserManagement/doc/CLI_Commands.md`](modules/UserManagement/doc/CLI_Commands.md)
+- **🏢 Organization Module**: Full API documentation at [`modules/Organization/doc/GraphQL_API.md`](modules/Organization/doc/GraphQL_API.md)
+- **🏗️ ADRs**: Architectural decisions at [`doc/architectural-decision-records/`](doc/architectural-decision-records/)
+- **📖 Guides**: Development patterns and conventions at [`doc/`](doc/)
+- **🌐 GraphQL**: Individual module schemas at `modules/*/GraphQL/`
+
+**Quick Start**: For API usage examples, check the UserManagement module's comprehensive documentation which includes authentication setup, complete request examples, and CLI tools.
 
 ---

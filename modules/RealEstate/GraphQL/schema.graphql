@@ -1,0 +1,90 @@
+type RealEstate {
+    "ID única da imobiliária"
+    id: ID!
+    
+    "ID da organização base"
+    organization_id: ID!
+    
+    "Organização base associada"
+    organization: Organization! @belongsTo
+    
+    "Nome da imobiliária (delegado da organização)"
+    name: String
+    
+    "Nome fantasia da imobiliária (delegado da organização)"
+    fantasy_name: String
+    
+    "CNPJ da imobiliária (delegado da organização)"
+    cnpj: String
+    
+    "Descrição da imobiliária (delegado da organização)"
+    description: String
+    
+    "Email de contato (delegado da organização)"
+    email: String
+    
+    "Telefone de contato (delegado da organização)"
+    phone: String
+    
+    "Website da imobiliária (delegado da organização)"
+    website: String
+    
+    "Status ativo/inativo (delegado da organização)"
+    active: Boolean
+    
+    "Número do CRECI da imobiliária"
+    creci: String
+    
+    "Inscrição estadual"
+    state_registration: String
+    
+    "Data de criação"
+    created_at: DateTime!
+    
+    "Data da última atualização"
+    updated_at: DateTime!
+}
+
+"""
+Input para atualização de uma imobiliária existente
+"""
+input UpdateRealEstateInput {
+    "Nome da imobiliária"
+    name: String @rules(apply: ["string", "max:255"])
+    
+    "Nome fantasia da imobiliária"
+    fantasy_name: String @rules(apply: ["nullable", "string", "max:255"])
+    
+    "Descrição da imobiliária"
+    description: String @rules(apply: ["nullable", "string", "max:1000"])
+    
+    "Email de contato"
+    email: String @rules(apply: ["email"])
+    
+    "Telefone de contato"
+    phone: String @rules(apply: ["nullable", "string", "max:20"])
+    
+    "Website da imobiliária"
+    website: String @rules(apply: ["nullable", "url", "max:255"])
+    
+    "Número do CRECI"
+    creci: String @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Inscrição estadual"
+    state_registration: String @rules(apply: ["nullable", "string", "max:50"])
+    
+    "Status ativo/inativo"
+    active: Boolean
+}
+
+
+
+
+
+extend type Mutation {
+    "Atualizar uma imobiliária existente"
+    updateRealEstate(
+        id: ID!
+        input: UpdateRealEstateInput!
+    ): RealEstate! @field(resolver: "Modules\\RealEstate\\GraphQL\\Mutations\\UpdateRealEstateResolver")
+}

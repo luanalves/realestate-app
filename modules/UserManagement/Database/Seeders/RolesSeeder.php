@@ -32,14 +32,18 @@ class RolesSeeder extends Seeder
 
     public function run(): void
     {
-        $roles = [];
         foreach (self::ROLES as $name => $description) {
-            $roles[] = [
-                'name' => $name,
-                'description' => $description,
-            ];
-        }
+            $exists = DB::table('roles')->where('name', $name)->exists();
 
-        DB::table('roles')->insert($roles);
+            if (!$exists) {
+                DB::table('roles')->insert([
+                    'name' => $name,
+                    'description' => $description,
+                ]);
+                $this->command->info("Role added: $name");
+            } else {
+                $this->command->info("Role already exists: $name");
+            }
+        }
     }
 }

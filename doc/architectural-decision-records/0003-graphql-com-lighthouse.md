@@ -5,7 +5,7 @@
 
 ## Contexto
 
-Durante a definição da camada de interface da aplicação, foi necessário escolher o protocolo de comunicação entre o frontend desacoplado e o backend (Laravel).
+Durante a definição da camada de interface da aplicação, foi necessário escolher o protocolo de comunicação entre o frontend desacoplado e o backend (Laravel) em uma **arquitetura headless e stateless**.
 
 A equipe avaliou duas abordagens principais: API REST tradicional e GraphQL, considerando os seguintes critérios:
 
@@ -18,6 +18,8 @@ Performance em ambientes modulares
 Facilidade de integração com frontend moderno
 
 Suporte a autenticação, autorização e políticas de acesso por campo
+
+Compatibilidade com arquitetura stateless (sem sessões no servidor)
 
 Curva de aprendizado e suporte no ecossistema Laravel
 
@@ -46,10 +48,25 @@ O modelo schema-first com lazy loading de resolvers permite que apenas o necess�
 
 ## Consequências
 
-A aplicação utilizará GraphQL como camada de comunicação primária, exposta através do pacote Laravel Lighthouse.
+### Arquitetura Headless e Stateless
+
+A aplicação utilizará GraphQL como camada de comunicação primária, exposta através do pacote Laravel Lighthouse em uma **arquitetura completamente headless e stateless**:
+
+- **Headless**: Sem renderização server-side ou interface web integrada
+- **Stateless**: Sem gerenciamento de sessões no servidor - toda autenticação via tokens JWT
+- **API-first**: Projetada exclusivamente para consumo por clientes externos
+
+### Implementação Técnica
 
 Toda a modelagem de domínio será refletida no schema GraphQL, com uso intensivo de diretivas personalizadas, autorização contextual e resolvers separados por domínio.
 
 O frontend desacoplado consumirá a API utilizando Apollo Client, com suporte a cache automático, polling e atualização reativa.
+
+### Benefícios da Arquitetura
+
+- **Flexibilidade de cliente**: Suporte nativo a SPA, mobile apps, serverless functions
+- **Escalabilidade**: Arquitetura stateless permite scaling horizontal sem complexidade
+- **Performance**: Cache inteligente no cliente e otimizações de query
+- **Manutenibilidade**: Separação clara entre API e apresentação
 
 Boas práticas como padrão Relay, paginação, rate limiting, throttling, monitoramento de queries lentas e tracing por operação serão adotadas como parte do desenvolvimento contínuo.

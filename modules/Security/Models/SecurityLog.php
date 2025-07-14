@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\Security\Models;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;

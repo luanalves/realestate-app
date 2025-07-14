@@ -27,6 +27,13 @@ class SecurityServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Bootstrap Security module services here
+        // Load migrations
+        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        
+        // Register GraphQL schema
+        config(['lighthouse.schema.register' => array_merge(
+            config('lighthouse.schema.register', []),
+            [__DIR__ . '/../GraphQL/schema.graphql']
+        )]);
     }
 }

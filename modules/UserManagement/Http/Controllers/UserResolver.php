@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Modules\UserManagement\Http\Controllers;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Modules\UserManagement\Http\Requests\CreateUserRequest;
 

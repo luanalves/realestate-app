@@ -3,6 +3,9 @@ Main GraphQL Schema
 This file combines all module schemas.
 """
 
+#import ../modules/Organization/GraphQL/schema.graphql
+#import ../modules/RealEstate/GraphQL/schema.graphql
+
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 scalar JSON @scalar(class: "App\\GraphQL\\Scalars\\JSON")
 
@@ -58,7 +61,7 @@ type Query {
     """
     Get currently authenticated user
     """
-    me: User @auth
+    me: User @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\Me")
     
     """
     Get all users (requires authentication)
@@ -69,6 +72,11 @@ type Query {
     Get a user by ID (requires authentication)
     """
     user(id: ID!): User @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\User")
+    
+    """
+    Get all available roles (requires authentication)
+    """
+    roles: [Role!]! @field(resolver: "Modules\\UserManagement\\GraphQL\\Queries\\Roles")
 
     """
     Get security logs with filters and pagination
@@ -110,10 +118,60 @@ type Mutation {
     deleteUser(id: ID!): DeleteUserResponse @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\DeleteUser")
 
     """
-    Login a user
+    Change user's password (requires authentication)
     """
-    login(email: String!, password: String!): LoginResponse!
-        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\Login")
+    changePassword(
+        current_password: String!, 
+        new_password: String!, 
+        new_password_confirmation: String!
+    ): PasswordChangeResponse! 
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\ChangePassword")
+        
+    """
+    Request a password reset link (doesn't require authentication)
+    """
+    requestPasswordReset(
+        email: String!
+    ): RequestPasswordResetResponse! 
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\RequestPasswordReset")
+        
+    """
+    Reset password using token (doesn't require authentication)
+    """
+    resetPassword(
+        email: String!, 
+        token: String!, 
+        password: String!, 
+        password_confirmation: String!
+    ): PasswordResetResponse! 
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\ResetPassword")
+        
+    """
+    Update user profile (requires authentication)
+    """
+    updateProfile(
+        name: String,
+        email: String
+    ): ProfileUpdateResponse!
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdateProfile")
+        
+    """
+    Update user preferences (requires authentication)
+    """
+    updatePreferences(
+        preferences: JSON!
+    ): PreferencesUpdateResponse!
+        @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\UpdatePreferences")
+        
+    # """
+    # Set user active status (admin only)
+    # """
+    # setUserActiveStatus(
+    #     user_id: ID!,
+    #     is_active: Boolean!
+    # ): UserActiveStatusResponse!
+    #     @field(resolver: "Modules\\UserManagement\\GraphQL\\Mutations\\SetUserActiveStatus")
+
 }
 
 # User Management Types
@@ -122,6 +180,7 @@ input CreateUserInput {
     email: String!
     password: String!
     role_id: ID!
+    is_active: Boolean = true
 }
 
 input UpdateUserInput {
@@ -129,6 +188,7 @@ input UpdateUserInput {
     email: String
     password: String
     role_id: ID
+    is_active: Boolean
 }
 
 """
@@ -139,6 +199,9 @@ type User {
     name: String!
     email: String!
     email_verified_at: DateTime
+    preferences: JSON
+    tenant_id: ID
+    is_active: Boolean!
     created_at: DateTime!
     updated_at: DateTime!
     role: Role @belongsTo
@@ -160,6 +223,7 @@ type Role {
 
 """
 Login response object
+@deprecated Use the OAuth endpoint /oauth/token instead
 """
 type LoginResponse {
     access_token: String!
@@ -175,6 +239,55 @@ type DeleteUserResponse {
     success: Boolean!
     message: String!
 }
+
+"""
+Password change response
+"""
+type PasswordChangeResponse {
+    success: Boolean!
+    message: String!
+}
+
+"""
+Request password reset response
+"""
+type RequestPasswordResetResponse {
+    success: Boolean!
+    message: String!
+}
+
+"""
+Password reset response
+"""
+type PasswordResetResponse {
+    success: Boolean!
+    message: String!
+}
+
+"""
+Profile update response
+"""
+type ProfileUpdateResponse {
+    success: Boolean!
+    message: String!
+}
+
+"""
+Preferences update response
+"""
+type PreferencesUpdateResponse {
+    success: Boolean!
+    message: String!
+}
+
+# """
+# User active status update response
+# """
+# type UserActiveStatusResponse {
+#     success: Boolean!
+#     message: String!
+#     user: User
+# }
 
 # Security Module Types
 """

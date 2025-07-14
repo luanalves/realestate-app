@@ -247,7 +247,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\ModuleName;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
 use Mockery;
@@ -458,7 +458,7 @@ public function testAuthenticationRequiredForQuery(): void
 ### update password
 ```php
 app php artisan tinker
-$user = App\Models\User::where('email', 'contato@thedevkitchen.com.br')->first();
+$user = Modules\UserManagement\Models\User::where('email', 'contato@thedevkitchen.com.br')->first();
 $user->password = Hash::make('senha123');
 $user->save();
 ```
@@ -493,3 +493,49 @@ php artisan passport:client --client
   ```
 - Os resultados dos testes serão exibidos diretamente no terminal, indicando sucesso, falha ou testes arriscados.
 - Certifique-se de que todas as dependências estejam instaladas e o ambiente Docker esteja rodando antes de executar os testes.
+
+## Regras de Segurança para Comandos de Banco de Dados
+
+### ⚠️ COMANDOS PERIGOSOS - SEMPRE PEDIR CONFIRMAÇÃO
+
+Antes de executar os seguintes comandos, **SEMPRE** peça confirmação explícita do usuário e explique as consequências:
+
+#### 🚨 `php artisan migrate:fresh`
+- **PERIGO**: Remove TODAS as tabelas e dados do banco
+- **CONSEQUÊNCIA**: Perda total de dados (usuários, organizações, imobiliárias, etc.)
+- **AÇÃO OBRIGATÓRIA**: 
+  - Perguntar: "⚠️ ATENÇÃO: Este comando vai APAGAR TODOS OS DADOS do banco. Tem certeza? (sim/não)"
+  - Explicar que será necessário executar `--seed` para repopular dados de teste
+  - Sugerir alternativas mais seguras quando apropriado
+
+#### 🚨 `php artisan migrate:reset`
+- **PERIGO**: Desfaz todas as migrations, removendo tabelas
+- **CONSEQUÊNCIA**: Perda de estrutura e dados do banco
+- **AÇÃO OBRIGATÓRIA**: Pedir confirmação explícita
+
+#### 🚨 `php artisan migrate:rollback` (sem parâmetros específicos)
+- **PERIGO**: Pode desfazer múltiplas migrations
+- **CONSEQUÊNCIA**: Perda de dados e estrutura de tabelas
+- **AÇÃO OBRIGATÓRIA**: Pedir confirmação e especificar quantos steps
+
+#### 🚨 `php artisan db:wipe`
+- **PERIGO**: Remove todas as tabelas, views, e types
+- **CONSEQUÊNCIA**: Destruição completa da estrutura do banco
+- **AÇÃO OBRIGATÓRIA**: Pedir confirmação explícita
+
+### ✅ ALTERNATIVAS SEGURAS
+
+Quando possível, sugira alternativas mais seguras:
+
+- Em vez de `migrate:fresh`, use `migrate` + `db:seed`
+- Para testes, use `RefreshDatabase` nos arquivos de teste
+- Para rollback específico, use `migrate:rollback --step=1`
+- Para ambiente de desenvolvimento, considere backup antes de comandos destrutivos
+
+### 🛡️ COMANDOS SEGUROS (podem ser executados sem confirmação)
+
+- `php artisan migrate`
+- `php artisan db:seed`
+- `php artisan migrate:status`
+- `php artisan schema:dump`
+- `php artisan migrate:install`

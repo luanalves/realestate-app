@@ -11,10 +11,20 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <testsuite name="ModulesUnit">
+            <directory phpVersion="8.0.0" phpVersionOperator=">=">modules/Organization/Tests/Unit</directory>
+            <directory phpVersion="8.0.0" phpVersionOperator=">=">modules/RealEstate/Tests/Unit</directory>
+        </testsuite>
+        <testsuite name="ModulesFeature">
+            <directory phpVersion="8.0.0" phpVersionOperator=">=">modules/Organization/Tests/Feature</directory>
+            <directory phpVersion="8.0.0" phpVersionOperator=">=">modules/RealEstate/Tests/Feature</directory>
+            <directory phpVersion="8.0.0" phpVersionOperator=">=">modules/Security/Tests/Feature</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
             <directory>app</directory>
+            <directory>modules</directory>
         </include>
     </source>
     <php>

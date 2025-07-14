@@ -6,14 +6,15 @@
 ## Contexto
 
 
-A aplicação imobiliária será acessada por diferentes perfis de usuários (administradores da aplicação, funcionários das imobiliárias, corretores e clientes finais), cada um com permissões e jornadas distintas. Além disso, a interface principal da aplicação será baseada em GraphQL, consumida por um frontend desacoplado.
+A aplicação imobiliária será acessada por diferentes perfis de usuários (administradores da aplicação, funcionários das imobiliárias, corretores e clientes finais), cada um com permissões e jornadas distintas. Além disso, a interface principal da aplicação será baseada em GraphQL, consumida por um frontend desacoplado, seguindo uma **arquitetura headless e stateless**.
 
 Nesse cenário, é necessário garantir:
 
 - Segurança no acesso à API;
-- Controle de sessão via tokens;
+- Controle de sessão via tokens (sem estado no servidor);
 - Flexibilidade para autenticar múltiplas aplicações (por exemplo: painéis administrativos, apps mobile, etc.);
-- Validação de permissões com base em perfis de usuários (RBAC).
+- Validação de permissões com base em perfis de usuários (RBAC);
+- Escalabilidade horizontal sem dependência de sessões compartilhadas.
 
 ## Decisão
 
@@ -31,8 +32,23 @@ Além da emissão de tokens com OAuth2, a aplicação também adota um segundo n
 
 ## Consequências
 
+### Arquitetura Headless e Stateless
+
+- **Sem estado no servidor**: Não há sessões mantidas no servidor, apenas tokens JWT validados a cada requisição
+- **Escalabilidade horizontal**: A aplicação pode ser facilmente escalada em múltiplos servidores sem compartilhamento de estado
+- **Flexibilidade de cliente**: Qualquer frontend pode consumir a API (SPA, mobile, desktop, serverless)
+
+### Implementação Técnica
+
 - As chamadas à API GraphQL exigirão um token válido do tipo Bearer (OAuth2).
 - A autenticação inicial será realizada via `grant_type=password`, com clientes registrados no Passport.
 - O frontend da aplicação armazenará e enviará esse token a cada requisição.
 - A validação do perfil do usuário (RBAC) será feita nos resolvers, garantindo que apenas usuários autorizados possam executar certas operações.
 - Novos perfis e escopos de acesso poderão ser adicionados com facilidade, mantendo a segurança e a escalabilidade do sistema.
+
+### Benefícios da Arquitetura
+
+- **Performance**: Sem overhead de gerenciamento de sessões
+- **Segurança**: Tokens com tempo de expiração configurável
+- **Manutenibilidade**: API independente do frontend
+- **Testabilidade**: Endpoints podem ser testados isoladamente

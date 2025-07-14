@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Security;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Modules\Security\Models\LogDetail;
 use Modules\Security\Models\SecurityLog;
 use Tests\TestCase;

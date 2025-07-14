@@ -26,8 +26,6 @@ class Login
 
     public function __invoke($_, array $args)
     {
-        Log::info("Login attempt started", ['email' => $args['email']]);
-        
         // 1. Validate input
         $validator = Validator::make($args, [
             'email' => ['required', 'email'],
@@ -46,24 +44,17 @@ class Login
             'scope' => '',
         ]);
 
-        if (! $http->ok()) {
-            Log::warning("Login failed - Invalid credentials", ['email' => $args['email']]);
+        if (!$http->ok()) {
+            Log::warning('Login failed - Invalid credentials', ['email' => $args['email']]);
             abort(401, 'Credenciais inválidas');
         }
 
         $tokenData = $http->json();
-        Log::info("OAuth token generated successfully", ['email' => $args['email']]);
 
         // 3. Get user data with cache-first strategy
         try {
             $user = $this->userService->getAuthenticatedUserData($args['email']);
             $formattedUser = $this->userService->formatUserForResponse($user);
-            
-            Log::info("Login completed successfully", [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'role' => $user->role?->name ?? 'no_role'
-            ]);
 
             return [
                 'access_token' => $tokenData['access_token'],
@@ -71,13 +62,12 @@ class Login
                 'expires_in' => $tokenData['expires_in'],
                 'user' => $formattedUser,
             ];
-            
         } catch (\Exception $e) {
-            Log::error("Login failed - User data retrieval error", [
+            Log::error('Login failed - User data retrieval error', [
                 'email' => $args['email'],
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            
+
             // Token was created but user data failed - this shouldn't happen
             // but we handle it gracefully
             abort(500, 'Erro interno do servidor');

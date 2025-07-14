@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,10 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Remove the ignoreRoutes() call as we want Passport routes to be registered
-        // Passport::ignoreRoutes();
-        Passport::enablePasswordGrant();
-
+        //
     }
 
     /**
@@ -23,7 +19,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Caminho das migrations do módulo
-        $this->loadMigrationsFrom(base_path('modules/UserManagement/Database/Migrations'));
     }
 }

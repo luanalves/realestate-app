@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Security;
 
-use App\Models\User;
+use Modules\UserManagement\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
